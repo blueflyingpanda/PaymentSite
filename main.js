@@ -46,7 +46,8 @@ function main() {
         e.preventDefault();
         rs.callback = RequestsSender.logCallback
         let form = document.getElementById('studentForm');
-        rs.httpPost('student', new FormData(form))
+        rs.httpPost('student', new FormData(form));
+        form.reset();
     })
 }
 
