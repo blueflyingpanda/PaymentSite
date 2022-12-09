@@ -119,6 +119,9 @@ function htmlAuthCallback(text) {
             window.location.replace(`${baseURL}/player.html`);
         }
     }
+    else if (data["status"] == 401) {
+        alert("Wrong password!");
+    }
     else {
         alert(data["status"]);
     }
