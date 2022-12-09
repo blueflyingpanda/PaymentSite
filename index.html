@@ -1,34 +1,22 @@
-<html ontouch>
+<!DOCTYPE html>
+<html>
 
 <head>
-    <title>PAYMENT</title>
-    <meta charset='utf-8'>
+    <title>AUTHORIZATION</title>
+    <meta charset="UTF-8">
     <link rel="icon" href="icon.png">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <script src="sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body onload="main()">
-    <h1> Добро пожаловать! </h1>
-    <h2> Зарегистрируйтесь, чтобы воспользоваться платёжной услугой </h2>
-    <hr>
-    </hr>
-    <h3> Пожалуйста введите ваши данные </h3>
-    <div>
-        <form id="studentForm">
-            <br><input type="text" name="lastname" placeholder="фамилия"></br>
-            <br><input type="text" name="firstname" placeholder="имя"></br>
-            <br><input type="text" name="middlename" placeholder="отчество"></br>
-            <br><input type="text" name="email" placeholder="почта"></br>
-            <br><input type="text" name="grade" placeholder="класс"></br>
-            <br><button type="submit"><b>Зарегистрироваться</b></button>
-        </form>
-    </div>
-    <br>
-    <div id="output">
-        <button onclick="showStudents()">показать список</button>
-        <button onclick="clearStudents()">очистить список</button>
-    </div>
+    <h1>Авторизация в платёжной системе государства Хзково</h1>
+    <form id="authForm" method="post">
+        <input class="entrance" autocomplete="off" type="password" name="password" placeholder="Введите ваш код входа">
+        <button class="submit" type="submit">Авторизироваться</button>
+    </form>
     <script src="main.js"></script>
 </body>
 
