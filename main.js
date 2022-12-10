@@ -45,8 +45,8 @@ let baseURL = "http://127.0.0.1:5500";
 let apiURL = "http://127.0.0.1:5000";
 
 if (production) {
-    baseURL = "https://blueflyingpanda.github.io/PaymentSite/"
-    apiURL = "https://lhelper.pythonanywhere.com/";
+    baseURL = "https://blueflyingpanda.github.io/PaymentSite"
+    apiURL = "https://lhelper.pythonanywhere.com";
 }
 
 const tokenHeader = "auth_token";
