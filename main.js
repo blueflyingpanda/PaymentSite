@@ -45,7 +45,7 @@ let baseURL = "http://127.0.0.1:5500";
 let apiURL = "http://127.0.0.1:5000";
 
 if (production) {
-    baseURL = "https://blueflyingpanda.github.io/PaymentSite/"
+    // baseURL = "https://blueflyingpanda.github.io/PaymentSite/"
     apiURL = "https://lhelper.pythonanywhere.com/";
 }
 
@@ -55,6 +55,7 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
 function logout() {
     localStorage.removeItem("Authorization")
+    localStorage.removeItem("isTeacher")
     window.location.replace(`${baseURL}/index.html`);
 }
 
@@ -112,6 +113,7 @@ function htmlAuthCallback(text) {
     let data = JSON.parse(text);
     if (data["status"] == 200) {
         localStorage.setItem("Authorization", data[tokenHeader])
+        localStorage.setItem("isTeacher", data["teacher"])
         if (data["teacher"] == true) {
             window.location.replace(`${baseURL}/teacher.html`);
         }
@@ -128,6 +130,14 @@ function htmlAuthCallback(text) {
 }
 
 function main() {
+    if (localStorage.getItem("Authorization") && localStorage.getItem("isTeacher") !== null) {
+        if (localStorage.getItem("isTeacher") == "true") {
+            window.location.replace(`${baseURL}/teacher.html`);
+        }
+        else {
+            window.location.replace(`${baseURL}/player.html`);
+        }
+    }
     addEventListener("submit", (e) => {
         e.preventDefault();
         rs.callback = htmlAuthCallback
