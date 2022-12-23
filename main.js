@@ -6,14 +6,6 @@ class RequestsSender {
         this.isAsync = isAsync;
     }
 
-    static logCallback(text) {
-        console.log(text)
-    }
-
-    static alertCallback(text) {
-        alert(text)
-    }
-
     httpGet(path = "") {
         var xmlHttp = new XMLHttpRequest();
         let callback = this.callback
@@ -37,6 +29,14 @@ class RequestsSender {
         xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"))
         xmlHttp.send(data);
     }
+}
+
+function logCallback(text) {
+    console.log(text)
+}
+
+function alertCallback(text) {
+    alert(text)
 }
 
 const frontProduction = true;
