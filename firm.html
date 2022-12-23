@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <button class="exit">Выйти из аккаунта</button>
+    <div class="start-btns">
+        <button class="btn-green">Выйти из аккаунта</button>
+        <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="lightDarkToggle">&#9728;</button>
+    </div>
     <div class="main">
         <div id="info">
             <h1>Добро пожаловать, фирма "Шоколадочка"</h1>
@@ -19,13 +22,14 @@
             <li>4. номер 7</li>
             <li>5. два 45, один с сыром</li>
             <li>6. большая содовая</li>
+            <hr id="main-hr">
+            <h1>Ваши возможности:</h1>
         </div>
-        <hr>
-        <h1>Ваши возможности:</h1>
-        <div class="btns"></div>
+        <div>
             <button onclick="nalogi()" class="btn-purple">Уплата налогов</button><br>
             <button onclick="perevod()" class="btn-purple">Перевод денег другим игрокам</button><br>
         </div>
     </div>
     <script src="script.js"></script>
+    <script>lightDarkToggle()</script>
 </body>

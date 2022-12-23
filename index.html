@@ -12,12 +12,14 @@
 </head>
 
 <body onload="main()">
-    <h1>Авторизация в платёжной системе Республики Лицейск</h1>
-    <form id="authForm" method="post">
-        <input class="entrance" autocomplete="off" type="password" name="password" placeholder="Введите ваш код входа"
-            min="5" max="5">
-        <button class="submit" type="submit">Авторизироваться</button>
-    </form>
+    <div class="main">
+        <h1>Авторизация в платёжной системе Республики Лицейск</h1>
+        <form id="authForm" method="post">
+            <input id="passw" autocomplete="off" type="password" name="password" placeholder="Введите ваш код входа"
+                min="5" max="5">
+            <button class="btn-green" style="margin: 20px" type="submit">Авторизироваться</button>
+        </form>
+    </div>
     <script src="main.js"></script>
 </body>
 

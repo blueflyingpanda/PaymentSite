@@ -141,6 +141,7 @@ function htmlAuthCallback(text) {
 
 function invalidPassword(form) {
     alert('Wrong password!');
+    document.getElementById("passw").style.border = "2px solid #ff483b";
     form.reset();
 }
 
