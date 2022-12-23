@@ -12,9 +12,10 @@
 </head>
 
 <body onload="main()">
-    <h1>Авторизация в платёжной системе государства Хзково</h1>
+    <h1>Авторизация в платёжной системе Республики Лицейск</h1>
     <form id="authForm" method="post">
-        <input class="entrance" autocomplete="off" type="password" name="password" placeholder="Введите ваш код входа">
+        <input class="entrance" autocomplete="off" type="password" name="password" placeholder="Введите ваш код входа"
+            min="5" max="5">
         <button class="submit" type="submit">Авторизироваться</button>
     </form>
     <script src="main.js"></script>

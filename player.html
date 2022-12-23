@@ -17,15 +17,20 @@
             <h1 id="greeting">Добро пожаловать,</h1>
             <h2 id="grade">Класс -</h2>
             <h2 id="balance">Баланс:</h2>
+            <h2 id="inn">ИНН:</h2>
         </div>
         <hr>
         <h1>Ваши возможности:</h1>
         <div class="btns"></div>
-        <button onclick="" class="nalogi">Уплатить налоги</button><br>
-        <button onclick="" class="perevod">Перевод денег другому игроку</button><br>
-        <button onclick="" class="uslugi">Оплата услуг</button><br>
+        <button onclick="nalogi()" class="btn-purple">Уплатить налоги</button><br>
+        <button onclick="perevod()" class="btn-purple">Перевод денег другому игроку</button><br>
+        <button onclick="uslugi()" class="btn-purple">Услуги фирмы</button><br>
+        <button onclick="role_verify()" class="btn-orange">Перейти в министерство `ministry_name`</button>
+        <button onclick="firm_verify()" class="btn-orange">Перейти в фирму `firm_name`</button>
+        <!--Лишь одна кнопка из двух выше: либо перейти в министерство, либо перейти в фирму-->
     </div>
     <script src="main.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

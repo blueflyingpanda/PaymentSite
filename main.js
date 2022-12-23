@@ -39,13 +39,17 @@ class RequestsSender {
     }
 }
 
-const production = true;
+const frontProduction = true;
+const backProduction = true;
+const commonPasswordLength = 5;
 
 let baseURL = "http://127.0.0.1:5500";
 let apiURL = "http://127.0.0.1:5000";
 
-if (production) {
+if (frontProduction) {
     baseURL = "https://blueflyingpanda.github.io/PaymentSite"
+}
+if (backProduction) {
     apiURL = "https://lhelper.pythonanywhere.com";
 }
 
@@ -71,10 +75,13 @@ function htmlTeacherCallback(text) {
         firstName = data["teacher"][0][0];
         middleName = data["teacher"][0][1];
         money = data["teacher"][0][3];
+        inn = data["teacher"][0][4];
         greeting = document.getElementById("greeting");
         greeting.innerHTML += ` ${firstName} ${middleName}!`;
+        inn_field = document.getElementById("inn");
+        inn_field.innerHTML += ` ${inn}`;
         balance = document.getElementById("balance");
-        balance.innerHTML += ` ${money} ШкололоКоинов`;
+        balance.innerHTML += ` ${money} талиц`;
     }
     else {
         alert(`${data["status"]} ${data["message"][0]}`)
@@ -95,13 +102,16 @@ function htmlPlayerCallback(text) {
         lastName = data["player"][0][2];
         gradeInfo = data["player"][0][3];
         money = data["player"][0][4];
+        inn = data["player"][0][6];
         console.log(data)
         greeting = document.getElementById("greeting");
         greeting.innerHTML += ` ${firstName} ${lastName}!`;
         grade = document.getElementById("grade");
         grade.innerHTML += ` ${gradeInfo}`
+        inn_field = document.getElementById("inn");
+        inn_field.innerHTML += ` ${inn}`;
         balance = document.getElementById("balance");
-        balance.innerHTML += ` ${money} ШкололоКоинов`;
+        balance.innerHTML += ` ${money} талиц`;
     }
     else {
         alert(`${data["status"]} ${data["message"][0]}`)
@@ -129,6 +139,17 @@ function htmlAuthCallback(text) {
     }
 }
 
+function invalidPassword(form) {
+    alert('Wrong password!');
+    form.reset();
+}
+
+function validPassword(form, formData) {
+    formData.set("password", sha256(formData.get("password")))
+    rs.httpPost('auth', formData);
+    form.reset();
+}
+
 function main() {
     if (localStorage.getItem("Authorization") && localStorage.getItem("isTeacher") !== null) {
         if (localStorage.getItem("isTeacher") == "true") {
@@ -143,8 +164,12 @@ function main() {
         rs.callback = htmlAuthCallback
         let form = document.getElementById('authForm');
         let formData = new FormData(form);
-        formData.set("password", sha256(formData.get("password")))
-        rs.httpPost('auth', formData);
-        form.reset();
+        let password = formData.get("password")
+        if (!password || password.length < commonPasswordLength) {
+            invalidPassword(form);
+        }
+        else {
+            validPassword(form, formData);
+        }
     })
 }
