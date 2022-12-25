@@ -159,7 +159,7 @@ function main() {
         else if (localStorage.getItem("isTeacher") == "false") {
             window.location.replace(`${baseURL}/player.html`);
         }
-        else {
+        else if (localStorage.getItem("isTeacher") == "null") {
             // redirect to minister page
         }
     }
