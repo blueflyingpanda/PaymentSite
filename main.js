@@ -152,12 +152,15 @@ function validPassword(form, formData) {
 }
 
 function main() {
-    if (localStorage.getItem("Authorization") && localStorage.getItem("isTeacher") !== null) {
+    if (localStorage.getItem("Authorization")) {
         if (localStorage.getItem("isTeacher") == "true") {
             window.location.replace(`${baseURL}/teacher.html`);
         }
-        else {
+        else if (localStorage.getItem("isTeacher") == "false") {
             window.location.replace(`${baseURL}/player.html`);
+        }
+        else {
+            // redirect to minister page
         }
     }
     addEventListener("submit", (e) => {
