@@ -72,10 +72,10 @@ function getTeacherPage() {
 function htmlTeacherCallback(text) {
     let data = JSON.parse(text);
     if (data["status"] == 200) {
-        firstName = data["teacher"][0][0];
-        middleName = data["teacher"][0][1];
-        money = data["teacher"][0][3];
-        inn = data["teacher"][0][4];
+        firstName = data["teacher"][0];
+        middleName = data["teacher"][1];
+        money = data["teacher"][3];
+        inn = data["teacher"][4];
         greeting = document.getElementById("greeting");
         greeting.innerHTML += ` ${firstName} ${middleName}!`;
         inn_field = document.getElementById("inn");
@@ -98,11 +98,11 @@ function getPlayerPage() {
 function htmlPlayerCallback(text) {
     let data = JSON.parse(text);
     if (data["status"] == 200) {
-        firstName = data["player"][0][0];
-        lastName = data["player"][0][2];
-        gradeInfo = data["player"][0][3];
-        money = data["player"][0][4];
-        inn = data["player"][0][6];
+        firstName = data["player"][0];
+        lastName = data["player"][2];
+        gradeInfo = data["player"][3];
+        money = data["player"][4];
+        inn = data["player"][6];
         console.log(data)
         greeting = document.getElementById("greeting");
         greeting.innerHTML += ` ${firstName} ${lastName}!`;
