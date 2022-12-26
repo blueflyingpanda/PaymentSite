@@ -161,7 +161,7 @@ function main() {
             window.location.replace(`${baseURL}/player.html`);
         }
         else if (localStorage.getItem("isTeacher") == "null") {
-            window.location.replace(`${baseURL}/ministry_mvd.html`)
+            window.location.replace(`${baseURL}/ministry_economic.html`)
         }
     }
     addEventListener("submit", (e) => {
