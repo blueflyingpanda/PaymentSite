@@ -25,11 +25,10 @@
             <h1>Ваши возможности:</h1>
         </div>
         <div>
-            <button onclick="nalogi()" class="btn-purple">Уплатить налоги</button><br>
-            <button onclick="perevod()" class="btn-purple">Перевод денег другому игроку</button><br>
-            <button onclick="uslugi()" class="btn-purple">Услуги фирмы</button><br>
-            <button onclick="role_verify()" class="btn-orange">Перейти в министерство `ministry_name`</button>
-            <button onclick="firm_verify()" class="btn-orange">Перейти в фирму `firm_name`</button>
+            <button onclick="taxModal(), getTaxes()" class="btn-purple">Уплатить налоги</button><br>
+            <button onclick="transferModal()" class="btn-purple">Перевод денег другому игроку</button><br>
+            <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
+            <button onclick="firmVerify()" class="btn-orange">Перейти в фирму `firm_name`</button>
             <!--Лишь одна кнопка из двух выше: либо перейти в министерство, либо перейти в фирму-->
         </div>
     </div>

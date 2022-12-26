@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justice</title>
+</head>
+<body>
+    <div class="start-btns">
+        <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
+        <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="lightDarkToggle">&#9728;</button>
+    </div>
+    <div class="main">
+        <div id="info">
+            <h1>Добро пожаловать, сотрудник министерства юстиций!</h1>
+            <h2>Ваши возможности:</h2>
+            <hr id="main-hr">
+        </div>
+        <div>
+            <button onclick="finePlayer()" class="btn-purple">Неуплата штрафа</button><br>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    <script src="script.js"></script>
+    <script>lightDarkToggle()</script>
+</body>
+</html>

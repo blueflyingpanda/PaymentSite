@@ -38,7 +38,7 @@ input { /*Поля*/
     margin-top: 4vh;
     margin-bottom: 3vh;
     height: 0.75vh;
-    background-color: #000;
+    width: 90vw;
 }
 
 .start-btns { /*div с верхними кнопками на страничке*/
@@ -141,7 +141,7 @@ input { /*Поля*/
 /*----------Модальное окошечко---------*/
 
 .modal,
-.pin_modal { /*Анимация появления модалки*/
+.pin-modal { /*Анимация появления модалки*/
     animation: 1s show ease;
 }
 @keyframes show {
@@ -157,6 +157,7 @@ input { /*Поля*/
     background: #0000004d;
 }
 .modal-window { /*Содержание модального окна*/
+    border: 10px solid #fe9654;
     width: 80vw;
     border-radius: 10px;
     background: #fff;
@@ -177,9 +178,8 @@ input { /*Поля*/
     margin-bottom: 2vh;
 }
 .modal-nalogi { /*Статус налогов*/
-    background-color: #fe9654;
     border: none;
-    color: white;
+    color: #ffffff;
     padding: 7px 14px;
     text-align: center;
     text-decoration: none;

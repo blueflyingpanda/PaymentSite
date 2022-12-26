@@ -133,6 +133,7 @@ function htmlAuthCallback(text) {
     }
     else if (data["status"] == 401) {
         alert("Wrong password!");
+        document.getElementById("passw").style.border = "3px solid #ff483b";
     }
     else {
         alert(data["status"]);
@@ -141,7 +142,7 @@ function htmlAuthCallback(text) {
 
 function invalidPassword(form) {
     alert('Wrong password!');
-    document.getElementById("passw").style.border = "2px solid #ff483b";
+    document.getElementById("passw").style.border = "3px solid #ff483b";
     form.reset();
 }
 
@@ -152,12 +153,15 @@ function validPassword(form, formData) {
 }
 
 function main() {
-    if (localStorage.getItem("Authorization") && localStorage.getItem("isTeacher") !== null) {
+    if (localStorage.getItem("Authorization")) {
         if (localStorage.getItem("isTeacher") == "true") {
             window.location.replace(`${baseURL}/teacher.html`);
         }
-        else {
+        else if (localStorage.getItem("isTeacher") == "false") {
             window.location.replace(`${baseURL}/player.html`);
+        }
+        else if (localStorage.getItem("isTeacher") == "null") {
+            window.location.replace(`${baseURL}/ministry_mvd.html`)
         }
     }
     addEventListener("submit", (e) => {
