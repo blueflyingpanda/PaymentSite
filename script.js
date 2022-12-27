@@ -33,41 +33,8 @@ function lightDarkToggle (toggle) { //Отрисовщик интерфейса 
 
 
 
-function taxModal () { //Модалка налогов
- // Добавление кода на страницу
-  let modal = document.createElement("div");
-  modal.classList.add("modal");
-  document.body.append(modal);
-  modal.insertAdjacentHTML("afterbegin", `
-  <div id="modal-overlay" class="modal-overlay">
-    <div id="modal-window" class="modal-window">
-      <div class="modal-header">
-        <span class="modal-title">Уплата налогов</span>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button id="modal_cancel_id" onclick="modalCancel()" class="btn-orange">Выйти</button>
-      </div>
-    </div>
-  </div>`);
-
-//   alert("Уплачены/неуплачены (Если 1 => уплачены, иначе => неуплачены) TODO_1: сделать в зависимости от значения на сервере вывод статуса налогов. В случае неуплаты при нажатии на 'Уплатить' значение на сервере изменится.");
-//   let taxes = prompt("Вы уплатили налоги?");
-//   let modalTaxes = document.querySelector(".modal-body"),
-//     modalTaxesFooter = document.querySelector(".modal-footer");
-//   if (taxes == "1") {
-//     modalTaxes.insertAdjacentHTML("afterbegin", `<span class="modal-nalogi" style="background-color: #599d36">Налоги уплачены</span>`);
-//     modalTaxesFooter.insertAdjacentHTML("afterbegin", `<button type="button" class="btn-orange" disabled>Упллатить</button>`);
-//   }
-//   else {
-//     modalTaxes.insertAdjacentHTML("afterbegin", `<span class="modal-nalogi" style="background-color: #fe5495">Налоги не уплачены</span>`);
-//     modalTaxesFooter.insertAdjacentHTML("afterbegin", `<button onclick="payTaxes()" type="button" class="btn-orange">Упллатить</button>`);
-//   };
-}
-
-function transferModal () { //Модалка переводов
-  alert('TODO_2: сделать выпадающее окошечко <datalist> у <input placeholder="Выберите игрока: ">, где будут имена игроков (<options>), получаемые с сервера. Также уже можно заняться реализацией перевода денег на баланс другого игрока + зарплата (вычетание будет происходить с баланса предприятия).');
+function transferModal () { //Модалка переводов (игрок/учитель)
+  let func_name = localStorage.getItem("isTeacher") == "true" ? "getTeacherSalary" : "getTransfer";
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -79,20 +46,22 @@ function transferModal () { //Модалка переводов
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-          <input id="input_1" autocomplete="off" list="player-list" type="text" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
-          <input id="input_2" autocomplete="off" type="number" placeholder="Кол-во талиц: " name="money-amount" required>
+          <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
+          <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
-          <button onclick="pinCode()" type="button" class="btn-orange">Подтвердить</button>
-          <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
+          <button onclick="pinCode('${func_name}')" type="button" class="btn-orange">Подтвердить</button>
+          <button onclick="modalCancel()" id="modal_cancel_id" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
     </div>
   </div>`);
 }
 
-function firmModal () { //Модалка фирм
-  alert("TODO_3: Тут то же самое, что и во втором todo, но тут будут фирмы и услуги.")
+
+
+function firmModal () { //Оплата услуг компании (игрок/учитель)
+  func_name = "getPayFirm";
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -102,21 +71,21 @@ function firmModal () { //Модалка фирм
       <div class="modal-header">
         <span class="modal-title">Оплата услуг фирмы</span>
       </div>
-      <form id="serviceForm" method="post">
-        <div class="modal-body">
-          <input id="input_1" autocomplete="off" maxlength="32" placeholder="Выберите фирму: " name="firm-name" required>
-          <input id="input_2" autocomplete="off" maxlength="32" placeholder="Выберите услугу: " name="service-name" required>
-        </div>
-        <div class="modal-footer">
-          <button onclick="pinCode()" type="button" class="btn-orange">Подтвердить</button>
-          <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
-        </div>
-      </form>  
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" maxlength="20" placeholder="Выберите фирму: " required>
+        <input autocomplete="off" maxlength="20" placeholder="Выберите услугу: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="pinCode('${func_name}')" type="button" class="btn-orange">Подтвердить</button>
+        <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
+      </div>  
     </div>
   </div>`);
 }
 
-function cashCardTransfer () { //Модалка переводов из электронных в наличные
+
+
+function cashCardTransfer () { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -126,21 +95,44 @@ function cashCardTransfer () { //Модалка переводов из элек
       <div class="modal-header">
         <span class="modal-title">Перевод электронных денег в наличные</span>
       </div>
-      <form id="serviceForm" method="post">
-        <div class="modal-body">
-          <input id="input_1" autocomplete="off" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
-          <input id="input_2" autocomplete="off" type="number" placeholder="Кол-во талиц: " name="money-amount" required>
-        </div>
-        <div class="modal-footer">
-          <button onclick="pinCode()" type="button" class="btn-orange">Подтвердить</button>
-          <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
-        </div>
-      </form>  
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
+        <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="pinCode()" type="button" class="btn-orange">Подтвердить</button>
+        <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
+      </div> 
     </div>
-</div>`);
+  </div>`);
 }
 
-function finePlayer () { //Модалка переводов из электронных в наличные
+
+function editEmployees () {
+  let modal = document.createElement("div");
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Работа с сотрудниками</span>
+      </div>
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
+        <input autocomplete="off" type="password" maxlength="15" placeholder="Подпись министра экономики: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="getAddEmployee()" type="button" class="btn-orange">Нанять</button>
+        <button onclick="getRemoveEmployee()" type="button" class="btn-orange">Уволить</button>
+        <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
+      </div> 
+    </div>
+  </div>`);
+}
+
+
+function finePlayer () { //Штрафник и отработка его долгов (юстиции)
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -150,11 +142,11 @@ function finePlayer () { //Модалка переводов из электро
       <div class="modal-header">
         <span class="modal-title">Неуплата штрафа</span>
       </div>
-      <div class="modal-body">
+      <div id="modal-body" class="modal-body">
         <input id="input_1" autocomplete="off" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
         <h2>Игрок: Пельмень Андреевич</h2>
-        <span>Статус налогов на данный период:</span><span style="background-color: #fe9654; color: #000" class="modal-nalogi">неуплачены</span><br>
-        <span>Количество штрафов:</span><span style="background-color: #fe9654; color: #000" class="modal-nalogi">3</span>
+        <span>Статус налогов на данный период:</span><span style="background-color: #fe9654; color: #000" class="modal-frame">неуплачены</span><br>
+        <span>Количество штрафов:</span><span style="background-color: #fe9654; color: #000" class="modal-frame">3</span>
       </div>
       <div class="modal-footer">
         <button onclick="finePlayerFind()" type="button" class="btn-orange">Найти</button>
@@ -166,7 +158,8 @@ function finePlayer () { //Модалка переводов из электро
 }
 
 
-function taxLogs () { //Отрисовка таблицы штрафников
+
+function taxLogs () { //Отрисовка таблицы штрафников (МВД)
   let transfer_div = document.getElementById("log-table");
   let transfer_btn = document.getElementById("transfers");
     transfer_div = document.createElement("div");
@@ -176,7 +169,7 @@ function taxLogs () { //Отрисовка таблицы штрафников
     transfer_div.insertAdjacentHTML("afterbegin", ` 
     <h2>Здесь будут показаны все игроки, просрочившие уплату налогов за прошедшие периоды</h2>
     <hr>
-    <h2 style="color: #fff">Образец:</h2>
+    <h2>Образец:</h2>
     <h2>|Игрок|</h2>
     <h2>|Статус уплаты налога за этот период|</h2>
     <h2>|Количество штрафов|</h2>
@@ -197,28 +190,22 @@ function taxLogs () { //Отрисовка таблицы штрафников
 
 
 
-function pinCode () { //Модальное окно с вводом пин-кода. 
-  alert('TODO_4: Нижнюю проверку на кол-во символов надо будет заменить на проверку наличия игрока/фирмы в базе данных. В случае игрока - проверка кол-ва талиц на балансе. В случае фирмы - проверка кол-ва талиц на балансе и проверка наличия услуги у фирмы.');
-  let inputForm1 = document.getElementById("input_1");
-  let inputForm2 = document.getElementById("input_2");
-  form = {
-    "info":
-      {
-        "player": `${inputForm1.value}`,
-        "money": `${inputForm2.value}`
-      },
-    "status": "200"
-  }
-  console.log(form);
+function pinCode (func_name) { //Модальное окно с вводом пароля (заново). 
+  inputs = Array.from(document.querySelectorAll("input"));
 
-
-  if (inputForm1.value.length <= 4) {
-    inputForm1.style.border = "3px solid #ff483b";
+  for (i = 0; i < inputs.length; i++) {
+    if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
+    inputs[i].style.border = "3px solid #ff483b";
+    }
+    else {
+      inputs[i].style.border = "3px solid #3bff86"
+    }
   }
-  if (inputForm2.value.length <= 4) {
-    inputForm2.style.border = "3px solid #ff483b";
-  }
-  if (inputForm1.value.length > 4 && inputForm2.value.length > 4) {  
+  if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
+    let data = []
+    for (i = 0; i < inputs.length; i++) {
+      data.push(`'${inputs[i].value}'`);
+    }
     let pin_modal = document.createElement("div");
     pin_modal.classList.add("pin-modal");
     document.body.append(pin_modal);
@@ -228,35 +215,25 @@ function pinCode () { //Модальное окно с вводом пин-ко�
         <div class="modal-header">
           <span class="modal-title">Подтверждение действия</span>
         </div>
-        <form id="pinForm" method="post">
-          <div class="modal-body">
-            <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
-          </div>
-          <div class="modal-footer">
-            <button type="button" onclick="pinCodeVerify()" class="btn-orange">Подтвердить</button>
-            <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
-          </div>
-        </form>
+        <div id="modal-body" class="modal-body">
+          <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="pinCodeVerify(${func_name}, [${data}])" class="btn-orange">Подтвердить</button>
+          <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
+        </div>
       </div>
     </div>`);
-    let pinForm = document.getElementById("pinForm");
-    pinForm.addEventListener("keydown", function () {
-      if (event.keyCode == 13) {
-        event.preventDefault();
-      }
-    });
   }
 }
-function pinCodeVerify () { //Подтверждение пин-кода.
-  let pinForm = document.querySelector("form");
+function pinCodeVerify (func_name, data) { //Подтверждение пароля.
   let pinInput = document.getElementById("pin-input");
-
-  alert('TODO_5: Тут надо запросы к серваку делать на подтверждение пин-кода, а не тот огрызок, который я сделал. PIN=228133');
   if (pinInput.value == "228133" ) {
-    pinForm.submit(); //TODO: Обработчик и отправитель всех инпутов на сервак в main.js
+    func_name(data);
+    modalCancel();
   }
   else {
-    pinInput.style.border = "2px solid #ff483b";
+    pinInput.style.border = "3px solid #ff483b";
   }
 }
 
@@ -286,120 +263,3 @@ function modalCancel () { //Кнопка "Выйти" в модалках
 
 
 //Жёстко заспидранил stuckoverflow за день.
-
-// function payTaxes(response) {
-//   alert(response)
-// }
-
-function firm_verify() {
-  alert("ladybug42")
-}
-
-// Старая версия логов
-
-// function transfersLogs () { //Отрисовка таблицы логов
-//   let transfer_div = document.getElementById("log-table");
-//   let transfer_btn = document.getElementById("transfers");
-//   if (transfer_div == null) {
-//     transfer_div = document.createElement("div");
-//     transfer_div.classList.add("log-table");
-//     transfer_div.setAttribute("id", "log-table");
-//     if (transfer_btn == null || transfer_btn == undefined) {
-//       document.body.append(transfer_div);
-//     }
-//     else {
-//       transfer_btn.textContent = "Закрыть транзакции";
-//       transfer_btn.after(transfer_div);
-//     };
-//     transfer_div.insertAdjacentHTML("afterbegin", `
-//       <button onclick="playerTransfers()" class="btn-orange">Транзакции игроков</button>
-//       <button onclick="pubfirmTransfers()" class="btn-orange">Транзакции гос. фирм</button>
-//       <button id="prifirmTransfersId" onclick="prifirmTransfers()" class="btn-orange">Транзакции частных фирм</button>`);
-//     transfer_div.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
-//     transfer_div.scrollIntoView();
-//   }
-//   else {
-//     transfer_btn.setAttribute("disabled", "disabled");
-//     transfer_div.animate([ {opacity: 1}, {opacity: 0}], { duration: 1000});
-//     setTimeout(() => {
-//       transfer_div.remove();
-//       transfer_btn.removeAttribute("disabled");
-//       transfer_btn.textContent = "Транзакции";
-//     }, 970);
-//   }
-// }
-// function playerTransfers () { //Таблица и отрисовка её внутренностей (3 следующих функции)
-//   try {log_values = document.getElementById("log-values").remove();} catch {};
-//   let prifirmTransfersId = document.getElementById("prifirmTransfersId");
-//   prifirmTransfersId.insertAdjacentHTML("afterend", `
-//   <div id="log-values">
-//   <h2>|Сумма и время|</h2>
-//   <h2>|Отправитель|</h2>
-//   <h2>|Получатель|</h2>
-//   <hr>
-//   <!--Образец вывода-->
-//   <p>|228 талиц, 14:34|</p>
-//   <p>|Пельмень Андреевич|</p>
-//   <p>|Бекмамбет Трахтенбергович|</p>
-//   <hr>
-//   <p>|1337 талиц, 13:53|</p>
-//   <p>|Uvuvwevwevwe Onyetenyevwe Ugwemuhwem Osas|</p>
-//   <p>|У чувака выше ахринеть какое длинное имя. У меня длиннее ;p|</p>
-//   <hr>
-//   <p>|4321 талиц, 12:13|</p>
-//   <p>|Копипастим, пока руки не отвалятся|</p>
-//   <p>|Да-да, не отвалятся|</p>
-//   <hr>
-//   <p>|1234 талиц, 11:43|</p>
-//   <p>|Босс, я устал|</p>
-//   <p>|Давай-давай, вилкой чисти-чисти, раз-раз-раз-раз|</p>
-//   </div>`);
-// }
-// function pubfirmTransfers () {
-//   try {document.getElementById("log-values").remove();} catch {};
-//   let prifirmTransfersId = document.getElementById("prifirmTransfersId");
-//   prifirmTransfersId.insertAdjacentHTML("afterend", `
-//   <div id="log-values">
-//   <h2>|Сумма и время|</h2>
-//   <h2>|Отправитель|</h2>
-//   <h2>|Получатель|</h2>
-//   <hr>
-//   <!--Образец вывода-->
-//   <p>|338 талиц, 15:51|</p>
-//   <p>|Дофига важный|</p>
-//   <p>|Хух бумажный|</p>
-//   <hr>
-//   <p>|777 талиц, 12:12|</p>
-//   <p>|Uvuvwevwevwe Onyetenyevwe Ugwemuhwem Osas-старший|</p>
-//   <p>|Едрить молодец|</p>
-//   <hr>
-//   <p>|4321 талиц, 11:52|</p>
-//   <p>|Едрить комплимент|</p>
-//   <p>|В жопе цемент|</p>
-//   <hr>
-//   <p>|1341 талиц, 10:43|</p>
-//   <p>|Фига крутой|</p>
-//   <p>|Вытри ♂ cum ♂ под губой|</p>
-//   </div>`);
-// }
-// function prifirmTransfers () { 
-//   try {document.getElementById("log-values").remove();} catch {console.log(" ")};
-//   let prifirmTransfersId = document.getElementById("prifirmTransfersId");
-//   prifirmTransfersId.insertAdjacentHTML("afterend", `
-//   <div id="log-values">
-//   <h2>|Сумма и время|</h2>
-//   <h2>|Отправитель|</h2>
-//   <h2>|Получатель|</h2>
-//   <hr>
-//   <!--Образец вывода-->
-//   <h1>|Заполняем хоть бы как|</h1>
-//   <hr>
-//   <h2>|Пук-среньк|</h2>
-//   <hr>
-//   <h3>|Хи-хи|</h3>
-//   <hr>
-//   <h4>|Ха-ха|</h4>
-//   <hr>
-//   <h5>|Шизофрения какая-то. Бывает ¯\\_(ツ)_/¯|</h5>
-//   <style>.log-table h1, h3, h4, h5 {color: #fe9654;}</style>`);
-// }

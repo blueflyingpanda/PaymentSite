@@ -177,14 +177,14 @@ input { /*Поля*/
 .modal-body input {
     margin-bottom: 2vh;
 }
-.modal-nalogi { /*Статус налогов*/
+.modal-frame { /*Статус налогов*/
     border: none;
-    color: #ffffff;
+    color: #000;
     padding: 7px 14px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    margin: 4px 2px 15px;
+    margin: auto 5vw 2vh 5vw;
     border-radius: 10px;
 }
 
