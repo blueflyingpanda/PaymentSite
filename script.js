@@ -1,5 +1,3 @@
-//alert("TODO_0: сделать инициализацию пользователя с сервера. Если он госслужащий, то мы добавим кнопочку 'перейти в министерство'(она есть в хтмльке), которая отправит пользователя на страницу министерства (которую мы ща активно делаем. наверно). Если деловой важный человек предприниматель, то мы добавим кнопочку 'перейти в фирму' (она тоже есть в хтмл), которая отправит пользователя на страницу фирмы (которую мы тоже делаем, но не так активно).");
-
 function lightDarkToggle (toggle) { //Отрисовщик интерфейса страницы
   if (typeof localStorage["Toggle"] != "string") {
     localStorage["Toggle"] = "true";
@@ -35,6 +33,7 @@ function lightDarkToggle (toggle) { //Отрисовщик интерфейса 
 
 function transferModal () { //Модалка переводов (игрок/учитель)
   let func_name = localStorage.getItem("isTeacher") == "true" ? "getTeacherSalary" : "getTransfer";
+  let header = localStorage.getItem("isTeacher") == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -42,11 +41,11 @@ function transferModal () { //Модалка переводов (игрок/уч
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
-        <span class="modal-title">Перевод средств другому игроку</span>
+        <span class="modal-title">${header}</span>
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-          <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
+          <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока: " required>
           <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
@@ -73,7 +72,7 @@ function firmModal () { //Оплата услуг компании (игрок/�
       </div>
       <div id="modal-body" class="modal-body">
         <input autocomplete="off" maxlength="20" placeholder="Выберите фирму: " required>
-        <input autocomplete="off" maxlength="20" placeholder="Выберите услугу: " required>
+        <input autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
         <button onclick="pinCode('${func_name}')" type="button" class="btn-orange">Подтвердить</button>
@@ -227,8 +226,10 @@ function pinCode (func_name) { //Модальное окно с вводом п�
   }
 }
 function pinCodeVerify (func_name, data) { //Подтверждение пароля.
+  console.log(data);
   let pinInput = document.getElementById("pin-input");
-  if (pinInput.value == "228133" ) {
+  // if (sha256(String(pinInput.value)) == localStorage.getItem("Authorization")) {
+  if (pinInput.value == "228") {
     func_name(data);
     modalCancel();
   }
@@ -259,7 +260,3 @@ function modalCancel () { //Кнопка "Выйти" в модалках
     setTimeout(() => {  modal.remove();}, 970);
   }
 }
-
-
-
-//Жёстко заспидранил stuckoverflow за день.
