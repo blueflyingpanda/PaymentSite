@@ -18,7 +18,7 @@ class RequestsSender {
         xmlHttp.send(null);
     }
 
-    httpPost(path = "", data) {
+    httpPost(path = "", data, contentType = null) {
         var xmlHttp = new XMLHttpRequest();
         let callback = this.callback
         xmlHttp.onreadystatechange = function () {
@@ -27,6 +27,9 @@ class RequestsSender {
         }
         xmlHttp.open("POST", this.url + "/" + path, this.isAsync);
         xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"))
+        if (contentType != null) {
+            xmlHttp.setRequestHeader("Content-Type", contentType);
+        }
         xmlHttp.send(data);
     }
 }
@@ -189,11 +192,11 @@ function main() { //TODO: Редиректы на министров
 
 //Функции кнопок.
 
-function getTaxes () { //Уплата налогов
+function getTaxes() { //Уплата налогов
     rs.callback = htmlTaxesCallback;
     rs.httpPost('paytax', null);
 }
-function htmlTaxesCallback (text) {
+function htmlTaxesCallback(text) {
     let modal = document.createElement("div");
     modal.classList.add("modal");
     document.body.append(modal);
@@ -231,23 +234,25 @@ function htmlTaxesCallback (text) {
 
 
 
-function getTransfer (text) { //Переводы между игроками
+function getTransfer(text) { //Переводы между игроками
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
     }
     console.log(JSON.stringify(data));
     rs.callback = htmlTransferCallback;
-    rs.httpPost("transfer", JSON.stringify(data));
+    rs.httpPost("transfer", JSON.stringify(data), "application/json");
 }
-function htmlTransferCallback (text) {
+
+
+function htmlTransferCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
 
 
 
-function getPayFirm (text) { //Оплата услуг компании
+function getPayFirm(text) { //Оплата услуг компании
     console.log(text);
     data = {
         "amount": Number(text[1]),
@@ -259,34 +264,34 @@ function getPayFirm (text) { //Оплата услуг компании
     rs.httpPost("pay", JSON.stringify(data));
     console.log(JSON.stringify(data));
 }
-function htmlPayFirmCallback (text) {
+function htmlPayFirmCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
 
 
 
-function getTeacherSalary (text) { //Выдача зарплаты игроку
+function getTeacherSalary(text) { //Выдача зарплаты игроку
     console.log(text);
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
     }
     rs.callback = htmlTeacherSalaryCallback;
-    rs.httpPost("teacher-salary", JSON.stringify(data));
+    rs.httpPost("teacher-salary", data);
 }
-function htmlTeacherSalaryCallback (text) {
+function htmlTeacherSalaryCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
 
 
 
-function getCompanySalary () {
+function getCompanySalary() {
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
 }
-function htmlCompanySalaryCallback (text) {
+function htmlCompanySalaryCallback(text) {
     let modal = document.createElement("div");
     modal.classList.add("modal");
     document.body.append(modal);
@@ -300,7 +305,7 @@ function htmlCompanySalaryCallback (text) {
         </div>
         <div class="modal-footer">
             <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
-        </div>  
+        </div>
       </div>
     </div>`);
     let modal_body = document.getElementById("modal-body");
@@ -309,82 +314,82 @@ function htmlCompanySalaryCallback (text) {
         modal_body.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены</span`;
     }
     else if (data["status"] == 400) {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат</span`;   
+        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат</span`;
     }
     else {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #ff4500;">Ошибка</span`;   
+        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #ff4500;">Ошибка</span`;
     }
 }
 
 
 
-function getAddEmployee () {
+function getAddEmployee() {
     inputs = Array.from(document.querySelectorAll("input"));
     for (i = 0; i < inputs.length; i++) {
-      if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
-      inputs[i].style.border = "3px solid #ff483b";
-      }
-      else {
-        inputs[i].style.border = "3px solid #3bff86"
-      }
+        if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
+            inputs[i].style.border = "3px solid #ff483b";
+        }
+        else {
+            inputs[i].style.border = "3px solid #3bff86"
+        }
     }
-    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
-      let data = []
-      for (i = 0; i < inputs.length; i++) {
-        data.push(`'${inputs[i].value}'`);
-      }
-      data = {
-        "signature": `${sha256(String(data[1]))}`,
-        "employee": `${data[0]}`
-      }
+    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {
+        let data = []
+        for (i = 0; i < inputs.length; i++) {
+            data.push(`'${inputs[i].value}'`);
+        }
+        data = {
+            "signature": `${sha256(String(data[1]))}`,
+            "employee": `${data[0]}`
+        }
 
-      rs.callback = htmlAddEmployeeCallback;
-      rs.httpPost("add-employee", data)
+        rs.callback = htmlAddEmployeeCallback;
+        rs.httpPost("add-employee", data)
     }
 }
-function htmlAddEmployeeCallback (text) {
+function htmlAddEmployeeCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
 
 
 
-function getRemoveEmployee () {
+function getRemoveEmployee() {
     inputs = Array.from(document.querySelectorAll("input"));
     for (i = 0; i < inputs.length; i++) {
-      if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
-      inputs[i].style.border = "3px solid #ff483b";
-      }
-      else {
-        inputs[i].style.border = "3px solid #3bff86"
-      }
+        if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
+            inputs[i].style.border = "3px solid #ff483b";
+        }
+        else {
+            inputs[i].style.border = "3px solid #3bff86"
+        }
     }
-    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
-      let data = []
-      for (i = 0; i < inputs.length; i++) {
-        data.push(`'${inputs[i].value}'`);
-      }
-      data = {
-        "signature": `${sha256(String(data[1]))}`,
-        "employee": `${data[0]}`
-      }
+    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {
+        let data = []
+        for (i = 0; i < inputs.length; i++) {
+            data.push(`'${inputs[i].value}'`);
+        }
+        data = {
+            "signature": `${sha256(String(data[1]))}`,
+            "employee": `${data[0]}`
+        }
 
-      rs.callback = htmlRemoveEmployeeCallback;
-      rs.httpPost("remove-employee", data)
+        rs.callback = htmlRemoveEmployeeCallback;
+        rs.httpPost("remove-employee", data)
     }
 }
-function htmlRemoveEmployeeCallback (text) {
+function htmlRemoveEmployeeCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
 
 
 
-function getFineCheckPlayer () {
+function getFineCheckPlayer() {
     rs.callback = htmlFineCheckPlayer;
     rs.httpGet();
 }
-function htmlFineCheckPlayer (text) {
+function htmlFineCheckPlayer(text) {
     let data = JSON.parse(text);
     console.log(data);
 }
