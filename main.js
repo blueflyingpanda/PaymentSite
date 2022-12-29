@@ -238,7 +238,7 @@ function getTransfer (text) { //Переводы между игроками
     }
     console.log(JSON.stringify(data));
     rs.callback = htmlTransferCallback;
-    rs.httpPost("transfer", data);
+    rs.httpPost("transfer", JSON.stringify(data));
 }
 function htmlTransferCallback (text) {
     let data = JSON.parse(text);
