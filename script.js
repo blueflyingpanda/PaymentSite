@@ -1,4 +1,45 @@
-function lightDarkToggle (toggle) { //Отрисовщик интерфейса страницы
+//TODO: Включить/отключить подтверждение действия.
+function confirm() {
+  let modal = document.createElement("div");
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Подтверждение действий</span>
+      </div>
+      <form id="transferForm" method="post">
+        <div class="modal-body">
+        <span>Придумайте пин-код, с помощью которого вы будете выполнять важные действия в своём аккаунте (оставьте поле пустым, если он не нужен)</span>
+        <input id="pin-code" autocomplete="off" type="number" maxlength="10" placeholder="Введите пин-код (или ничего): ">
+        </div>
+        <div class="modal-footer">
+          <button id="modal_cancel_id" onclick="confirmPass(), modalCancel(true)" type="button" class="btn-orange">Подтвердить</button>
+        </div>
+      </form>
+    </div>
+  </div>`);
+}
+function confirmPass() {
+  input = document.getElementById("pin-code");
+  if (input.value != "") {
+    localStorage.setItem("Confirmation", sha256(input.value));
+  }
+  else {
+    localStorage.setItem("Confirmation", false);
+  }
+  location.reload();
+}
+
+if (localStorage.getItem("Confirmation") == null) {
+  confirm();
+}
+const CONFIRM = localStorage.getItem("Confirmation");
+
+
+
+function lightDarkToggle(toggle) { //Отрисовщик интерфейса страницы
   if (typeof localStorage["Toggle"] != "string") {
     localStorage["Toggle"] = "true";
   }
@@ -7,10 +48,10 @@ function lightDarkToggle (toggle) { //Отрисовщик интерфейса 
   let h2 = document.querySelector("#info").querySelectorAll("h2");
   let li = document.querySelectorAll("li");
   let hr = document.getElementById("main-hr");
-  let toggle_btn = document.getElementById("lightDarkToggle");
+  let toggleBtn = document.getElementById("lightDarkToggle");
 
   if (localStorage["Toggle"] == "true") {
-    toggle_btn.textContent = "🌚";
+    toggleBtn.textContent = "🌚";
     try { hr.style.backgroundColor = "#000"; hr.style.borderColor = "#000";} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#000"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#000"}} catch {};
@@ -19,7 +60,7 @@ function lightDarkToggle (toggle) { //Отрисовщик интерфейса 
     if (toggle) {localStorage["Toggle"] = "false"; location.reload();}
   }
   else {
-    toggle_btn.textContent = "☀";
+    toggleBtn.textContent = "☀";
     try { hr.style.backgroundColor = "#fff"; hr.style.borderColor = "#fff";} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#fff"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#fff"}} catch {};
@@ -31,9 +72,12 @@ function lightDarkToggle (toggle) { //Отрисовщик интерфейса 
 
 
 
-function transferModal () { //Модалка переводов (игрок/учитель)
-  let func_name = localStorage.getItem("isTeacher") == "true" ? "getTeacherSalary" : "getTransfer";
+function transferModal() { //Модалка переводов (игрок/учитель)
   let header = localStorage.getItem("isTeacher") == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
+  let functionName = localStorage.getItem("isTeacher") == "true" ? "getTeacherSalary" : "getTransfer";
+  let func = CONFIRM != "false" ? `pinCode('${functionName}')` : `checkFieldsDataSave(${functionName})`;
+  console.log(func);
+
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -49,8 +93,8 @@ function transferModal () { //Модалка переводов (игрок/уч
           <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
-          <button onclick="pinCode('${func_name}')" type="button" class="btn-orange">Подтвердить</button>
-          <button onclick="modalCancel(true)" id="modal_cancel_id" type="button" class="btn-orange">Выйти</button>
+          <button onclick="${func}" type="button" class="btn-orange">Подтвердить</button>
+          <button id="modal_cancel_id" onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
     </div>
@@ -59,8 +103,10 @@ function transferModal () { //Модалка переводов (игрок/уч
 
 
 
-function firmModal () { //Оплата услуг компании (игрок/учитель)
-  func_name = "getPayFirm";
+function firmModal() { //Оплата услуг компании (игрок/учитель)
+  functionName = "getPayFirm";
+  let func = CONFIRM != "false" ? `pinCode('${functionName}')` : `checkFieldsDataSave(${functionName})`;
+
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -75,7 +121,7 @@ function firmModal () { //Оплата услуг компании (игрок/�
         <input autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button onclick="pinCode('${func_name}')" type="button" class="btn-orange">Подтвердить</button>
+        <button onclick="${func}" type="button" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
     </div>
@@ -84,7 +130,7 @@ function firmModal () { //Оплата услуг компании (игрок/�
 
 
 
-function cashCardTransfer () { //Модалка переводов из электронных в наличные (министерство экономики)
+function cashCardTransfer() { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -107,7 +153,7 @@ function cashCardTransfer () { //Модалка переводов из элек
 }
 
 
-function editEmployees () {
+function editEmployees() {
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -122,8 +168,8 @@ function editEmployees () {
         <input autocomplete="off" type="password" maxlength="15" placeholder="Подпись министра экономики: " required>
       </div>
       <div class="modal-footer">
-        <button onclick="getAddEmployee()" type="button" class="btn-orange">Нанять</button>
-        <button onclick="getRemoveEmployee()" type="button" class="btn-orange">Уволить</button>
+        <button onclick="getAddEmployee()" type="button" class="btn-orange">Нанять сотрудника</button>
+        <button onclick="getRemoveEmployee()" type="button" class="btn-orange">Уволить сотрудника</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
@@ -131,7 +177,7 @@ function editEmployees () {
 }
 
 
-function finePlayer () { //Штрафник и отработка его долгов (юстиции)
+function finePlayer() { //Штрафник и отработка его долгов (юстиции)
   let modal = document.createElement("div");
   modal.classList.add("modal");
   document.body.append(modal);
@@ -155,7 +201,7 @@ function finePlayer () { //Штрафник и отработка его дол�
 
 
 
-function taxLogs () { //Отрисовка таблицы штрафников (МВД)
+function taxLogs() { //Отрисовка таблицы штрафников (МВД)
   let transfer_div = document.getElementById("log-table");
   let transfer_btn = document.getElementById("transfers");
     transfer_div = document.createElement("div");
@@ -186,7 +232,7 @@ function taxLogs () { //Отрисовка таблицы штрафников (
 
 
 
-function pinCode (func_name) { //Модальное окно с вводом пароля (заново). 
+function pinCode(funcName) { //Модальное окно с вводом пароля (заново).
   inputs = Array.from(document.querySelectorAll("input"));
 
   for (i = 0; i < inputs.length; i++) {
@@ -197,15 +243,16 @@ function pinCode (func_name) { //Модальное окно с вводом п�
       inputs[i].style.border = "3px solid #3bff86"
     }
   }
+
   if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
     let data = []
     for (i = 0; i < inputs.length; i++) {
       data.push(`'${inputs[i].value}'`);
     }
-    let pin_modal = document.createElement("div");
-    pin_modal.classList.add("pin-modal");
-    document.body.append(pin_modal);
-    pin_modal.insertAdjacentHTML("afterbegin", `    
+    let pinModal = document.createElement("div");
+    pinModal.classList.add("pin-modal");
+    document.body.append(pinModal);
+    pinModal.insertAdjacentHTML("afterbegin", `    
     <div id="modal-overlay" class="modal-overlay">
       <div id="modal-window" class="modal-window">
         <div class="modal-header">
@@ -215,19 +262,17 @@ function pinCode (func_name) { //Модальное окно с вводом п�
           <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
         </div>
         <div class="modal-footer">
-          <button type="button" onclick="pinCodeVerify(${func_name}, [${data}])" class="btn-orange">Подтвердить</button>
+          <button type="button" onclick="pinCodeVerify(${funcName}, [${data}])" class="btn-orange">Подтвердить</button>
           <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
         </div>
       </div>
     </div>`);
   }
 }
-function pinCodeVerify (func_name, data) { //Подтверждение пароля.
-  console.log(data);
+function pinCodeVerify(funcName, data) { //Подтверждение пароля.
   let pinInput = document.getElementById("pin-input");
-  // if (sha256(String(pinInput.value)) == localStorage.getItem("Authorization")) {
-  if (pinInput.value == "228") {
-    func_name(data);
+  if (sha256(String(pinInput.value)) == localStorage.getItem("Confirmation")) {
+    funcName(data);
     modalCancel();
   }
   else {
@@ -237,38 +282,39 @@ function pinCodeVerify (func_name, data) { //Подтверждение паро
 
 
 
-function modalCancel (modal_close) { //Кнопка "Выйти" в модалках
-  if (modal_close) {
-    let modal_btn = document.querySelectorAll("#modal_cancel_id");
-    for (let i = 0; i < modal_btn.length; i++) {modal_btn[i].setAttribute("disabled", "disabled");}
+function modalCancel(modalClose) { //Кнопка "Выйти" в модалках
+  if (modalClose) {
+    let modalBtn = document.querySelectorAll("#modal_cancel_id");
+    for (let i = 0; i < modalBtn.length; i++) {modalBtn[i].setAttribute("disabled", "disabled");}
   }
   let modal = document.querySelector(".modal");
-  let pin_modal = document.querySelector(".pin-modal");
-  let modal_info = document.querySelector(".modal-info");
-  let modal_animate = [
+  let pinModal = document.querySelector(".pin-modal");
+  let modalInfo = document.querySelector(".modal-info");
+  let modalAnimate = [
     {opacity: "1"},
     {opacity: "0"}
   ]
-
-  if (pin_modal != null) {
-    pin_modal.animate(modal_animate, {duration: 1000})
-    setTimeout(() => { pin_modal.remove() }, 970);
+  if (modal != null) {
+    modal.animate(modalAnimate, {duration: 1000})
+    setTimeout(() => { modal.remove(); }, 970);
   }
-  if (modal_info != null) {
-    modal_info.animate(modal_animate, {duration: 1000})
-    setTimeout(() => { modal_info.remove() }, 970);
+  if (pinModal != null) {
+    pinModal.animate(modalAnimate, {duration: 1000})
+    setTimeout(() => { pinModal.remove() }, 970);
   }
-  modal.animate(modal_animate, {duration: 1000})
-  setTimeout(() => { modal.remove(); }, 970);
+  if (modalInfo != null) {
+    modalInfo.animate(modalAnimate, {duration: 1000})
+    setTimeout(() => { modalInfo.remove() }, 970);
+  }
 }
 
 
 
-function output (message=null, bcgcolor="#fe9654") { //Модалка после каких-либо операций вместо алёртов
-  let modal_info = document.createElement("div");
-    modal_info.classList.add("modal-info");
-    document.body.append(modal_info);
-    modal_info.insertAdjacentHTML("afterbegin", `    
+function output(message=null, bcgcolor="#fe9654") { //Модалка после каких-либо операций вместо алёртов
+  let modalInfo = document.createElement("div");
+    modalInfo.classList.add("modal-info");
+    document.body.append(modalInfo);
+    modalInfo.insertAdjacentHTML("afterbegin", `    
     <div id="modal-overlay" class="modal-overlay">
       <div id="modal-window" class="modal-window">
         <div class="modal-header">
@@ -282,4 +328,27 @@ function output (message=null, bcgcolor="#fe9654") { //Модалка после
         </div>
       </div>
     </div>`);
+}
+
+
+
+function checkFieldsDataSave (functionName) { //Проверка полей на соответствие и сохранение введённых в них данных.
+  inputs = Array.from(document.querySelectorAll("input"));
+  console.log(inputs);
+  for (i = 0; i < inputs.length; i++) {
+    if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
+    inputs[i].style.border = "3px solid #ff483b";
+    }
+    else {
+      inputs[i].style.border = "3px solid #3bff86"
+    }
+  }
+  if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
+    let data = []
+    for (i = 0; i < inputs.length; i++) {
+      data.push(`${inputs[i].value}`);
+    }
+    functionName(data);
+    modalCancel();
+  }
 }

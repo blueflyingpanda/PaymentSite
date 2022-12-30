@@ -70,6 +70,7 @@ input { /*Поля*/
 
 .lightDarkToggle {
     align-content: start;
+    margin: 1vh;
     padding: 5px 10px;
     border: 5px solid #3bff86;
     border-radius: 5px;

@@ -63,10 +63,13 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 function logout() {
     localStorage.removeItem("Authorization");
     localStorage.removeItem("isTeacher");
+    localStorage.removeItem("Firm");
     window.location.replace(`${baseURL}/index.html`);
 }
 
-function getTeacherPage() {
+
+
+function getTeacherPage() { //Учитель
     rs.callback = htmlTeacherCallback;
     rs.httpGet('teacher');
 
@@ -79,12 +82,10 @@ function htmlTeacherCallback(text) {
         middleName = data["teacher"][1];
         money = data["teacher"][3];
         inn = data["teacher"][4];
-        greeting = document.getElementById("greeting");
-        greeting.innerHTML += ` ${firstName} ${middleName}!`;
-        inn_field = document.getElementById("inn");
-        inn_field.innerHTML += ` ${inn}`;
-        balance = document.getElementById("balance");
-        balance.innerHTML += ` ${money} талиц`;
+        
+        document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
+        document.getElementById("inn").innerHTML += `${inn}`;
+        document.getElementById("balance").innerHTML += `${money} талиц`;
     }
     else {
         alert(`${data["status"]} ${data["message"][0]}`)
@@ -92,7 +93,9 @@ function htmlTeacherCallback(text) {
     }
 }
 
-function getPlayerPage() {
+
+
+function getPlayerPage() { //Игрок
     rs.callback = htmlPlayerCallback;
     rs.httpGet('player');
 
@@ -100,22 +103,23 @@ function getPlayerPage() {
 
 function htmlPlayerCallback(text) {
     let data = JSON.parse(text);
-    console.log(data);
     if (data["status"] == 200) {
         firstName = data["player"][0];
         lastName = data["player"][2];
         gradeInfo = data["player"][3];
-        money = data["player"][4];
+        balance = data["player"][4];
         firm = data["player"][5];
         inn = data["player"][6];
 
-        document.getElementById("greeting").innerHTML += ` ${firstName} ${lastName}!`;
-        document.getElementById("grade").innerHTML += ` ${gradeInfo}`
-        document.getElementById("inn").innerHTML += ` ${inn}`;
-        document.getElementById("balance").innerHTML += ` ${money} талиц`;
+        document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
+        document.getElementById("grade").innerHTML += `${gradeInfo}`
+        document.getElementById("inn").innerHTML += `${inn}`;
+        document.getElementById("balance").innerHTML += `${balance} талиц`;
+
         if (firm != null) {
+            localStorage.setItem("Firm", firm);
             document.getElementById("btns").insertAdjacentHTML("beforeend", `
-            <button id="firm" onclick="firmVerify()" class="btn-orange">Перейти в фирму ${firm}</button>
+            <button id="firm" onclick="document.location = '${baseURL}/firm.html'" class="btn-orange">Перейти в фирму ${firm}</button>
             `)
         }
     }
@@ -124,6 +128,25 @@ function htmlPlayerCallback(text) {
         window.location.replace(`${baseURL}/index.html`);
     }
 }
+
+
+
+function getCompany(firm) { //Фирма
+    rs.callback = htmlCompanyCallback;
+    rs.httpGet(`company?company_id=${firm}`);
+}
+function htmlCompanyCallback(text) {
+    let data = JSON.parse(text);
+    console.log(data);
+    firmName = data["company"][1]; console.log(firmName);
+    firmBalance = data["company"][5]; console.log(firmBalance);
+
+
+    document.getElementById("greeting").innerHTML += `${firmName}!`;
+    document.getElementById("balance").innerHTML += `${firmBalance} талиц`;
+}
+
+
 
 function htmlAuthCallback(text) {
     let data = JSON.parse(text);
@@ -146,6 +169,8 @@ function htmlAuthCallback(text) {
     }
 }
 
+
+
 function invalidPassword(form) {
     alert('Wrong password!');
     document.getElementById("passw").style.border = "3px solid #ff483b";
@@ -157,6 +182,8 @@ function validPassword(form, formData) {
     rs.httpPost('auth', formData);
     form.reset();
 }
+
+
 
 function main() { //TODO: Редиректы на министров
     if (localStorage.getItem("Authorization")) {
@@ -219,19 +246,19 @@ function htmlTaxesCallback(text) {
     </div>`);
 
     let data = JSON.parse(text);
-    let modal_body = document.getElementById("modal-body");
+    let modalBody = document.getElementById("modal-body");
 
     if (data["status"] == 200) {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены</span>`
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены</span>`
     }
     else if (data["status"] == 400) {
         if (data["message"] == "taxes have already been paid") {
-            modal_body.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Налоги уже были уплачены за этот период</span><br>`;
-            modal_body.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Налоги уже были уплачены за этот период</span><br>`;
+            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
         }
         else {
-            modal_body.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">У вас недостаточно средств для уплаты налогов</span><br>`;
-            modal_body.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">У вас недостаточно средств для уплаты налогов</span><br>`;
+            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
         }
     }
 }
@@ -239,11 +266,11 @@ function htmlTaxesCallback(text) {
 
 
 function getTransfer(text) { //Переводы между игроками
+    console.log(text);
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
     }
-
     rs.callback = htmlTransferCallback;
     rs.httpPost("transfer", JSON.stringify(data), "application/json");
 }
@@ -360,17 +387,6 @@ function htmlTeacherSalaryCallback(text) {
 
 
 
-function getCompany() { //Вывод информации о фирме
-    rs.callback = htmlCompanyCallback;
-    rs.httpGet("company");
-}
-function htmlCompanyCallback(text) {
-    let data = JSON.parse(text);
-    console.log(data);
-}
-
-
-
 function getCompanySalary() {  //Уплата налогов и выдача зарплаты у компании
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
@@ -392,17 +408,17 @@ function htmlCompanySalaryCallback(text) {
         </div>
       </div>
     </div>`);
-    let modal_body = document.getElementById("modal-body");
+    let modalBody = document.getElementById("modal-body");
 
     let data = JSON.parse(text);
     if (data["status"] == 200) {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены</span`;
     }
     else if (data["status"] == 400) {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат</span`;
     }
     else {
-        modal_body.innerHTML += `<span class="modal-frame" style="background-color: #ff4500;">Ошибка</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ff4500;">Ошибка</span`;
     }
 }
 
