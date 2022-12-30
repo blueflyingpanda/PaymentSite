@@ -338,7 +338,7 @@ function getTeacherSalary(text) { //Выдача зарплаты игроку
 function htmlTeacherSalaryCallback(text) {
     let data = JSON.parse(text);
     let message, bcgcolor = null;
-    
+
     if (data["status"] == 200) {
         if (data["message"] == "salary paid") {
             message = "Зарплата выплачена";
@@ -511,6 +511,7 @@ function htmlFinePlayerFind(text) {
 
 function getFinePlayerPay() {
     input = document.getElementById("input_1");
+    document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     let data = {
         "player_id": Number(input.value)
     }
