@@ -141,7 +141,8 @@ input { /*Поля*/
 /*----------Модальное окошечко---------*/
 
 .modal,
-.pin-modal { /*Анимация появления модалки*/
+.pin-modal,
+.modal-info { /*Анимация появления модалки*/
     animation: 1s show ease;
 }
 @keyframes show {
@@ -164,7 +165,6 @@ input { /*Поля*/
     margin: 20vh auto;
     text-align: center;
 }
-
 .modal-header {
     padding: 5px 10px;
 }
@@ -174,10 +174,17 @@ input { /*Поля*/
     margin-right: auto;
     margin-bottom: 3vh;
 }
+.modal-header input,
 .modal-body input {
-    margin-bottom: 2vh;
+    margin: 2vh auto 2vh auto;
 }
-.modal-frame { /*Статус налогов*/
+.modal-footer button {
+    margin: 1vh 2vw 1vh 2vw;
+}
+.modal-body h2 {
+    margin: 0;
+}
+.modal-frame {
     border: none;
     color: #000;
     padding: 7px 14px;
