@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
 
@@ -137,9 +137,8 @@ function getCompany(firm) { //Фирма
 }
 function htmlCompanyCallback(text) {
     let data = JSON.parse(text);
-    console.log(data);
-    firmName = data["company"][1]; console.log(firmName);
-    firmBalance = data["company"][5]; console.log(firmBalance);
+    firmName = data["company"][1];
+    firmBalance = data["company"][5];
 
 
     document.getElementById("greeting").innerHTML += `${firmName}!`;
@@ -161,7 +160,9 @@ function htmlAuthCallback(text) {
         }
     }
     else if (data["status"] == 401) {
-        alert("Wrong password!");
+        let message = "Неправильный пароль, попробуйте ещё раз!";
+        let bcgcolor = "#fe9654";
+        output(message, bcgcolor);
         document.getElementById("passw").style.border = "3px solid #ff483b";
     }
     else {
@@ -172,7 +173,9 @@ function htmlAuthCallback(text) {
 
 
 function invalidPassword(form) {
-    alert('Wrong password!');
+    let message = "Неправильный пароль, попробуйте ещё раз!";
+    let bcgcolor = "#fe9654";
+    output(message, bcgcolor);
     document.getElementById("passw").style.border = "3px solid #ff483b";
     form.reset();
 }
@@ -185,7 +188,7 @@ function validPassword(form, formData) {
 
 
 
-function main() { //TODO: Редиректы на министров
+function main() { 
     if (localStorage.getItem("Authorization")) {
         if (localStorage.getItem("isTeacher") == true) {
             window.location.replace(`${baseURL}/teacher.html`);
@@ -266,7 +269,6 @@ function htmlTaxesCallback(text) {
 
 
 function getTransfer(text) { //Переводы между игроками
-    console.log(text);
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
@@ -313,7 +315,6 @@ function getPayFirm(text) { //Оплата услуг компании
     }
 
     rs.callback = htmlPayFirmCallback;
-    console.log(JSON.stringify(data));
     rs.httpPost("pay", JSON.stringify(data), "application/json");
 }
 function htmlPayFirmCallback(text) {
@@ -445,7 +446,7 @@ function getAddEmployee() { //Нанять сотрудника
         }
 
         rs.callback = htmlAddEmployeeCallback;
-        rs.httpPost("add-employee", data)
+        rs.httpPost("add-employee", JSON.stringify(data), "application/json")
     }
 }
 function htmlAddEmployeeCallback(text) {
@@ -476,7 +477,7 @@ function getRemoveEmployee() { //Уволить сотрудника
         }
 
         rs.callback = htmlRemoveEmployeeCallback;
-        rs.httpPost("remove-employee", data)
+        rs.httpPost("remove-employee", JSON.stringify(data), "application/json")
     }
 }
 function htmlRemoveEmployeeCallback(text) {
@@ -504,9 +505,8 @@ function htmlFinePlayerFind(text) {
     let data = JSON.parse(text);
     let message, bcgcolor = null;
 
-    console.log(data);
     if (data["status"] == 200) {
-        input = document.getElementById("input_1").value; console.log(input);
+        input = document.getElementById("input_1").value;
         fine = data["fine"]; 
         body = document.getElementById("modal-body");
         body.insertAdjacentHTML("beforeend", `
