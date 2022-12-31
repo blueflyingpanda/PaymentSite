@@ -1,4 +1,3 @@
-//TODO: Включить/отключить подтверждение действия.
 function lightDarkToggle(toggle) { //Отрисовщик интерфейса страницы
   if (typeof localStorage["Toggle"] != "string") {
     localStorage["Toggle"] = "true";
@@ -32,7 +31,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
 
 
 
-function checkFieldsDataSave (functionName, pinValue) { //Проверка полей на соответствие и сохранение введённых в них данных.
+function checkFieldsDataSave(functionName, pinValue) { //Проверка полей на соответствие и сохранение введённых в них данных.
   inputs = Array.from(document.querySelectorAll("input"));
   if (functionName != "confirmPass") {
     for (i = 0; i < inputs.length; i++) {
@@ -44,23 +43,30 @@ function checkFieldsDataSave (functionName, pinValue) { //Проверка по�
       }
     }
   }
+
   let data = [];
-  if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {  
-    for (i = 0; i < inputs.length; i++) {
-      if (typeof inputs[i].value == "string") {
-        data.push(`${inputs[i].value}`);
-      }
-      else {
-        data.push(inputs[i].value);
-      }
+  for (i = 0; i < inputs.length; i++) {
+    if (typeof inputs[i].value == "string") {
+      data.push(`${inputs[i].value}`);
+    }
+    else {
+      data.push(inputs[i].value);
     }
   }
+
+  if (inputs.filter(input => input.value.length > 20) != 0 || inputs.filter(input => input.value.length < 1) != 0) {  
+    let message = "Неправильно введены данные!"
+    let bcgcolor = "#fe9654";
+    output(message, bcgcolor);
+  }
+  else {
     if (pinValue) {
       pinCode(functionName, data);
     }
     else {
       functionName(data);
     }
+  }
 }
 function pinCode(functionName, data) { //Модальное окно с вводом пин-кода (после checkFieldsDataSave).
   let pinModal = document.createElement("div");
@@ -135,9 +141,6 @@ function confirmPass() {
     localStorage.setItem("Confirmation", false);
   }
   location.reload();
-}
-if (localStorage.getItem("Confirmation") == null) {
-  confirm();
 }
 
 
@@ -339,7 +342,7 @@ function modalCancel(modalClose) { //Кнопка "Выйти" в модалка
     {opacity: "1"},
     {opacity: "0"}
   ]
-  
+
   if (modal != null) {
     modal.animate(modalAnimate, {duration: 1000})
     setTimeout(() => { modal.remove(); }, 970);

@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
 
@@ -69,7 +69,11 @@ function logout() {
 
 
 
-function getTeacherPage() { //Учитель
+function getTeacherPage() { //Учитель (onload teacher.html)
+    if (localStorage.getItem("Confirmation") == null) {
+        confirm();
+      }
+    
     rs.callback = htmlTeacherCallback;
     rs.httpGet('teacher');
 
@@ -95,7 +99,11 @@ function htmlTeacherCallback(text) {
 
 
 
-function getPlayerPage() { //Игрок
+function getPlayerPage() { //Игрок (onload player.html)
+    if (localStorage.getItem("Confirmation") == null) {
+        confirm();
+      }
+    
     rs.callback = htmlPlayerCallback;
     rs.httpGet('player');
 
