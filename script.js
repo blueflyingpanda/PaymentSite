@@ -94,7 +94,7 @@ function pinCode(functionName, data) { //Модальное окно с ввод
         <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
       </div>
       <div class="modal-footer">
-        <button type="button" onclick="pinCodeVerify(${functionName}, [${dataNew}])" class="btn-orange">Подтвердить</button>
+        <button id="modal_cancel_id" type="button" onclick="pinCodeVerify(${functionName}, [${dataNew}])" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>
     </div>
@@ -102,8 +102,9 @@ function pinCode(functionName, data) { //Модальное окно с ввод
 }
 function pinCodeVerify(functionName, data) { //Подтверждение пароля.
   let pinInput = document.getElementById("pin-input");
-  if (sha256(String(pinInput.value)) == localStorage.getItem("Confirmation")) {
-    modalCancel();
+  if (sha256(String(pinInput.value)) == localStorage["Confirmation"]) {
+    modalCancel(true);
+    pinInput.style.border = "3px solid #3bff86"
     functionName(data);
   }
   else {
@@ -113,10 +114,10 @@ function pinCodeVerify(functionName, data) { //Подтверждение пар
 
 
 
-var CONFIRM = localStorage.getItem("Confirmation");
+let CONFIRM = localStorage["Confirmation"];
 function confirm() { //Изменение пин-кода с подтверждением.
   let functionName = "confirmPass";
-  if (CONFIRM != null && CONFIRM != "false") {
+  if (CONFIRM != undefined && CONFIRM != "false") {
     functionName = `checkFieldsDataSave('${functionName}', true)`;
   }
   else {
@@ -147,20 +148,21 @@ function confirm() { //Изменение пин-кода с подтвержд�
 function confirmPass() {
   input = document.getElementById("pin-code");
   if (input.value != " ") {
-    localStorage.setItem("Confirmation", sha256(input.value));
+    localStorage["Confirmation"] = sha256(input.value);
   }
   else {
-    localStorage.setItem("Confirmation", false);
+    localStorage["Confirmation"] = false;
   }
+  modalCancel(true);
   location.reload();
 }
 
 
 
 function transferModal() { //Модалка переводов (игрок/учитель)
-  let header = localStorage.getItem("isTeacher") == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
-  let functionName = localStorage.getItem("isTeacher") == "true" ? "getTeacherSalary" : "getTransfer";
-  let func = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+  let header = localStorage["isTeacher"] == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
+  let functionName = localStorage["isTeacher"] == "true" ? "getTeacherSalary" : "getTransfer";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
 
   modal.classList.add("modal");
@@ -177,7 +179,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
           <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
-          <button id="modal_cancel_id" onclick="modalCancel(true), ${func}" type="button" class="btn-orange">Подтвердить</button>
+          <button id="modal_cancel_id" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
           <button id="modal_cancel_id" onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
@@ -189,7 +191,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
 
 function firmModal() { //Оплата услуг компании (игрок/учитель)
   functionName = "getPayFirm";
-  let func = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+  let functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
   
   modal.classList.add("modal");
@@ -205,7 +207,7 @@ function firmModal() { //Оплата услуг компании (игрок/у
         <input autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button id="modal_cancel_id" onclick="modalCancel(true), ${func}" type="button" class="btn-orange">Подтвердить</button>
+        <button id="modal_cancel_id" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
     </div>
@@ -214,8 +216,10 @@ function firmModal() { //Оплата услуг компании (игрок/у
 
 
 
-function cashCardTransfer() { //Модалка переводов из электронных в наличные (министерство экономики)
+function withdraw() { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
+  let functionName = "getWithdraw";
+
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -230,7 +234,7 @@ function cashCardTransfer() { //Модалка переводов из элек�
         <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button onclick="pinCode()" type="button" class="btn-orange">Подтвердить</button>
+        <button onclick="modalCancel(true), checkFieldsDataSave(${functionName})" type="button" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
@@ -240,6 +244,10 @@ function cashCardTransfer() { //Модалка переводов из элек�
 
 function editEmployees() {
   let modal = document.createElement("div");
+  let functionAddEmployee = "getAddEmployee";
+  let functionRemoveEmployee = "getRemoveEmployee";
+  functionAddEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddEmployee}', true)` : `checkFieldsDataSave(${functionAddEmployee}, false)`;
+  functionRemoveEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionRemoveEmployee}', true)` : `checkFieldsDataSave(${functionRemoveEmployee}, false)`;
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -254,8 +262,8 @@ function editEmployees() {
         <input autocomplete="off" type="password" maxlength="15" placeholder="Подпись министра экономики: " required>
       </div>
       <div class="modal-footer">
-        <button onclick="getAddEmployee()" type="button" class="btn-orange">Нанять сотрудника</button>
-        <button onclick="getRemoveEmployee()" type="button" class="btn-orange">Уволить сотрудника</button>
+        <button onclick="modalCancel(true), ${functionAddEmployee}" type="button" class="btn-orange">Нанять сотрудника</button>
+        <button onclick="modalCancel(true), ${functionRemoveEmployee}" type="button" class="btn-orange">Уволить сотрудника</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>

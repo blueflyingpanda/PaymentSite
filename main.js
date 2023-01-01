@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
 
@@ -60,6 +60,8 @@ const tokenHeader = "auth_token";
 
 let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
+
+
 function logout() {
     localStorage.removeItem("Authorization");
     localStorage.removeItem("isTeacher");
@@ -69,8 +71,8 @@ function logout() {
 
 
 
-function getTeacherPage() { //Учитель (onload teacher.html)
-    if (localStorage.getItem("Confirmation") == null) {
+function getTeacherPage() { //Учитель (onload teacher.html, endpoint - /teacher)
+    if (localStorage["Confirmation"] == undefined) {
         confirm();
       }
     
@@ -99,8 +101,8 @@ function htmlTeacherCallback(text) {
 
 
 
-function getPlayerPage() { //Игрок (onload player.html)
-    if (localStorage.getItem("Confirmation") == null) {
+function getPlayerPage() { //Игрок (onload player.html) (endpoint - /player)
+    if (localStorage["Confirmation"] == undefined) {
         confirm();
       }
     
@@ -125,24 +127,25 @@ function htmlPlayerCallback(text) {
         document.getElementById("balance").innerHTML += `${balance} талиц`;
 
         if (firm != null) {
-            localStorage.setItem("Firm", firm);
+            localStorage["Firm"] = firm;
             document.getElementById("btns").insertAdjacentHTML("beforeend", `
             <button id="firm" onclick="document.location = '${baseURL}/firm.html'" class="btn-orange">Перейти в фирму ${firm}</button>
             `)
         }
     }
     else {
-        alert(`${data["status"]} ${data["message"][0]}`)
+        alert(`${data["status"]} ${data["message"][0]}`);
         window.location.replace(`${baseURL}/index.html`);
     }
 }
 
 
 
-function getCompany(firm) { //Фирма
+function getCompany(firm) { //Фирма (endpoint - /company)
     rs.callback = htmlCompanyCallback;
     rs.httpGet(`company?company_id=${firm}`);
 }
+
 function htmlCompanyCallback(text) {
     let data = JSON.parse(text);
     firmName = data["company"][1];
@@ -155,7 +158,7 @@ function htmlCompanyCallback(text) {
 
 
 
-function htmlAuthCallback(text) {
+function htmlAuthCallback(text) { 
     let data = JSON.parse(text);
     if (data["status"] == 200) {
         localStorage.setItem("Authorization", data[tokenHeader])
@@ -196,7 +199,7 @@ function validPassword(form, formData) {
 
 
 
-function main() { 
+function main() { // (endpoint - /auth)
     if (localStorage.getItem("Authorization")) {
         if (localStorage.getItem("isTeacher") == true) {
             window.location.replace(`${baseURL}/teacher.html`);
@@ -234,10 +237,11 @@ function main() {
 
 //Функции кнопок.
 
-function getTaxes() { //Уплата налогов
+function getTaxes() { //Уплата налогов (endpoint - /paytax)
     rs.callback = htmlTaxesCallback;
     rs.httpPost('paytax', null);
 }
+
 function htmlTaxesCallback(text) {
     let modal = document.createElement("div");
     modal.classList.add("modal");
@@ -251,7 +255,7 @@ function htmlTaxesCallback(text) {
         <div id="modal-body" class="modal-body">
         </div>
         <div class="modal-footer">
-          <button id="modal_cancel_id" onclick="modalCancel()" class="btn-orange">Выйти</button>
+          <button id="modal_cancel_id" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
         </div>
       </div>
     </div>`);
@@ -276,7 +280,7 @@ function htmlTaxesCallback(text) {
 
 
 
-function getTransfer(text) { //Переводы между игроками
+function getTransfer(text) { //Переводы между игроками (endpoint - /transfer)
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
@@ -284,9 +288,10 @@ function getTransfer(text) { //Переводы между игроками
     rs.callback = htmlTransferCallback;
     rs.httpPost("transfer", JSON.stringify(data), "application/json");
 }
+
 function htmlTransferCallback(text) {
     let data = JSON.parse(text);
-    let message, bcgcolor = null;
+    let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
         message = "Операция прошла успешно!";
@@ -314,7 +319,7 @@ function htmlTransferCallback(text) {
 
 
 
-function getPayFirm(text) { //Оплата услуг компании
+function getPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
     bool = localStorage.getItem("isTeacher") == "true" ? true : false;
     data = {
         "amount": Number(text[1]),
@@ -325,9 +330,10 @@ function getPayFirm(text) { //Оплата услуг компании
     rs.callback = htmlPayFirmCallback;
     rs.httpPost("pay", JSON.stringify(data), "application/json");
 }
+
 function htmlPayFirmCallback(text) {
     let data = JSON.parse(text);
-    let message, bcgcolor = null;
+    let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
         message = "Операция прошла успешно!";
@@ -355,7 +361,7 @@ function htmlPayFirmCallback(text) {
 
 
 
-function getTeacherSalary(text) { //Выдача зарплаты игроку
+function getTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
@@ -371,9 +377,10 @@ function getTeacherSalary(text) { //Выдача зарплаты игроку
         rs.httpPost("teacher-salary", JSON.stringify(data), "application/json");
     }
 }
+
 function htmlTeacherSalaryCallback(text) {
     let data = JSON.parse(text);
-    let message, bcgcolor = null;
+    let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
         if (data["message"] == "salary paid") {
@@ -396,10 +403,11 @@ function htmlTeacherSalaryCallback(text) {
 
 
 
-function getCompanySalary() {  //Уплата налогов и выдача зарплаты у компании
+function getCompanySalary() {  //Уплата налогов и выдача зарплаты у компании (endpoint - /company-salary)
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
 }
+
 function htmlCompanySalaryCallback(text) {
     let modal = document.createElement("div");
     modal.classList.add("modal");
@@ -433,30 +441,17 @@ function htmlCompanySalaryCallback(text) {
 
 
 
-function getAddEmployee() { //Нанять сотрудника
-    inputs = Array.from(document.querySelectorAll("input"));
-    for (i = 0; i < inputs.length; i++) {
-        if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
-            inputs[i].style.border = "3px solid #ff483b";
-        }
-        else {
-            inputs[i].style.border = "3px solid #3bff86"
-        }
+function getAddEmployee(text) { //Нанять сотрудника (endpoint - /add-employee)
+    console.log(text);
+    data = {
+        "signature": `${sha256(String(text[1]))}`,
+        "employee": `${text[0]}`
     }
-    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {
-        let data = []
-        for (i = 0; i < inputs.length; i++) {
-            data.push(`'${inputs[i].value}'`);
-        }
-        data = {
-            "signature": `${sha256(String(data[1]))}`,
-            "employee": `${data[0]}`
-        }
 
-        rs.callback = htmlAddEmployeeCallback;
-        rs.httpPost("add-employee", JSON.stringify(data), "application/json")
-    }
+    rs.callback = htmlAddEmployeeCallback;
+    rs.httpPost("add-employee", JSON.stringify(data), "application/json")
 }
+
 function htmlAddEmployeeCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
@@ -464,30 +459,17 @@ function htmlAddEmployeeCallback(text) {
 
 
 
-function getRemoveEmployee() { //Уволить сотрудника
-    inputs = Array.from(document.querySelectorAll("input"));
-    for (i = 0; i < inputs.length; i++) {
-        if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
-            inputs[i].style.border = "3px solid #ff483b";
-        }
-        else {
-            inputs[i].style.border = "3px solid #3bff86"
-        }
+function getRemoveEmployee(text) { //Уволить сотрудника (endpoint - /remove-employee)
+    console.log(text);
+    data = {
+        "signature": `${sha256(String(text[1]))}`,
+        "employee": `${text[0]}`
     }
-    if (inputs.filter(input => input.value.length > 20) == 0 && inputs.filter(input => input.value.length < 1) == 0) {
-        let data = []
-        for (i = 0; i < inputs.length; i++) {
-            data.push(`'${inputs[i].value}'`);
-        }
-        data = {
-            "signature": `${sha256(String(data[1]))}`,
-            "employee": `${data[0]}`
-        }
 
-        rs.callback = htmlRemoveEmployeeCallback;
-        rs.httpPost("remove-employee", JSON.stringify(data), "application/json")
-    }
+    rs.callback = htmlRemoveEmployeeCallback;
+    rs.httpPost("remove-employee", JSON.stringify(data), "application/json")
 }
+
 function htmlRemoveEmployeeCallback(text) {
     let data = JSON.parse(text);
     console.log(data);
@@ -509,9 +491,10 @@ function getFinePlayerFind() { //Проверка штрафов у игрока
         rs.httpGet(`check-player?player_id=${input.value}`);
     }
 }
+
 function htmlFinePlayerFind(text) {
     let data = JSON.parse(text);
-    let message, bcgcolor = null;
+    let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
         input = document.getElementById("input_1").value;
@@ -543,9 +526,10 @@ function getFinePlayerPay() {
     rs.callback = htmlFinePlayerPay;
     rs.httpPost(`drop-charges`, JSON.stringify(data), "application/json")
 }
+
 function htmlFinePlayerPay (text) {
     let data = JSON.parse(text);
-    let message, bcgcolor = null;
+    let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
         message = "Штраф аннулирован"
@@ -554,6 +538,29 @@ function htmlFinePlayerPay (text) {
     }
     else {
         message = "Случилась непревиденная ошибка";
+        bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+}
+
+
+function getWithdraw(text) { // (endpoint - /withdraw), TODO: не работает, кста. И надо ещё министров сделать.
+    data = {
+        "player_id": `${text[0]}`,
+        "amount": `${text[1]}`
+    }
+
+    rs.callback = htmlWithdraw;
+    rs.httpPost("withdraw", JSON.stringify(data), "application/json")
+}
+
+function htmlWithdraw(text) {
+    let data = JSON.parse(text);
+    console.log(data);
+    let message = null, bcgcolor = null;
+    
+    if (data["status"] == 401) {
+        message = "Неавторизованный пользователь! Авторизуйтесь с помощью данного вам кода!"
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
