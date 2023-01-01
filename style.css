@@ -42,7 +42,6 @@ input { /*Поля*/
 }
 
 .start-btns { /*div с верхними кнопками на страничке*/
-    margin: 0;
     text-align: center;
 }
 
@@ -51,6 +50,7 @@ input { /*Поля*/
     border: none;
     color: white;
     padding: 10px 20px;
+    margin: 1vh 0.5vw 1vh;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -68,26 +68,6 @@ input { /*Поля*/
     background-color: #30d670cf;
 }
 
-.lightDarkToggle {
-    align-content: start;
-    margin: 1vh;
-    padding: 5px 10px;
-    border: 5px solid #3bff86;
-    border-radius: 5px;
-    background-color: #3bff86;
-    color: #fff;
-    font-size: 2.5rem;
-    cursor: pointer;
-    transition: 0.5s;
-}
-.lightDarkToggle:hover {
-    box-shadow: 0 10px 15px 0 #3dff8766, 0 15px 30px 0 #3dff8780;
-}
-.lightDarkToggle:active {
-    background-color: #2cc165;
-    transition: none;
-}
-
 .btn-purple { /*Кнопочки*/
     background-color: #4d3bff;
     border: none;
@@ -97,7 +77,7 @@ input { /*Поля*/
     text-decoration: none;
     display: inline-block;
     font-size: 2rem;
-    margin: 4px 2px 15px;
+    margin: 1vh 0.5vw 1vh;
     cursor: pointer;
     transition: 0.3s;
     border-radius: 10px;
@@ -120,7 +100,7 @@ input { /*Поля*/
     text-decoration: none;
     display: inline-block;
     font-size: 1.5rem;
-    margin: 4px 2px 15px;
+    margin: 1vh 0.5vw 1vh;
     cursor: pointer;
     transition: 0.3s;
     border-radius: 10px;

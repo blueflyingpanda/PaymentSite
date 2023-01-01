@@ -33,7 +33,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
 
 function checkFieldsDataSave(functionName, pinValue) { //Проверка полей на соответствие и сохранение введённых в них данных.
   inputs = Array.from(document.querySelectorAll("input"));
-  if (functionName != "confirmPass") {
+  if (functionName.name != "confirmPass") {
     for (i = 0; i < inputs.length; i++) {
       if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
       inputs[i].style.border = "3px solid #ff483b";
@@ -55,9 +55,11 @@ function checkFieldsDataSave(functionName, pinValue) { //Проверка пол
   }
 
   if (inputs.filter(input => input.value.length > 20) != 0 || inputs.filter(input => input.value.length < 1) != 0) {  
-    let message = "Неправильно введены данные!"
-    let bcgcolor = "#fe9654";
-    output(message, bcgcolor);
+    if (functionName.name != "confirmPass") {
+      let message = "Неправильно введены данные!"
+      let bcgcolor = "#fe9654";
+      output(message, bcgcolor);
+    }
   }
   else {
     if (pinValue) {
@@ -69,6 +71,16 @@ function checkFieldsDataSave(functionName, pinValue) { //Проверка пол
   }
 }
 function pinCode(functionName, data) { //Модальное окно с вводом пин-кода (после checkFieldsDataSave).
+  let dataNew = ''; //Приводим массив в порядок (добавляем кавычки, а то PinCodeVerify их съедает)
+  for (i = 0; i < data.length; i++) {
+    if (dataNew == '') {
+      dataNew += `'${data[i]}'`;
+    }
+    else {
+      dataNew += `, '${data[i]}'`;
+    }
+  }
+
   let pinModal = document.createElement("div");
   pinModal.classList.add("pin-modal");
   document.body.append(pinModal);
@@ -82,7 +94,7 @@ function pinCode(functionName, data) { //Модальное окно с ввод
         <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
       </div>
       <div class="modal-footer">
-        <button type="button" onclick="pinCodeVerify(${functionName}, [${data}])" class="btn-orange">Подтвердить</button>
+        <button type="button" onclick="pinCodeVerify(${functionName}, [${dataNew}])" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>
     </div>
@@ -122,8 +134,8 @@ function confirm() { //Изменение пин-кода с подтвержд�
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-        <span>Придумайте пароль, с помощью которого вы будете выполнять важные действия в своём аккаунте (оставьте поле пустым, если он не нужен)</span>
-        <input id="pin-code" autocomplete="off" maxlength="10" placeholder="Введите пароль (или ничего): ">
+        <span>Придумайте пароль, с помощью которого вы будете выполнять важные действия в своём аккаунте (поставьте пробел, если он не нужен)</span>
+        <input id="pin-code" autocomplete="off" maxlength="10" placeholder="Введите пароль (или пробел): ">
         </div>
         <div class="modal-footer">
           <button onclick="${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -134,7 +146,7 @@ function confirm() { //Изменение пин-кода с подтвержд�
 }
 function confirmPass() {
   input = document.getElementById("pin-code");
-  if (input.value != "") {
+  if (input.value != " ") {
     localStorage.setItem("Confirmation", sha256(input.value));
   }
   else {
