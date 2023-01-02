@@ -190,8 +190,8 @@ function transferModal() { //Модалка переводов (игрок/уч�
 
 
 function firmModal() { //Оплата услуг компании (игрок/учитель)
-  functionName = "getPayFirm";
-  let functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+  let functionName = "getPayFirm";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
   
   modal.classList.add("modal");
