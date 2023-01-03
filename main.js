@@ -43,10 +43,11 @@ function alertCallback(text) {
 }
 
 const frontProduction = true;
+const frontAndroidProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
 
-let baseURL = "http://127.0.0.1:5500";
+let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500" : "http://127.0.0.1:5500"
 let apiURL = "http://127.0.0.1:5000";
 
 if (frontProduction) {
@@ -516,7 +517,7 @@ function htmlFinePlayerFind(text) {
 
 
 
-function getFinePlayerPay() {
+function getFinePlayerPay() { // (endpoint - /drop-charges)
     input = document.getElementById("input_1");
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     let data = {
