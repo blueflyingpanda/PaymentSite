@@ -15,7 +15,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#000"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#000"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#000"}} catch {};
-    document.body.style.backgroundColor = "#fff"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1000});
+    document.body.style.backgroundColor = "#fff"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1200});
     if (toggle) {localStorage["Toggle"] = "false"; location.reload();}
   }
   else {
@@ -24,7 +24,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#fff"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#fff"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#fff"}} catch {};
-    document.body.style.backgroundColor = "#000"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1000});
+    document.body.style.backgroundColor = "#000"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1200});
     if (toggle) {localStorage["Toggle"] = "true"; location.reload();}
   }
 }
@@ -161,7 +161,7 @@ function confirmPass() {
 
 function transferModal() { //Модалка переводов (игрок/учитель)
   let header = localStorage["isTeacher"] == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
-  let functionName = localStorage["isTeacher"] == "true" ? "getTeacherSalary" : "getTransfer";
+  let functionName = localStorage["isTeacher"] == "true" ? "postTeacherSalary" : "postTransfer";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
 
@@ -190,7 +190,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
 
 
 function firmModal() { //Оплата услуг компании (игрок/учитель)
-  let functionName = "getPayFirm";
+  let functionName = "postPayFirm";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
   
@@ -218,7 +218,7 @@ function firmModal() { //Оплата услуг компании (игрок/у
 
 function withdraw() { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
-  let functionName = "getWithdraw";
+  let functionName = "postWithdraw";
 
 
   modal.classList.add("modal");
@@ -242,10 +242,11 @@ function withdraw() { //Модалка переводов из электрон�
 }
 
 
+
 function editEmployees() {
   let modal = document.createElement("div");
-  let functionAddEmployee = "getAddEmployee";
-  let functionRemoveEmployee = "getRemoveEmployee";
+  let functionAddEmployee = "postAddEmployee";
+  let functionRemoveEmployee = "postRemoveEmployee";
   functionAddEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddEmployee}', true)` : `checkFieldsDataSave(${functionAddEmployee}, false)`;
   functionRemoveEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionRemoveEmployee}', true)` : `checkFieldsDataSave(${functionRemoveEmployee}, false)`;
 
@@ -286,43 +287,12 @@ function finePlayer() { //Штрафник и отработка его долг
       <div id="modal-body" class="modal-body">
       </div>
       <div class="modal-footer">
-        <button onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
-        <button id="drop-charges" onclick="getFinePlayerPay()" type="button" class="btn-orange" disabled>Отработать налоги</button>
+        <button onclick="postFinePlayerFind()" type="button" class="btn-orange">Найти</button>
+        <button id="drop-charges" onclick="postFinePlayerPay()" type="button" class="btn-orange" disabled>Отработать налоги</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
     </div>
   </div>`);
-}
-
-
-
-function taxLogs() { //Отрисовка таблицы штрафников (МВД)
-  let transfer_div = document.getElementById("log-table");
-
-  transfer_div = document.createElement("div");
-  transfer_div.classList.add("log-table");
-  transfer_div.setAttribute("id", "log-table");
-  document.body.append(transfer_div); //transfer_div.innerHTML += ${...} в main.js;
-  transfer_div.insertAdjacentHTML("afterbegin", ` 
-  <h2>Здесь будут показаны все игроки, просрочившие уплату налогов за прошедшие периоды</h2>
-  <hr>
-  <h2>Образец:</h2>
-  <h2>|Игрок|</h2>
-  <h2>|Статус уплаты налога за этот период|</h2>
-  <h2>|Количество штрафов|</h2>
-  <hr>
-  <p>|Пелмень Андреевич|</p>
-  <p>|Уплачены|</p>
-  <p>|2|</p>
-  <hr>
-  <p>|Бекмамбет Трахтенбергович|</p>
-  <p>|Неуплачены|</p>
-  <p>|1|</p>
-  <hr>
-  <p>|Баттлфилд Овервотч|</p>
-  <p>|Неуплачены|</p>
-  <p>|3|</p>`);
-  transfer_div.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
 }
 
 

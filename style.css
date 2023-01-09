@@ -1,12 +1,24 @@
+::-webkit-scrollbar { /*Стилизация скроллбара*/
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: 5px 5px 5px -5px rgba(34, 60, 80, 0.2) inset;
+    background-color: #fff;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #fe9654;
+}
+
 input::-webkit-outer-spin-button, /*Выпиливание стрелочек у <input type="number">*/
 input::-webkit-inner-spin-button {
     appearance: none;
     margin: 0; 
 }
+
 button {
     -webkit-tap-highlight-color: transparent;
 }
-body {
+body {    
     font-size: 1.5rem;
     font-family: 'Oswald', sans-serif;
 }
@@ -52,7 +64,7 @@ input { /*Поля*/
     border: none;
     color: white;
     padding: 10px 20px;
-    margin: 1vh 0.5vw 1vh;
+    margin: 7px 7px 7px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -80,7 +92,7 @@ input { /*Поля*/
     text-decoration: none;
     display: inline-block;
     font-size: 2rem;
-    margin: 1vh 0.5vw 1vh;
+    margin: 7px 7px 7px;
     cursor: pointer;
     transition: 0.3s;
     border-radius: 10px;
@@ -103,7 +115,7 @@ input { /*Поля*/
     text-decoration: none;
     display: inline-block;
     font-size: 1.5rem;
-    margin: 1vh 0.5vw 1vh;
+    margin: 7px 7px 7px;
     cursor: pointer;
     transition: 0.3s;
     border-radius: 10px;
@@ -163,7 +175,7 @@ input { /*Поля*/
     margin: 2vh auto 2vh auto;
 }
 .modal-footer button {
-    margin: 1vh 2vw 1vh 2vw;
+    margin: 7px 15px 7px 15px;
 }
 .modal-body h2 {
     margin: 0;
@@ -204,7 +216,7 @@ input { /*Поля*/
 }
 .log-table h2 {
     color: #fe9654;
-    margin: auto 8vw auto 8vw;
+    margin: auto 10px 1vh 10px;
     text-align: center;
 }
 .log-table p {

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MVD</title>
 </head>
-<body>
+<body onload="getFinePlayers()">
     <div class="start-btns">
         <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
         <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
@@ -23,6 +23,5 @@
     <script src="main.js"></script>
     <script src="script.js"></script>
     <script>lightDarkToggle()</script>
-    <script>taxLogs()</script>
 </body>
 </html>

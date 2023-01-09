@@ -63,7 +63,7 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
 
 
-function logout() {
+function logout() { //Выход из аккаунта
     localStorage.removeItem("Authorization");
     localStorage.removeItem("isTeacher");
     localStorage.removeItem("Firm");
@@ -238,7 +238,7 @@ function main() { // (endpoint - /auth)
 
 //Функции кнопок.
 
-function getTaxes() { //Уплата налогов (endpoint - /paytax)
+function postTaxes() { //Уплата налогов (endpoint - /paytax)
     rs.callback = htmlTaxesCallback;
     rs.httpPost('paytax', null);
 }
@@ -281,7 +281,7 @@ function htmlTaxesCallback(text) {
 
 
 
-function getTransfer(text) { //Переводы между игроками (endpoint - /transfer)
+function postTransfer(text) { //Переводы между игроками (endpoint - /transfer)
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
@@ -320,7 +320,7 @@ function htmlTransferCallback(text) {
 
 
 
-function getPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
+function postPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
     bool = localStorage.getItem("isTeacher") == "true" ? true : false;
     data = {
         "amount": Number(text[1]),
@@ -362,7 +362,7 @@ function htmlPayFirmCallback(text) {
 
 
 
-function getTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
+function postTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0])
@@ -404,7 +404,7 @@ function htmlTeacherSalaryCallback(text) {
 
 
 
-function getCompanySalary() {  //Уплата налогов и выдача зарплаты у компании (endpoint - /company-salary)
+function postCompanySalary() {  //Уплата налогов и выдача зарплаты у компании (endpoint - /company-salary)
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
 }
@@ -442,7 +442,7 @@ function htmlCompanySalaryCallback(text) {
 
 
 
-function getAddEmployee(text) { //Нанять сотрудника (endpoint - /add-employee)
+function postAddEmployee(text) { //Нанять сотрудника (endpoint - /add-employee)
     console.log(text);
     data = {
         "signature": `${sha256(String(text[1]))}`,
@@ -460,7 +460,7 @@ function htmlAddEmployeeCallback(text) {
 
 
 
-function getRemoveEmployee(text) { //Уволить сотрудника (endpoint - /remove-employee)
+function postRemoveEmployee(text) { //Уволить сотрудника (endpoint - /remove-employee)
     console.log(text);
     data = {
         "signature": `${sha256(String(text[1]))}`,
@@ -478,7 +478,57 @@ function htmlRemoveEmployeeCallback(text) {
 
 
 
-function getFinePlayerFind() { //Проверка штрафов у игрока
+function getFinePlayers() { //Получение игроков, у которых есть штрафы для МВД (endpoint - /debtors)
+    let transfer_div = document.getElementById("log-table");
+
+    transfer_div = document.createElement("div");
+    transfer_div.classList.add("log-table");
+    transfer_div.setAttribute("id", "log-table");
+    document.body.append(transfer_div); //transfer_div.innerHTML += ${...} в main.js;
+    transfer_div.insertAdjacentHTML("afterbegin", ` 
+    <h2>Здесь будут показаны все игроки, просрочившие уплату налогов за прошедшие периоды</h2>
+    <hr>
+    <h2>Образец:</h2>
+    <h2>|Игрок|</h2>
+    <h2>|Статус уплаты налога за этот период|</h2>
+    <h2>|Сумма штрафов|</h2>
+    <hr>`);
+    transfer_div.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
+
+    rs.callback = htmlFinePlayers;
+    rs.httpGet("/debtors");
+}
+
+function htmlFinePlayers(text) {
+    let transfer_div = document.getElementById("log-table");
+    let data = JSON.parse(text);
+
+    if (data["status"] == 200) {
+        for (let i = 0; data["debtors"][i] != undefined; i++) {
+            data["debtors"][i][1] = data["debtors"][i][1] == "1" ? "Уплачены" : "Неуплачены";
+
+            transfer_div.innerHTML += `
+            <h2>ID игрока: ${data["debtors"][i][0]}</h2>
+            <h2>${data["debtors"][i][1]}</h2>
+            <h2>${data["debtors"][i][2]} талиц</h2>
+            `
+
+            if (data["debtors"][i+1] != undefined) {
+                transfer_div.innerHTML += `<hr>`;
+            }
+        }
+
+        if (data["debtors"][0] == undefined) {
+            transfer_div.innerHTML += `
+            <h2>Здесь пока никого нет ;D</h2>
+            <h2>Проверьте эту таблицу после начала следующего периода</h2>`
+        }
+    }
+}
+
+
+
+function getFinePlayerFind() { //Проверка штрафов у игрока (endpoint - check-players)
     input = document.getElementById("input_1");
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
@@ -517,7 +567,7 @@ function htmlFinePlayerFind(text) {
 
 
 
-function getFinePlayerPay() { // (endpoint - /drop-charges)
+function postFinePlayerPay() { // (endpoint - /drop-charges)
     input = document.getElementById("input_1");
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     let data = {
@@ -528,7 +578,7 @@ function getFinePlayerPay() { // (endpoint - /drop-charges)
     rs.httpPost(`drop-charges`, JSON.stringify(data), "application/json")
 }
 
-function htmlFinePlayerPay (text) {
+function htmlFinePlayerPay(text) {
     let data = JSON.parse(text);
     let message = null, bcgcolor = null;
 
@@ -545,7 +595,7 @@ function htmlFinePlayerPay (text) {
 }
 
 
-function getWithdraw(text) { // (endpoint - /withdraw), TODO: не работает, кста. И надо ещё министров сделать.
+function postWithdraw(text) { // (endpoint - /withdraw), TODO: не работает, кста. И надо ещё министров сделать.
     data = {
         "player_id": `${text[0]}`,
         "amount": `${text[1]}`
