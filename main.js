@@ -484,7 +484,7 @@ function getFinePlayers() { //Получение игроков, у которы
     transfer_div = document.createElement("div");
     transfer_div.classList.add("log-table");
     transfer_div.setAttribute("id", "log-table");
-    document.body.append(transfer_div); //transfer_div.innerHTML += ${...} в main.js;
+    document.body.append(transfer_div);
     transfer_div.insertAdjacentHTML("afterbegin", ` 
     <h2>Здесь будут показаны все игроки, просрочившие уплату налогов за прошедшие периоды</h2>
     <hr>

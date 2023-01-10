@@ -287,7 +287,7 @@ function finePlayer() { //Штрафник и отработка его долг
       <div id="modal-body" class="modal-body">
       </div>
       <div class="modal-footer">
-        <button onclick="postFinePlayerFind()" type="button" class="btn-orange">Найти</button>
+        <button onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
         <button id="drop-charges" onclick="postFinePlayerPay()" type="button" class="btn-orange" disabled>Отработать налоги</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
