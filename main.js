@@ -8,25 +8,25 @@ class RequestsSender {
 
     httpGet(path = "") {
         var xmlHttp = new XMLHttpRequest();
-        let callback = this.callback
+        let callback = this.callback;
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4)
                 callback(xmlHttp.responseText);
         }
         xmlHttp.open("GET", this.url + "/" + path, this.isAsync);
-        xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"))
+        xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
         xmlHttp.send(null);
     }
 
     httpPost(path = "", data, contentType = null) {
         var xmlHttp = new XMLHttpRequest();
-        let callback = this.callback
+        let callback = this.callback;
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4)
                 callback(xmlHttp.responseText);
         }
         xmlHttp.open("POST", this.url + "/" + path, this.isAsync);
-        xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"))
+        xmlHttp.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
         if (contentType != null) {
             xmlHttp.setRequestHeader("Content-Type", contentType);
         }
@@ -84,15 +84,17 @@ function getTeacherPage() { //Учитель (onload teacher.html, endpoint - /t
 
 function htmlTeacherCallback(text) {
     let data = JSON.parse(text);
+
     if (data["status"] == 200) {
         firstName = data["teacher"][0];
         middleName = data["teacher"][1];
-        money = data["teacher"][3];
+        balance = data["teacher"][3];
+        talic = talicWordEnding(balance);
         inn = data["teacher"][4];
         
         document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
         document.getElementById("inn").innerHTML += `${inn}`;
-        document.getElementById("balance").innerHTML += `${money} талиц`;
+        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
     }
     else {
         alert(`${data["status"]} ${data["message"][0]}`)
@@ -119,13 +121,14 @@ function htmlPlayerCallback(text) {
         lastName = data["player"][2];
         gradeInfo = data["player"][3];
         balance = data["player"][4];
+        talic = talicWordEnding(balance);
         firm = data["player"][5];
         inn = data["player"][6];
 
         document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
         document.getElementById("grade").innerHTML += `${gradeInfo}`
         document.getElementById("inn").innerHTML += `${inn}`;
-        document.getElementById("balance").innerHTML += `${balance} талиц`;
+        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
 
         if (firm != null) {
             localStorage["Firm"] = firm;
@@ -149,12 +152,24 @@ function getCompany(firm) { //Фирма (endpoint - /company)
 
 function htmlCompanyCallback(text) {
     let data = JSON.parse(text);
-    firmName = data["company"][1];
-    firmBalance = data["company"][5];
+
+    if (data["status" == 200]) {
+        firmName = data["company"][1];
+        firmBalance = data["company"][5];
+        talic = talicWordEnding(firmBalance);
 
 
-    document.getElementById("greeting").innerHTML += `${firmName}!`;
-    document.getElementById("balance").innerHTML += `${firmBalance} талиц`;
+        document.getElementById("greeting").innerHTML += `${firmName}!`;
+        document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
+
+        for (let i = 0; data["members"][i] != undefined; i++) {
+            document.getElementById("company-list").innerHTML += `<li>${data["members"][i]}</li>`;
+        }
+    }
+    else {
+        alert(`${data["status"]} ${data["error"]}`);
+        window.location.replace(`${baseURL}/index.html`);
+    }
 }
 
 
@@ -443,7 +458,6 @@ function htmlCompanySalaryCallback(text) {
 
 
 function postAddEmployee(text) { //Нанять сотрудника (endpoint - /add-employee)
-    console.log(text);
     data = {
         "signature": `${sha256(String(text[1]))}`,
         "employee": `${text[0]}`
@@ -455,13 +469,35 @@ function postAddEmployee(text) { //Нанять сотрудника (endpoint -
 
 function htmlAddEmployeeCallback(text) {
     let data = JSON.parse(text);
-    console.log(data);
+    let message = null, bcgcolor = null;
+    
+    if (data["status"] == 200) {
+        message = "Игрок успешно нанят!";
+        bcgcolor = "#3bff86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 404) {
+        message = "Вы не основатель фирмы!";
+        bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 400) {
+        if (data["message"] == "wrong minister signature") {
+            message = "Непраильная подпись министра!";
+            bcgcolor = "#fe9654";
+            output(message, bcgcolor);
+        }
+        else {
+            message = "Такого игрока не существует или он работает в другой фирме, или он основатель фирмы";
+            bcgcolor = "#fe9654";
+            output(message, bcgcolor);
+        }
+    }
 }
 
 
 
 function postRemoveEmployee(text) { //Уволить сотрудника (endpoint - /remove-employee)
-    console.log(text);
     data = {
         "signature": `${sha256(String(text[1]))}`,
         "employee": `${text[0]}`
@@ -473,7 +509,29 @@ function postRemoveEmployee(text) { //Уволить сотрудника (endpo
 
 function htmlRemoveEmployeeCallback(text) {
     let data = JSON.parse(text);
-    console.log(data);
+
+    if (data["status"] == 200) {
+        message = "Игрок успешно уволен!";
+        bcgcolor = "#3bff86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 404) {
+        message = "Вы не основатель фирмы!";
+        bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 400) {
+        if (data["message"] == "wrong minister signature") {
+            message = "Непраильная подпись министра!";
+            bcgcolor = "#fe9654";
+            output(message, bcgcolor);
+        }
+        else {
+            message = "Или такого игрока не существует, или он работает в другой фирме, или он основатель фирмы";
+            bcgcolor = "#fe9654";
+            output(message, bcgcolor);
+        }
+    }
 }
 
 
@@ -505,12 +563,13 @@ function htmlFinePlayers(text) {
 
     if (data["status"] == 200) {
         for (let i = 0; data["debtors"][i] != undefined; i++) {
-            data["debtors"][i][1] = data["debtors"][i][1] == "1" ? "Уплачены" : "Неуплачены";
+            data["debtors"][i][1] = data["debtors"][i][1] == "1" ? "уплачены" : "неуплачены";
+            talic = talicWordEnding(data["debtors"][i][2]);
 
             transfer_div.innerHTML += `
             <h2>ID игрока: ${data["debtors"][i][0]}</h2>
-            <h2>${data["debtors"][i][1]}</h2>
-            <h2>${data["debtors"][i][2]} талиц</h2>
+            <h2>Налоги ${data["debtors"][i][1]}</h2>
+            <h2>Штраф - ${data["debtors"][i][2]} ${talic}</h2>
             `
 
             if (data["debtors"][i+1] != undefined) {
@@ -549,11 +608,14 @@ function htmlFinePlayerFind(text) {
 
     if (data["status"] == 200) {
         input = document.getElementById("input_1").value;
-        fine = data["fine"]; 
+        fine = data["fine"];
+        talic = talicWordEnding(fine);
         body = document.getElementById("modal-body");
+
+
         body.insertAdjacentHTML("beforeend", `
         <h2>Игрок: ${input}</h2>
-        <span>Количество штрафов:</span><span id="fines" style="background-color: #fe9654; color: #000" class="modal-frame">${fine}</span>
+        <span>Размер штрафа:</span><span id="fines" style="background-color: #fe9654; color: #000" class="modal-frame">${fine} ${talic}</span>
         `)
         document.getElementById("drop-charges").removeAttribute("disabled");
     }
@@ -607,12 +669,23 @@ function postWithdraw(text) { // (endpoint - /withdraw), TODO: не работа
 
 function htmlWithdraw(text) {
     let data = JSON.parse(text);
-    console.log(data);
     let message = null, bcgcolor = null;
     
     if (data["status"] == 401) {
         message = "Неавторизованный пользователь! Авторизуйтесь с помощью данного вам кода!"
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
+    }
+}
+
+function talicWordEnding (talic) {
+    if (talic%10 == 1) {
+        return "талица";
+    }
+    else if (talic%10 == 2 || talic%10 == 3 || talic%10 == 4) {
+        return "талицы";
+    }
+    else {
+        return "талиц";
     }
 }
