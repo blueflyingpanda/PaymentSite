@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
@@ -280,15 +280,15 @@ function htmlTaxesCallback(text) {
     let modalBody = document.getElementById("modal-body");
 
     if (data["status"] == 200) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены</span>`
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены!</span>`
     }
     else if (data["status"] == 400) {
         if (data["message"] == "taxes have already been paid") {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Налоги уже были уплачены за этот период</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Налоги уже были уплачены за этот период!</span><br>`;
             modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
         }
         else {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">У вас недостаточно средств для уплаты налогов</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">У вас недостаточно средств для уплаты налогов!</span><br>`;
             modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
         }
     }
@@ -316,18 +316,18 @@ function htmlTransferCallback(text) {
     }
     else if (data["status"] == 400) {
         if (data["message"] == "receiver does not exist") {
-            message = "Такого игрока не существует";
+            message = "Такого игрока не существует!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
         if (data["message"] == "not enough money to transfer") {
-            message = "Недостаточно средств для перевода";
+            message = "Недостаточно средств для перевода!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
     }
     else {
-        message = "Случилась непревиденная ошибка";
+        message = "Произошла непревиденная ошибка!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
@@ -358,18 +358,18 @@ function htmlPayFirmCallback(text) {
     }
     else if (data["status"] == 400){
         if (data["message"] == "not enough money to pay") {
-            message = "Недостаточно средств для перевода";
+            message = "Недостаточно средств для перевода!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
         else if (data["message"] == "no such company") {
-            message = "Такой компании не существует";
+            message = "Такой компании не существует!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
     }
     else {
-        message = "Случилась непревиденная ошибка";
+        message = "Произошла непревиденная ошибка";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
@@ -384,7 +384,7 @@ function postTeacherSalary(text) { //Выдача зарплаты игроку 
     }
 
     if (Number(text[1]) > 30 || Number(text[1]) < 10) {
-        message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц";
+        message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
@@ -400,18 +400,18 @@ function htmlTeacherSalaryCallback(text) {
 
     if (data["status"] == 200) {
         if (data["message"] == "salary paid") {
-            message = "Зарплата выплачена";
+            message = "Зарплата выплачена!";
             bcgcolor = "#3bff86";
             output(message, bcgcolor);
         }
         else if (data["message"] == "player does not exist") {
-            message = "Такого игрока не существует";
+            message = "Такого игрока не существует!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
     }
     else {
-        message = "Случилась непревиденная ошибка";
+        message = "Произошла непревиденная ошибка!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
@@ -445,13 +445,13 @@ function htmlCompanySalaryCallback(text) {
 
     let data = JSON.parse(text);
     if (data["status"] == 200) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены!</span`;
     }
     else if (data["status"] == 400) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат!</span`;
     }
     else {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ff4500;">Ошибка</span`;
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Вы не являетесь основателем фирмы!</span`;
     }
 }
 
@@ -488,7 +488,7 @@ function htmlAddEmployeeCallback(text) {
             output(message, bcgcolor);
         }
         else {
-            message = "Такого игрока не существует или он работает в другой фирме, или он основатель фирмы";
+            message = "Такого игрока не существует или он работает в другой фирме, или он основатель фирмы!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
@@ -580,7 +580,7 @@ function htmlFinePlayers(text) {
         if (data["debtors"][0] == undefined) {
             transfer_div.innerHTML += `
             <h2>Здесь пока никого нет ;D</h2>
-            <h2>Проверьте эту таблицу после начала следующего периода</h2>`
+            <h2>Проверьте эту таблицу после начала следующего периода!</h2>`
         }
     }
 }
@@ -620,7 +620,7 @@ function htmlFinePlayerFind(text) {
         document.getElementById("drop-charges").removeAttribute("disabled");
     }
     else if (data["status"] == 404) {
-        message = "Такого игрока не существует";
+        message = "Такого игрока не существует!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
         document.getElementById("drop-charges").setAttribute("disabled", "disabled");
@@ -650,7 +650,7 @@ function htmlFinePlayerPay(text) {
         output(message, bcgcolor);
     }
     else {
-        message = "Случилась непревиденная ошибка";
+        message = "Случилась непревиденная ошибка!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
     }
