@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = false;
+const frontProduction = true;
 const frontAndroidProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
