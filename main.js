@@ -153,7 +153,7 @@ function getCompany(firm) { //Фирма (endpoint - /company)
 function htmlCompanyCallback(text) {
     let data = JSON.parse(text);
 
-    if (data["status" == 200]) {
+    if (data["status"] == 200) {
         firmName = data["company"][1];
         firmBalance = data["company"][5];
         talic = talicWordEnding(firmBalance);
