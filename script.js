@@ -54,8 +54,9 @@ function checkFieldsDataSave(functionName, pinValue) { //Проверка пол
     }
   }
 
-  if (inputs.filter(input => input.value.length > 20) != 0 || inputs.filter(input => input.value.length < 1) != 0) {  
+  if (inputs.filter(input => input.value.length < 1) != 0) {  
     if (functionName.name != "confirmPass") {
+      modalCancel(true);
       let message = "Неправильно введены данные!"
       let bcgcolor = "#fe9654";
       output(message, bcgcolor);
@@ -70,6 +71,8 @@ function checkFieldsDataSave(functionName, pinValue) { //Проверка пол
     }
   }
 }
+
+
 function pinCode(functionName, data) { //Модальное окно с вводом пин-кода (после checkFieldsDataSave).
   let dataNew = ''; //Приводим массив в порядок (добавляем кавычки, а то PinCodeVerify их съедает)
   for (i = 0; i < data.length; i++) {
@@ -176,7 +179,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
       <form id="transferForm" method="post">
         <div class="modal-body">
           <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока: " required>
-          <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
+          <input id="input_2" autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
           <button id="modal_cancel_id" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -185,6 +188,18 @@ function transferModal() { //Модалка переводов (игрок/уч�
       </form>
     </div>
   </div>`);
+
+  let key = true;
+  modal.addEventListener("keyup", (e) => {
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+    if (e.keyCode == 13 && key) {
+      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
+      key = false;
+    }
+  })
 }
 
 
@@ -212,6 +227,18 @@ function firmModal() { //Оплата услуг компании (игрок/у
       </div>  
     </div>
   </div>`);
+
+  let key = true;
+  modal.addEventListener("keyup", (e) => {
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+    if (e.keyCode == 13 && key) {
+      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
+      key = false;
+    }
+  })
 }
 
 
@@ -219,6 +246,7 @@ function firmModal() { //Оплата услуг компании (игрок/у
 function withdraw() { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
   let functionName = "postWithdraw";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
 
 
   modal.classList.add("modal");
@@ -234,11 +262,23 @@ function withdraw() { //Модалка переводов из электрон�
         <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button onclick="modalCancel(true), checkFieldsDataSave(${functionName})" type="button" class="btn-orange">Подтвердить</button>
+        <button id="withdraw" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
   </div>`);
+
+  let key = true;
+  modal.addEventListener("keyup", (e) => {
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+    if (e.keyCode == 13 && key) {
+      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
+      key = false;
+    }
+  })
 }
 
 
@@ -269,11 +309,23 @@ function editEmployees() {
       </div> 
     </div>
   </div>`);
+
+  let key = true;
+  modal.addEventListener("keyup", (e) => {
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+  })
 }
 
 
 function finePlayer() { //Штрафник и отработка его долгов (юстиции)
   let modal = document.createElement("div");
+  let functionNameTax = "postFinePlayerPay";
+  functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
+
+  
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -287,12 +339,25 @@ function finePlayer() { //Штрафник и отработка его долг
       <div id="modal-body" class="modal-body">
       </div>
       <div class="modal-footer">
-        <button onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
-        <button id="drop-charges" onclick="postFinePlayerPay()" type="button" class="btn-orange" disabled>Отработать налоги</button>
+        <button id="find-player" onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
+        <button id="drop-charges" onclick="${functionNameTax}" type="button" class="btn-orange" disabled>Отработать налоги и штрафы</button>
         <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
     </div>
   </div>`);
+
+  let key = true;
+  let timer;
+  modal.addEventListener("keyup", (e) => {
+    if (!timer && e.keyCode == 13 && key) {
+      document.getElementById("find-player").click();
+      timer = setTimeout(() => timer = clearTimeout(timer), 1000);
+    }
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+  })
 }
 
 
@@ -316,6 +381,14 @@ function output(message=null, bcgcolor="#fe9654") { //Оповещения
       </div>
     </div>
   </div>`);
+
+  let key = true;
+  window.addEventListener("keyup", (e) => {
+    if (e.keyCode == 27 && key) {
+      modalCancel(true);
+      key = false;
+    }
+  })
 }
 
 

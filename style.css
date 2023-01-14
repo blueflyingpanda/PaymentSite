@@ -82,6 +82,11 @@ input { /*Поля*/
     transition: none;
     background-color: #30d670cf;
 }
+.btn-green:disabled {
+    cursor: not-allowed;
+    background-color: #3bff8687;
+    box-shadow: none;
+}
 
 .btn-purple { /*Кнопочки*/
     background-color: #4d3bff;
@@ -104,6 +109,11 @@ input { /*Поля*/
 .btn-purple:active {
     transition: none;
     background-color: #4f3bffd1;
+}
+.btn-purple:disabled {
+    cursor: not-allowed;
+    background-color: #4f3bff80;
+    box-shadow: none;
 }
 
 .btn-orange {

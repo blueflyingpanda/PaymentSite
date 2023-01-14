@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = false;
 const backProduction = true;
 const commonPasswordLength = 5;
@@ -68,149 +68,6 @@ function logout() { //Выход из аккаунта
     localStorage.removeItem("isTeacher");
     localStorage.removeItem("Firm");
     window.location.replace(`${baseURL}/index.html`);
-}
-
-
-
-function getTeacherPage() { //Учитель (onload teacher.html, endpoint - /teacher)
-    if (localStorage["Confirmation"] == undefined) {
-        confirm();
-      }
-    
-    rs.callback = htmlTeacherCallback;
-    rs.httpGet('teacher');
-
-}
-
-function htmlTeacherCallback(text) {
-    let data = JSON.parse(text);
-
-    if (data["status"] == 200) {
-        firstName = data["teacher"][0];
-        middleName = data["teacher"][1];
-        balance = data["teacher"][3];
-        talic = talicWordEnding(balance);
-        inn = data["teacher"][4];
-        
-        document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
-        document.getElementById("inn").innerHTML += `${inn}`;
-        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
-    }
-    else {
-        alert(`${data["status"]} ${data["message"][0]}`)
-        window.location.replace(`${baseURL}/index.html`);
-    }
-}
-
-
-
-function getPlayerPage() { //Игрок (onload player.html) (endpoint - /player)
-    if (localStorage["Confirmation"] == undefined) {
-        confirm();
-      }
-    
-    rs.callback = htmlPlayerCallback;
-    rs.httpGet('player');
-
-}
-
-function htmlPlayerCallback(text) {
-    let data = JSON.parse(text);
-    if (data["status"] == 200) {
-        firstName = data["player"][0];
-        lastName = data["player"][2];
-        gradeInfo = data["player"][3];
-        balance = data["player"][4];
-        talic = talicWordEnding(balance);
-        firm = data["player"][5];
-        inn = data["player"][6];
-
-        document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
-        document.getElementById("grade").innerHTML += `${gradeInfo}`
-        document.getElementById("inn").innerHTML += `${inn}`;
-        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
-
-        if (firm != null) {
-            localStorage["Firm"] = firm;
-            document.getElementById("btns").insertAdjacentHTML("beforeend", `
-            <button id="firm" onclick="document.location = '${baseURL}/firm.html'" class="btn-orange">Перейти в фирму ${firm}</button>
-            `)
-        }
-    }
-    else {
-        alert(`${data["status"]} ${data["message"][0]}`);
-        window.location.replace(`${baseURL}/index.html`);
-    }
-}
-
-
-
-function getCompany(firm) { //Фирма (endpoint - /company)
-    rs.callback = htmlCompanyCallback;
-    rs.httpGet(`company?company_id=${firm}`);
-}
-
-function htmlCompanyCallback(text) {
-    let data = JSON.parse(text);
-
-    if (data["status"] == 200) {
-        firmName = data["company"][1];
-        firmBalance = data["company"][5];
-        talic = talicWordEnding(firmBalance);
-
-
-        document.getElementById("greeting").innerHTML += `${firmName}!`;
-        document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
-
-        for (let i = 0; data["members"][i] != undefined; i++) {
-            document.getElementById("company-list").innerHTML += `<li>${data["members"][i]}</li>`;
-        }
-    }
-    else {
-        alert(`${data["status"]} ${data["error"]}`);
-        window.location.replace(`${baseURL}/index.html`);
-    }
-}
-
-
-
-function htmlAuthCallback(text) { 
-    let data = JSON.parse(text);
-    if (data["status"] == 200) {
-        localStorage.setItem("Authorization", data[tokenHeader])
-        localStorage.setItem("isTeacher", data["teacher"])
-        if (data["teacher"] == true) {
-            window.location.replace(`${baseURL}/teacher.html`);
-        }
-        else {
-            window.location.replace(`${baseURL}/player.html`);
-        }
-    }
-    else if (data["status"] == 401) {
-        let message = "Неправильный пароль, попробуйте ещё раз!";
-        let bcgcolor = "#fe9654";
-        output(message, bcgcolor);
-        document.getElementById("passw").style.border = "3px solid #ff483b";
-    }
-    else {
-        alert(data["status"]);
-    }
-}
-
-
-
-function invalidPassword(form) {
-    let message = "Неправильный пароль, попробуйте ещё раз!";
-    let bcgcolor = "#fe9654";
-    output(message, bcgcolor);
-    document.getElementById("passw").style.border = "3px solid #ff483b";
-    form.reset();
-}
-
-function validPassword(form, formData) {
-    formData.set("password", sha256(formData.get("password")));
-    rs.httpPost('auth', formData);
-    form.reset();
 }
 
 
@@ -251,14 +108,187 @@ function main() { // (endpoint - /auth)
     })
 }
 
+function invalidPassword(form) {
+    let message = "Неправильный пароль, попробуйте ещё раз!";
+    let bcgcolor = "#fe9654";
+    output(message, bcgcolor);
+    document.getElementById("passw").style.border = "3px solid #ff483b";
+    form.reset();
+}
+
+function validPassword(form, formData) {
+    formData.set("password", sha256(formData.get("password")));
+    rs.httpPost('auth', formData);
+    form.reset();
+}
+
+
+function htmlAuthCallback(text) { 
+    let data = JSON.parse(text);
+    if (data["status"] == 200) {
+        localStorage.setItem("Authorization", data[tokenHeader])
+        localStorage.setItem("isTeacher", data["teacher"])
+        if (data["teacher"] == true) {
+            window.location.replace(`${baseURL}/teacher.html`);
+        }
+        else if (data["teacher"] == false) {
+            window.location.replace(`${baseURL}/player.html`);
+        }
+        else if (data["teacher"] == null) {
+            window.location.replace(`${baseURL}/ministry_economic.html`);
+        }
+    }
+    else if (data["status"] == 401) {
+        let message = "Неправильный пароль, попробуйте ещё раз!";
+        let bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+        document.getElementById("passw").style.border = "3px solid #ff483b";
+    }
+    else {
+        alert(data["status"]);
+    }
+}
+
+
+
+function getPlayerPage() { //Игрок (onload player.html) (endpoint - /player)
+    if (localStorage["Confirmation"] == undefined) {
+        confirm();
+      }
+    
+    rs.callback = htmlPlayerCallback;
+    rs.httpGet('player');
+
+}
+
+function htmlPlayerCallback(text) {
+    let data = JSON.parse(text);
+    if (data["status"] == 200) {
+        firstName = data["player"][0];
+        lastName = data["player"][2];
+        gradeInfo = data["player"][3];
+        balance = data["player"][4];
+        talic = talicWordEnding(balance);
+        firm = data["player"][5];
+        inn = data["player"][6];
+
+        document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
+        document.getElementById("grade").innerHTML += `${gradeInfo}`
+        document.getElementById("inn").innerHTML += `${inn}`;
+        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
+
+        if (firm != null) {
+            localStorage["Firm"] = firm;
+            document.getElementById("btns").insertAdjacentHTML("beforeend", `
+            <button id="firm-entrance" onclick="document.location = '${baseURL}/firm.html'" class="btn-orange">Перейти в фирму ${firm}</button>
+            `)
+            
+            let firmEnter = document.getElementById("firm-entrance");
+            firmEnter.addEventListener("click", (e) => {
+                Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+            })
+        }
+    }
+    else {
+        alert(`${data["status"]} ${data["message"][0]}`);
+        window.location.replace(`${baseURL}/index.html`);
+    }
+}
+
+
+
+function getTeacherPage() { //Учитель (onload teacher.html, endpoint - /teacher)
+    if (localStorage["Confirmation"] == undefined) {
+        confirm();
+      }
+    
+    rs.callback = htmlTeacherCallback;
+    rs.httpGet('teacher');
+
+}
+
+function htmlTeacherCallback(text) {
+    let data = JSON.parse(text);
+
+    if (data["status"] == 200) {
+        firstName = data["teacher"][0];
+        middleName = data["teacher"][1];
+        balance = data["teacher"][3];
+        talic = talicWordEnding(balance);
+        inn = data["teacher"][4];
+        
+        document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
+        document.getElementById("inn").innerHTML += `${inn}`;
+        document.getElementById("balance").innerHTML += `${balance} ${talic}`;
+    }
+    else {
+        alert(`${data["status"]} ${data["message"][0]}`)
+        window.location.replace(`${baseURL}/index.html`);
+    }
+}
+
+
+
+function getCompany(firm) { //Фирма (endpoint - /company)
+    rs.callback = htmlCompanyCallback;
+    rs.httpGet(`company?company_id=${firm}`);
+}
+
+function htmlCompanyCallback(text) {
+    let data = JSON.parse(text);
+    console.log(data);
+
+    if (data["status"] == 200) {
+        firmName = data["company"][1];
+        firmBalance = data["company"][5];
+        talic = talicWordEnding(firmBalance);
+
+
+        document.getElementById("greeting").innerHTML += `${firmName}!`;
+        document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
+
+        for (let i = 0; data["members"][i] != undefined; i++) {
+            document.getElementById("company-list").innerHTML += `<li>${data["members"][i]}</li>`;
+        }
+
+        let firmExit = document.getElementById("firm-back");
+        firmExit.addEventListener("click", (e) => {
+            Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+        })
+
+    }
+    else {
+        alert(`${data["status"]} ${data["error"]}`);
+        window.location.replace(`${baseURL}/index.html`);
+    }
+}
+
+
+
+function getMinistryEconomic() {
+    rs.callback = htmlMinistryEconomicCallback;
+    rs.httpPost("auth", localStorage["Authorization"]);
+}
+
+function htmlMinistryEconomicCallback(text) {
+    let data = JSON.parse(text);
+    console.log(data);
+}
+
+
+
 //Функции кнопок.
 
 function postTaxes() { //Уплата налогов (endpoint - /paytax)
     rs.callback = htmlTaxesCallback;
     rs.httpPost('paytax', null);
+    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+    
 }
 
 function htmlTaxesCallback(text) {
+    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.removeAttribute("disabled")});
+
     let modal = document.createElement("div");
     modal.classList.add("modal");
     document.body.append(modal);
@@ -301,8 +331,18 @@ function postTransfer(text) { //Переводы между игроками (en
         "amount": Number(text[1]),
         "receiver": Number(text[0])
     }
-    rs.callback = htmlTransferCallback;
-    rs.httpPost("transfer", JSON.stringify(data), "application/json");
+    let receiver = data["receiver"]
+    let amount = data["amount"]
+
+    if (receiver % 1 != 0 || amount % 1 != 0 || receiver < 0 || amount < 0) {
+        let message = "Неправильно введены данные!"
+        let bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlTransferCallback;
+        rs.httpPost("transfer", JSON.stringify(data), "application/json");   
+    }
 }
 
 function htmlTransferCallback(text) {
@@ -320,7 +360,7 @@ function htmlTransferCallback(text) {
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
-        if (data["message"] == "not enough money to transfer") {
+        else if (data["message"] == "not enough money to transfer") {
             message = "Недостаточно средств для перевода!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
@@ -343,8 +383,17 @@ function postPayFirm(text) { //Оплата услуг компании (endpoin
         "isTeacher": bool
     }
 
-    rs.callback = htmlPayFirmCallback;
-    rs.httpPost("pay", JSON.stringify(data), "application/json");
+    let amount = data["amount"]
+
+    if (amount % 1 != 0 || amount < 0) {
+        let message = "Неправильно введены данные!"
+        let bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlPayFirmCallback;
+        rs.httpPost("pay", JSON.stringify(data), "application/json");
+    }
 }
 
 function htmlPayFirmCallback(text) {
@@ -382,8 +431,8 @@ function postTeacherSalary(text) { //Выдача зарплаты игроку 
         "amount": Number(text[1]),
         "receiver": Number(text[0])
     }
-
-    if (Number(text[1]) > 30 || Number(text[1]) < 10) {
+    let salary = data["amount"]
+    if (salary > 30 || salary < 10) {
         message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
@@ -422,9 +471,12 @@ function htmlTeacherSalaryCallback(text) {
 function postCompanySalary() {  //Уплата налогов и выдача зарплаты у компании (endpoint - /company-salary)
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
+    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+
 }
 
 function htmlCompanySalaryCallback(text) {
+    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.removeAttribute("disabled")});
     let modal = document.createElement("div");
     modal.classList.add("modal");
     document.body.append(modal);
@@ -488,7 +540,7 @@ function htmlAddEmployeeCallback(text) {
             output(message, bcgcolor);
         }
         else {
-            message = "Такого игрока не существует или он работает в другой фирме, или он основатель фирмы!";
+            message = "Либо игрока не существует, либо он уже работает в фирме!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
@@ -522,7 +574,7 @@ function htmlRemoveEmployeeCallback(text) {
     }
     else if (data["status"] == 400) {
         if (data["message"] == "wrong minister signature") {
-            message = "Непраильная подпись министра!";
+            message = "Неправильная подпись министра!";
             bcgcolor = "#fe9654";
             output(message, bcgcolor);
         }
@@ -603,7 +655,8 @@ function getFinePlayerFind() { //Проверка штрафов у игрока
 }
 
 function htmlFinePlayerFind(text) {
-    let data = JSON.parse(text);
+    let data = JSON.parse(text); 
+    console.log(data);
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
@@ -614,12 +667,13 @@ function htmlFinePlayerFind(text) {
 
 
         body.insertAdjacentHTML("beforeend", `
-        <h2>Игрок: ${input}</h2>
+        <h2 id="player_id">Игрок: ${input}</h2>
         <span>Размер штрафа:</span><span id="fines" style="background-color: #fe9654; color: #000" class="modal-frame">${fine} ${talic}</span>
         `)
         document.getElementById("drop-charges").removeAttribute("disabled");
     }
     else if (data["status"] == 404) {
+        modalCancel(true);
         message = "Такого игрока не существует!";
         bcgcolor = "#fe9654";
         output(message, bcgcolor);
@@ -645,7 +699,7 @@ function htmlFinePlayerPay(text) {
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        message = "Штраф аннулирован"
+        message = "Штраф аннулирован, налоги были уплачены!"
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
     }
@@ -662,9 +716,16 @@ function postWithdraw(text) { // (endpoint - /withdraw), TODO: не работа
         "player_id": `${text[0]}`,
         "amount": `${text[1]}`
     }
-
-    rs.callback = htmlWithdraw;
-    rs.httpPost("withdraw", JSON.stringify(data), "application/json")
+    let amount = data["amount"]
+    if (amount % 1 != 0) {
+        let message = "Неправильно введены данные!"
+        let bcgcolor = "#fe9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlWithdraw;
+        rs.httpPost("withdraw", JSON.stringify(data), "application/json")
+    }
 }
 
 function htmlWithdraw(text) {
