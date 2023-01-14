@@ -640,7 +640,7 @@ function htmlFinePlayers(text) {
 
 
 function getFinePlayerFind() { //Проверка штрафов у игрока (endpoint - check-players)
-    input = document.getElementById("input_1");
+    let input = document.getElementById("input_1");
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
 
@@ -649,6 +649,7 @@ function getFinePlayerFind() { //Проверка штрафов у игрока
     }
     else {
         input.style.border = "3px solid #3bff86"
+        document.getElementById("find-player").setAttribute("disabled", "disabled");
         rs.callback = htmlFinePlayerFind;
         rs.httpGet(`check-player?player_id=${input.value}`);
     }
@@ -656,18 +657,19 @@ function getFinePlayerFind() { //Проверка штрафов у игрока
 
 function htmlFinePlayerFind(text) {
     let data = JSON.parse(text); 
-    console.log(data);
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        input = document.getElementById("input_1").value;
-        fine = data["fine"];
-        talic = talicWordEnding(fine);
-        body = document.getElementById("modal-body");
+        let input = document.getElementById("input_1").value;
+        let fine = data["fine"];
+        let taxes = data["tax_paid"] == "1" ? "уплачены" : "не уплачены";
+        let talic = talicWordEnding(fine);
+        let body = document.getElementById("modal-body");
 
 
         body.insertAdjacentHTML("beforeend", `
         <h2 id="player_id">Игрок: ${input}</h2>
+        <span>Налоги:</span><span id="taxes" style="background-color: #fe9654; color: #000" class="modal-frame">${taxes}</span><br>
         <span>Размер штрафа:</span><span id="fines" style="background-color: #fe9654; color: #000" class="modal-frame">${fine} ${talic}</span>
         `)
         document.getElementById("drop-charges").removeAttribute("disabled");
@@ -679,6 +681,8 @@ function htmlFinePlayerFind(text) {
         output(message, bcgcolor);
         document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     }
+
+    document.getElementById("find-player").removeAttribute("disabled")
 }
 
 

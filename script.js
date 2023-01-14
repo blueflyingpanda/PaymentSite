@@ -320,7 +320,7 @@ function editEmployees() {
 }
 
 
-function finePlayer() { //Штрафник и отработка его долгов (юстиции)
+function finePlayer() { //Штрафник и отработка его долгов (юстиции и экономика)
   let modal = document.createElement("div");
   let functionNameTax = "postFinePlayerPay";
   functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
