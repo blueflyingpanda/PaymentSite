@@ -180,13 +180,14 @@ function htmlPlayerCallback(text) {
         if (firm != null) {
             localStorage["Firm"] = firm;
             document.getElementById("btns").insertAdjacentHTML("beforeend", `
-            <button id="firm-entrance" onclick="document.location = '${baseURL}/firm.html'" class="btn-orange">Перейти в фирму ${firm}</button>
+            <button id="firm-entrance" class="btn-orange">Перейти в фирму ${firm}</button>
             `)
             
             let firmEnter = document.getElementById("firm-entrance");
-            firmEnter.addEventListener("click", (e) => {
+            firmEnter.onclick = () => {
+                document.location = `${baseURL}/firm.html`;
                 Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
-            })
+            };
         }
     }
     else {
@@ -252,9 +253,10 @@ function htmlCompanyCallback(text) {
         }
 
         let firmExit = document.getElementById("firm-back");
-        firmExit.addEventListener("click", (e) => {
+        firmExit.onclick = () => {
+            document.location = `${baseURL}/player.html`;
             Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
-        })
+        };
 
     }
     else {

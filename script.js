@@ -188,18 +188,6 @@ function transferModal() { //Модалка переводов (игрок/уч�
       </form>
     </div>
   </div>`);
-
-  let key = true;
-  modal.addEventListener("keyup", (e) => {
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-    if (e.keyCode == 13 && key) {
-      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
-      key = false;
-    }
-  })
 }
 
 
@@ -227,18 +215,6 @@ function firmModal() { //Оплата услуг компании (игрок/у
       </div>  
     </div>
   </div>`);
-
-  let key = true;
-  modal.addEventListener("keyup", (e) => {
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-    if (e.keyCode == 13 && key) {
-      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
-      key = false;
-    }
-  })
 }
 
 
@@ -267,18 +243,6 @@ function withdraw() { //Модалка переводов из электрон�
       </div> 
     </div>
   </div>`);
-
-  let key = true;
-  modal.addEventListener("keyup", (e) => {
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-    if (e.keyCode == 13 && key) {
-      Array.from(document.querySelectorAll("button")).forEach((e) => { e.textContent == "Подтвердить" ? e.click() : null});
-      key = false;
-    }
-  })
 }
 
 
@@ -309,14 +273,6 @@ function editEmployees() {
       </div> 
     </div>
   </div>`);
-
-  let key = true;
-  modal.addEventListener("keyup", (e) => {
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-  })
 }
 
 
@@ -345,19 +301,6 @@ function finePlayer() { //Штрафник и отработка его долг
       </div>  
     </div>
   </div>`);
-
-  let key = true;
-  let timer;
-  modal.addEventListener("keyup", (e) => {
-    if (!timer && e.keyCode == 13 && key) {
-      document.getElementById("find-player").click();
-      timer = setTimeout(() => timer = clearTimeout(timer), 1000);
-    }
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-  })
 }
 
 
@@ -381,14 +324,6 @@ function output(message=null, bcgcolor="#fe9654") { //Оповещения
       </div>
     </div>
   </div>`);
-
-  let key = true;
-  window.addEventListener("keyup", (e) => {
-    if (e.keyCode == 27 && key) {
-      modalCancel(true);
-      key = false;
-    }
-  })
 }
 
 
@@ -398,24 +333,39 @@ function modalCancel(modalClose) { //Кнопка "Выйти" в модалка
     let modalBtn = document.querySelectorAll("#modal_cancel_id");
     for (let i = 0; i < modalBtn.length; i++) {modalBtn[i].setAttribute("disabled", "disabled");}
   }
-  let modal = document.querySelector(".modal");
-  let pinModal = document.querySelector(".pin-modal");
-  let modalInfo = document.querySelector(".modal-info");
+  let modal = Array.from(document.querySelectorAll(".modal"));
+  let pinModal = Array.from(document.querySelectorAll(".pin-modal"));
+  let modalInfo = Array.from(document.querySelectorAll(".modal-info"));
   let modalAnimate = [
     {opacity: "1"},
     {opacity: "0"}
   ]
 
-  if (modal != null) {
-    modal.animate(modalAnimate, {duration: 1000})
-    setTimeout(() => { modal.remove(); }, 970);
+  if (modal != 0) {
+    modal.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
+    modal.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
   }
-  if (pinModal != null) {
-    pinModal.animate(modalAnimate, {duration: 1000})
-    setTimeout(() => { pinModal.remove() }, 970);
+  if (pinModal != 0) {
+    pinModal.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
+    pinModal.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
   }
-  if (modalInfo != null) {
-    modalInfo.animate(modalAnimate, {duration: 1000})
-    setTimeout(() => { modalInfo.remove() }, 970);
+  if (modalInfo != 0) {
+    modalInfo.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
+    modalInfo.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
+  }
+}
+
+
+
+let timer;
+window.onkeydown = (e) => {
+  if (e.keyCode == 9) {
+      e.preventDefault();
+      document.activeElement.blur();
+  }
+  if (!timer && e.keyCode == 27) {
+    document.activeElement.blur();
+    modalCancel(true);
+    timer = setTimeout(() => timer = clearTimeout(timer), 1000);
   }
 }
