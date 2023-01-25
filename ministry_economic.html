@@ -8,9 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Economic</title>
 </head>
-<body>
-    <script>localStorage["Confirmation"] == undefined ? confirm() : null;</script>
-
+<body onload="getMinistryPage()">
     <div class="start-btns">
         <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
         <button class="btn-green" onclick="confirm()">Изменить пароль действий</button>
@@ -23,8 +21,9 @@
             <h1>Ваши возможности: </h1>
         </div>
         <div>
-            <button onclick="withdraw()" id="cashcard-transfer" class="btn-purple">Перевод электронных денег в наличные</button><br>
+            <button onclick="moneyTransit()" id="cashcard-transfer" class="btn-purple">Перевод денег</button><br>
             <button onclick="finePlayer()" id="taxes-pay-economic" class="btn-purple">Уплата штрафов и налогов игрока</button><br>
+            <button onclick="allLogs()" id="all-logs-economic" class="btn-purple">Системные логи</button><br>
         </div>
     </div>
 

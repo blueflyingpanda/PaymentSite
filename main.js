@@ -43,7 +43,7 @@ function alertCallback(text) {
 }
 
 const frontProduction = true;
-const frontAndroidProduction = false;
+const frontAndroidProduction = true;
 const backProduction = true;
 const commonPasswordLength = 5;
 
@@ -67,6 +67,7 @@ function logout() { //Выход из аккаунта
     localStorage.removeItem("Authorization");
     localStorage.removeItem("isTeacher");
     localStorage.removeItem("Firm");
+    localStorage.removeItem("FieldActivity");
     window.location.replace(`${baseURL}/index.html`);
 }
 
@@ -74,43 +75,42 @@ function logout() { //Выход из аккаунта
 
 function main() { // (endpoint - /auth)
     if (localStorage.getItem("Authorization")) {
-        if (localStorage.getItem("isTeacher") == true) {
+        if (localStorage.getItem("isTeacher") == "true") {
             window.location.replace(`${baseURL}/teacher.html`);
         }
-        else if (localStorage.getItem("isTeacher") == false) {
+        else if (localStorage.getItem("isTeacher") == "false") {
             window.location.replace(`${baseURL}/player.html`);
         }
-        else if (localStorage.getItem("isTeacher") == null) {
-            window.location.replace(`${baseURL}/ministry_economic.html`);
+        else if (localStorage.getItem("isTeacher") == "null") {
+            if (localStorage["FieldActivity"] == "economic") {
+                window.location.replace(`${baseURL}/ministry_economic.html`);
+            }
+            else if (localStorage["FieldActivity"] == "mvd") {
+                window.location.replace(`${baseURL}/ministry_mvd.html`);
+            }
+            else if (localStorage["FieldActivity"] == "judgement") {
+                window.location.replace(`${baseURL}/ministry_justice.html`)
+            }
         }
     }
     addEventListener("submit", (e) => {
-        e.preventDefault();
-        text = document.getElementById("passw").value;
-        if (sha256(text) == "9ba8cd17e1a8c2de7284dede56e3a7ff701e41897af24b324b1dce7c4435c8a6") {
-            window.location.replace(`${baseURL}/ministry_mvd.html`);
-        }
-        else if (sha256(text) == "f65908db4a3158ac90fd185fa22d76bfb68d55f9138fff756abaf8219553dc7e") {
-            window.location.replace(`${baseURL}/ministry_justice.html`);
+    e.preventDefault();
+        rs.callback = htmlAuthCallback;
+        let form = document.getElementById('authForm');
+        let formData = new FormData(form);
+        let password = formData.get("password")
+        if (!password || password.length < commonPasswordLength) {
+            invalidPassword(form);
         }
         else {
-            rs.callback = htmlAuthCallback;
-            let form = document.getElementById('authForm');
-            let formData = new FormData(form);
-            let password = formData.get("password")
-            if (!password || password.length < commonPasswordLength) {
-                invalidPassword(form);
-            }
-            else {
-                validPassword(form, formData);
-            }
+            validPassword(form, formData);
         }
-    })
+    });
 }
 
 function invalidPassword(form) {
     let message = "Неправильный пароль, попробуйте ещё раз!";
-    let bcgcolor = "#fe9654";
+    let bcgcolor = "#FE9654";
     output(message, bcgcolor);
     document.getElementById("passw").style.border = "3px solid #ff483b";
     form.reset();
@@ -125,6 +125,7 @@ function validPassword(form, formData) {
 
 function htmlAuthCallback(text) { 
     let data = JSON.parse(text);
+    console.log(data);
     if (data["status"] == 200) {
         localStorage.setItem("Authorization", data[tokenHeader])
         localStorage.setItem("isTeacher", data["teacher"])
@@ -135,52 +136,68 @@ function htmlAuthCallback(text) {
             window.location.replace(`${baseURL}/player.html`);
         }
         else if (data["teacher"] == null) {
-            window.location.replace(`${baseURL}/ministry_economic.html`);
+            let field_activity = data["message"][6]; 
+            localStorage["FieldActivity"] = field_activity;
+            if (field_activity == "economic") {
+                window.location.replace(`${baseURL}/ministry_economic.html`);
+            }
+            else if (field_activity == "mvd") {
+                window.location.replace(`${baseURL}/ministry_mvd.html`);
+            }
+            else if (field_activity == "judgement") {
+                window.location.replace(`${baseURL}/ministry_justice.html`);
+            }
         }
     }
     else if (data["status"] == 401) {
         let message = "Неправильный пароль, попробуйте ещё раз!";
-        let bcgcolor = "#fe9654";
+        let bcgcolor = "#FE9654";
         output(message, bcgcolor);
         document.getElementById("passw").style.border = "3px solid #ff483b";
     }
     else {
-        alert(data["status"]);
+        let message = `STATUS: ${data["status"]}`,
+        bcgcolor = "#DC143C";
+        output(message, bcgcolor);
     }
 }
 
 
 
 function getPlayerPage() { //Игрок (onload player.html) (endpoint - /player)
-    if (localStorage["Confirmation"] == undefined) {
-        confirm();
-      }
-    
     rs.callback = htmlPlayerCallback;
     rs.httpGet('player');
-
 }
 
 function htmlPlayerCallback(text) {
     let data = JSON.parse(text);
+    console.log(data);
+
+    if (localStorage["Confirmation"] == undefined) {
+        confirm();
+    }
     if (data["status"] == 200) {
-        firstName = data["player"][0];
-        lastName = data["player"][2];
-        gradeInfo = data["player"][3];
-        balance = data["player"][4];
-        talic = talicWordEnding(balance);
-        firm = data["player"][5];
-        inn = data["player"][6];
+        let firstName = data["player"][0],
+        lastName = data["player"][2],
+        gradeInfo = data["player"][3],
+        balance = data["player"][4],
+        talic = talicWordEnding(balance),
+        firm = data["player"][5],
+        inn = data["player"][6],
+        fine = data["player"][7],
+        tax = data["player"][8],
+        founder = data["player"][9];
 
         document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
         document.getElementById("grade").innerHTML += `${gradeInfo}`
         document.getElementById("inn").innerHTML += `${inn}`;
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
 
-        if (firm != null) {
+        if (firm != null) { //Есть в фирме или нет
+            let employee = founder == 1 ? "владелец" : "наёмный сотрудник";
             localStorage["Firm"] = firm;
             document.getElementById("btns").insertAdjacentHTML("beforeend", `
-            <button id="firm-entrance" class="btn-orange">Перейти в фирму ${firm}</button>
+            <button id="firm-entrance" class="btn-orange">Перейти в фирму ${firm} (${employee})</button>
             `)
             
             let firmEnter = document.getElementById("firm-entrance");
@@ -189,42 +206,81 @@ function htmlPlayerCallback(text) {
                 Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
             };
         }
+
+        if (fine > 0 && tax != 1) { //Штраф и налог - красный
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#DC143C"; //Красный
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">ОПЛАТИТЕ ШТРАФ И УПЛАТИТЕ НАЛОГИ В БАНКЕ!</h2>`)
+        }
+        else if (tax != 1) {
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#8A2BE2"; //Фиолетовый
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">У вас неуплачены налоги!</h2>`)
+        }
+        else if (fine > 0) {
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#FF69B4"; //Розовый
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">Оплатите штраф в банке!</h2>`)
+        }
+        else {
+            prevButton = document.getElementById("action-pass");
+            prevButton.insertAdjacentHTML("afterend", 
+            `<button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green"></button>`);
+            lightDarkToggle();
+        }
+
     }
     else {
-        alert(`${data["status"]} ${data["message"][0]}`);
-        window.location.replace(`${baseURL}/index.html`);
+        let message = `STATUS: ${data["status"]}, MESSAGE: ${data["message"]}`,
+        bcgcolor = "#DC143C";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            logout();
+        }, 3000);
     }
 }
 
 
 
 function getTeacherPage() { //Учитель (onload teacher.html, endpoint - /teacher)
-    if (localStorage["Confirmation"] == undefined) {
-        confirm();
-      }
-    
     rs.callback = htmlTeacherCallback;
     rs.httpGet('teacher');
 
 }
 
 function htmlTeacherCallback(text) {
-    let data = JSON.parse(text);
+    if (localStorage["Confirmation"] == undefined) {
+        confirm();
+    }
+
+    let data = JSON.parse(text); console.log(data);
 
     if (data["status"] == 200) {
-        firstName = data["teacher"][0];
-        middleName = data["teacher"][1];
-        balance = data["teacher"][3];
-        talic = talicWordEnding(balance);
+        let firstName = data["teacher"][0],
+        middleName = data["teacher"][1],
+        balance = data["teacher"][3],
+        talic = talicWordEnding(balance),
         inn = data["teacher"][4];
+        subject = data["teacher"][5];
+        companyBalance = data["teacher"][6];
+        talicCompany = talicWordEnding(companyBalance);
         
         document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
-        document.getElementById("inn").innerHTML += `${inn}`;
+        document.getElementById("subject").innerHTML += `${subject}`;
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
+        document.getElementById("company-balance").innerHTML += `${companyBalance} ${talicCompany}`;
+        document.getElementById("inn").innerHTML += `${inn}`;
     }
     else {
-        alert(`${data["status"]} ${data["message"][0]}`)
-        window.location.replace(`${baseURL}/index.html`);
+        let message = `STATUS: ${data["status"]}, MESSAGE: ${data["message"]}`,
+        bcgcolor = "#DC143C";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.replace(`${baseURL}/index.html`);
+        }, 3000);
     }
 }
 
@@ -240,16 +296,19 @@ function htmlCompanyCallback(text) {
     console.log(data);
 
     if (data["status"] == 200) {
-        firmName = data["company"][1];
-        firmBalance = data["company"][5];
-        talic = talicWordEnding(firmBalance);
+        let firmName = data["company"][1],
+        firmBalance = data["company"][5],
+        talic = talicWordEnding(firmBalance),
+        tax = data["playerinfo"][0],
+        fine = data["playerinfo"][1];
+        founder = data["playerinfo"][2];
 
 
         document.getElementById("greeting").innerHTML += `${firmName}!`;
         document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
 
         for (let i = 0; data["members"][i] != undefined; i++) {
-            document.getElementById("company-list").innerHTML += `<li>${data["members"][i]}</li>`;
+            document.getElementById("company-list").insertAdjacentHTML("beforeend", `<li>${data["members"][i]}</li>`);
         }
 
         let firmExit = document.getElementById("firm-back");
@@ -258,23 +317,130 @@ function htmlCompanyCallback(text) {
             Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
         };
 
+        
+        if (founder != 1) {
+            document.querySelector("#btns").querySelectorAll("button").forEach((button) => {
+                button.setAttribute("disabled", "disabled");
+            })
+            document.getElementById("firm-back").removeAttribute("disabled");
+        }
+        if (fine > 0 && tax != 1) {
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#DC143C"; //Красный
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">ОПЛАТИТЕ ШТРАФ И УПЛАТИТЕ НАЛОГИ В БАНКЕ!</h2>`)
+        }
+        else if (tax != 1) {
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#8A2BE2"; //Фиолетовый
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">У вас неуплачены налоги!</h2>`)
+        }
+        else if (fine > 0) {
+            localStorage["Toggle"] = false; 
+            lightDarkToggle();
+            document.body.style.backgroundColor = "#FF69B4"; //Розовый
+            document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">Оплатите штраф в банке!</h2>`)
+        }
+        else {
+            prevButton = document.querySelector(".start-btns");
+            prevButton.insertAdjacentHTML("beforeend", 
+            `<button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green"></button>`);
+            lightDarkToggle();
+        }
+
     }
     else {
-        alert(`${data["status"]} ${data["error"]}`);
-        window.location.replace(`${baseURL}/index.html`);
+        let message = `STATUS: ${data["status"]}, MESSAGE: ${data["message"]}`,
+        bcgcolor = "#DC143C";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            logout();
+        }, 3000);
     }
 }
 
 
 
-function getMinistryEconomic() {
-    rs.callback = htmlMinistryEconomicCallback;
-    rs.httpPost("auth", localStorage["Authorization"]);
+function getMinistryPage() {
+    rs.callback = htmlMinistryCallback;
+    rs.httpGet("minister");
 }
 
-function htmlMinistryEconomicCallback(text) {
-    let data = JSON.parse(text);
-    console.log(data);
+function htmlMinistryCallback(text) {
+    let data = JSON.parse(text); console.log(data);
+
+    if (data["status"] == 200) {
+        if (data["minister"][6] == "economic") {
+            let keys = {
+                37: "left",
+                38: "up",
+                39: "right",
+                40: "down",
+                65: "a",
+                66: "b",
+                16: "shift",
+                17: "ctrl",
+                32: "space",
+            }
+            let konamiCode = ["up", "up", "down", "down", "left", "right", "left", "right", "b", "a", "ctrl", "shift", "ctrl", "shift", "space"];
+            let keyCount = 0;
+            function checkCodeKonami(e) {
+                let pressedKey = keys[e.keyCode];
+                if (pressedKey == konamiCode[keyCount]) {
+                    ++keyCount;
+                    console.log(pressedKey);
+                }
+                else {
+                    keyCount = 0;
+                }
+                if (keyCount == 15) {
+                    keyCount = 0;
+                    modalCancel(true);
+                    rs.callback = htmlMinisterCashCallback;
+                    rs.httpGet("minister-cash");
+
+                    function htmlMinisterCashCallback(text) {
+                        let data = JSON.parse(text);
+                        if (data["status"] == 200) {
+                            let message = `Имя: ${data["minister"][0]}<br>
+                                            Фамилия: ${data["minister"][2]}<br>
+                                            Отчество: ${data["minister"][1]}<br>
+                                            Наличка: ${data["minister"][4]} ${talicWordEnding(data["minister"][4])}`;
+                            let bcgcolor = "#FF4500";
+
+                            output(message, bcgcolor);
+                        }
+                        else {
+                            message = "Нефиг тут конами-коды вводить, мамкин хацкер :D";
+                            bcgcolor = "#FE9654";
+                            output(message, bcgcolor);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
+                        }
+                    }
+                }
+            }
+            window.addEventListener("keydown", checkCodeKonami, false);
+        }
+
+
+        if (localStorage["Confirmation"] == undefined && data["minister"][6] != "mvd") {
+            confirm();
+        }
+        if (data["minister"][6] == "mvd") {
+            getFinePlayers();
+        }
+    }
+    else {
+        let message = `STATUS: ${data["status"]}, MESSAGE: ${data["message"]}`,
+        bcgcolor = "#DC143C";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            logout();
+        }, 3000);
+    }
 }
 
 
@@ -290,39 +456,50 @@ function postTaxes() { //Уплата налогов (endpoint - /paytax)
 
 function htmlTaxesCallback(text) {
     Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.removeAttribute("disabled")});
+    let data = JSON.parse(text); console.log(data);
 
-    let modal = document.createElement("div");
-    modal.classList.add("modal");
-    document.body.append(modal);
-    modal.insertAdjacentHTML("afterbegin", `
-    <div id="modal-overlay" class="modal-overlay">
-      <div id="modal-window" class="modal-window">
-        <div id="modal-header" class="modal-header">
-          <span class="modal-title">Уплата налогов</span>
-        </div>
-        <div id="modal-body" class="modal-body">
-        </div>
-        <div class="modal-footer">
-          <button id="modal_cancel_id" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
-        </div>
-      </div>
-    </div>`);
+    if (data["status"] == 200 || data["status"] == 400) {
+        let modal = document.createElement("div");
+        modal.classList.add("modal");
+        document.body.append(modal);
+        modal.insertAdjacentHTML("afterbegin", `
+        <div id="modal-overlay" class="modal-overlay">
+            <div id="modal-window" class="modal-window">
+                <div id="modal-header" class="modal-header">
+                    <span class="modal-title">Уплата налогов</span>
+                </div>
+                <div id="modal-body" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button id="modal_cancel_id" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+                </div>
+            </div>
+        </div>`);
+    }
 
-    let data = JSON.parse(text);
     let modalBody = document.getElementById("modal-body");
 
     if (data["status"] == 200) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены!</span>`
+        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены!</span><br>`
+        modalBody.innerHTML += `<span>Сумма штрафа: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
     }
     else if (data["status"] == 400) {
         if (data["message"] == "taxes have already been paid") {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Налоги уже были уплачены за этот период!</span><br>`;
-            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #FE9654;">Налоги уже были уплачены за этот период!</span><br>`;
+            modalBody.innerHTML += `<span>Сумма штрафа: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
         }
         else {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">У вас недостаточно средств для уплаты налогов!</span><br>`;
-            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #fe9654">${data["fine"]}</span><br>`;
+            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #FE9654;">У вас недостаточно средств для уплаты налогов!</span><br>`;
+            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
         }
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -338,7 +515,7 @@ function postTransfer(text) { //Переводы между игроками (en
 
     if (receiver % 1 != 0 || amount % 1 != 0 || receiver < 0 || amount < 0) {
         let message = "Неправильно введены данные!"
-        let bcgcolor = "#fe9654";
+        let bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
@@ -359,19 +536,22 @@ function htmlTransferCallback(text) {
     else if (data["status"] == 400) {
         if (data["message"] == "receiver does not exist") {
             message = "Такого игрока не существует!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
         else if (data["message"] == "not enough money to transfer") {
             message = "Недостаточно средств для перевода!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
     }
     else {
         message = "Произошла непревиденная ошибка!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -389,7 +569,7 @@ function postPayFirm(text) { //Оплата услуг компании (endpoin
 
     if (amount % 1 != 0 || amount < 0) {
         let message = "Неправильно введены данные!"
-        let bcgcolor = "#fe9654";
+        let bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
@@ -410,19 +590,22 @@ function htmlPayFirmCallback(text) {
     else if (data["status"] == 400){
         if (data["message"] == "not enough money to pay") {
             message = "Недостаточно средств для перевода!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
         else if (data["message"] == "no such company") {
             message = "Такой компании не существует!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
     }
     else {
-        message = "Произошла непревиденная ошибка";
-        bcgcolor = "#fe9654";
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -436,12 +619,16 @@ function postTeacherSalary(text) { //Выдача зарплаты игроку 
     let salary = data["amount"]
     if (salary > 30 || salary < 10) {
         message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
-        rs.callback = htmlTeacherSalaryCallback;
-        rs.httpPost("teacher-salary", JSON.stringify(data), "application/json");
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -457,14 +644,17 @@ function htmlTeacherSalaryCallback(text) {
         }
         else if (data["message"] == "player does not exist") {
             message = "Такого игрока не существует!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
     }
     else {
         message = "Произошла непревиденная ошибка!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -474,39 +664,31 @@ function postCompanySalary() {  //Уплата налогов и выдача з
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
     Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
-
 }
 
 function htmlCompanySalaryCallback(text) {
-    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.removeAttribute("disabled")});
-    let modal = document.createElement("div");
-    modal.classList.add("modal");
-    document.body.append(modal);
-    modal.insertAdjacentHTML("afterbegin", `
-    <div id="modal-overlay" class="modal-overlay">
-      <div id="modal-window" class="modal-window">
-        <div class="modal-header">
-            <span class="modal-title">Уплата налогов и выдача зарплаты сотрудникам</span><br>
-        </div>
-        <div id="modal-body" class="modal-body">
-        </div>
-        <div class="modal-footer">
-            <button id="modal_cancel_id" type="button" onclick="modalCancel()" class="btn-orange">Выйти</button>
-        </div>
-      </div>
-    </div>`);
-    let modalBody = document.getElementById("modal-body");
-
     let data = JSON.parse(text);
+    let message, bcgcolor;
+    
     if (data["status"] == 200) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #ffd700;">Зарплаты были выплачены!</span`;
+        message = "Зарплаты были выплачены!";
+        bcgcolor = "#3BFF86";
+        output(message, bcgcolor);
+
     }
     else if (data["status"] == 400) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Недостаточно денег на счёте для выплаты зарплат!</span`;
+        message = "Недостаточно денег на счёте для выплаты зарплат!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
     }
     else {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #fe9654;">Вы не являетесь основателем фирмы!</span`;
-    }
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    } 
 }
 
 
@@ -532,21 +714,29 @@ function htmlAddEmployeeCallback(text) {
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
         if (data["message"] == "wrong minister signature") {
             message = "Непраильная подпись министра!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
         else {
             message = "Либо игрока не существует, либо он уже работает в фирме!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
     }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    } 
 }
 
 
@@ -571,33 +761,41 @@ function htmlRemoveEmployeeCallback(text) {
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
         if (data["message"] == "wrong minister signature") {
             message = "Неправильная подпись министра!";
-            bcgcolor = "#fe9654";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
         else {
-            message = "Или такого игрока не существует, или он работает в другой фирме, или он основатель фирмы";
-            bcgcolor = "#fe9654";
+            message = "Либо игрока не существует, либо он уже работает в фирме!";
+            bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
     }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    } 
 }
 
 
 
 function getFinePlayers() { //Получение игроков, у которых есть штрафы для МВД (endpoint - /debtors)
-    let transfer_div = document.getElementById("log-table");
+    let transferDiv = document.getElementById("log-table");
 
-    transfer_div = document.createElement("div");
-    transfer_div.classList.add("log-table");
-    transfer_div.setAttribute("id", "log-table");
-    document.body.append(transfer_div);
-    transfer_div.insertAdjacentHTML("afterbegin", ` 
+    transferDiv = document.createElement("div");
+    transferDiv.classList.add("log-table");
+    transferDiv.setAttribute("id", "log-table");
+    document.body.append(transferDiv);
+    transferDiv.insertAdjacentHTML("afterbegin", ` 
     <h2>Здесь будут показаны все игроки, просрочившие уплату налогов за прошедшие периоды</h2>
     <hr>
     <h2>Образец:</h2>
@@ -605,14 +803,14 @@ function getFinePlayers() { //Получение игроков, у которы
     <h2>|Статус уплаты налога за этот период|</h2>
     <h2>|Сумма штрафов|</h2>
     <hr>`);
-    transfer_div.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
+    transferDiv.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
 
     rs.callback = htmlFinePlayers;
     rs.httpGet("/debtors");
 }
 
 function htmlFinePlayers(text) {
-    let transfer_div = document.getElementById("log-table");
+    let transferDiv = document.getElementById("log-table");
     let data = JSON.parse(text);
 
     if (data["status"] == 200) {
@@ -620,22 +818,30 @@ function htmlFinePlayers(text) {
             data["debtors"][i][1] = data["debtors"][i][1] == "1" ? "уплачены" : "неуплачены";
             talic = talicWordEnding(data["debtors"][i][2]);
 
-            transfer_div.innerHTML += `
+            transferDiv.innerHTML += `
             <h2>ID игрока: ${data["debtors"][i][0]}</h2>
             <h2>Налоги ${data["debtors"][i][1]}</h2>
             <h2>Штраф - ${data["debtors"][i][2]} ${talic}</h2>
             `
 
             if (data["debtors"][i+1] != undefined) {
-                transfer_div.innerHTML += `<hr>`;
+                transferDiv.innerHTML += `<hr>`;
             }
         }
 
         if (data["debtors"][0] == undefined) {
-            transfer_div.innerHTML += `
+            transferDiv.innerHTML += `
             <h2>Здесь пока никого нет ;D</h2>
             <h2>Проверьте эту таблицу после начала следующего периода!</h2>`
         }
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
@@ -671,20 +877,33 @@ function htmlFinePlayerFind(text) {
 
         body.insertAdjacentHTML("beforeend", `
         <h2 id="player_id">Игрок: ${input}</h2>
-        <span>Налоги:</span><span id="taxes" style="background-color: #fe9654; color: #000" class="modal-frame">${taxes}</span><br>
-        <span>Размер штрафа:</span><span id="fines" style="background-color: #fe9654; color: #000" class="modal-frame">${fine} ${talic}</span>
+        <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${taxes}</span><br>
+        <span>Размер штрафа:</span><span id="fines" style="background-color: #FE9654; color: #000" class="modal-frame">${fine} ${talic}</span>
         `)
         document.getElementById("drop-charges").removeAttribute("disabled");
     }
     else if (data["status"] == 404) {
         modalCancel(true);
         message = "Такого игрока не существует!";
-        bcgcolor = "#fe9654";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
         document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     }
+    else if (data["status"] == 401) {
+        window.location.reload();
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
 
-    document.getElementById("find-player").removeAttribute("disabled")
+    setTimeout(() => {
+        document.getElementById("find-player").removeAttribute("disabled");
+    }, 1000);
 }
 
 
@@ -692,6 +911,8 @@ function htmlFinePlayerFind(text) {
 function postFinePlayerPay() { // (endpoint - /drop-charges)
     input = document.getElementById("input_1");
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
+    document.getElementById("find-player").setAttribute("disabled", "disabled")
+
     let data = {
         "player_id": Number(input.value)
     }
@@ -702,6 +923,7 @@ function postFinePlayerPay() { // (endpoint - /drop-charges)
 
 function htmlFinePlayerPay(text) {
     let data = JSON.parse(text);
+    console.log(data);
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
@@ -709,23 +931,36 @@ function htmlFinePlayerPay(text) {
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
     }
-    else {
-        message = "Случилась непревиденная ошибка!";
-        bcgcolor = "#fe9654";
+    else if (data["status"] == 404) {
+        modalCancel(true);
+        message = "Такого игрока не существует!";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
+        document.getElementById("drop-charges").setAttribute("disabled", "disabled");
+    }
+    else if (data["status"] == 401) {
+        window.location.reload();
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
 
-function postWithdraw(text) { // (endpoint - /withdraw), TODO: не работает, кста. И надо ещё министров сделать.
+function postWithdraw(text) { // (endpoint - /withdraw)
     data = {
         "player_id": `${text[0]}`,
         "amount": `${text[1]}`
     }
     let amount = data["amount"]
-    if (amount % 1 != 0) {
+    if (amount % 1 != 0 || amount < 1) {
         let message = "Неправильно введены данные!"
-        let bcgcolor = "#fe9654";
+        let bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
@@ -735,15 +970,159 @@ function postWithdraw(text) { // (endpoint - /withdraw), TODO: не работа
 }
 
 function htmlWithdraw(text) {
-    let data = JSON.parse(text);
+    let data = JSON.parse(text); console.log(data);
     let message = null, bcgcolor = null;
     
-    if (data["status"] == 401) {
-        message = "Неавторизованный пользователь! Авторизуйтесь с помощью данного вам кода!"
-        bcgcolor = "#fe9654";
+    if (data["status"] == 200) {
+        message = "Деньги сняты успешно!"
+        bcgcolor = "#3bff86"
+        output(message, bcgcolor)
+    }
+    else if (data["status"] == 401) {
+        window.location.reload();
+    }
+    else if (data["status"] == 400) {
+        message = "Неправильно введены данные!"
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
 }
+
+
+
+function postDeposit(text) { // (endpoint - /deposit)
+    data = {
+        "player_id": `${text[0]}`,
+        "amount": `${text[1]}`
+    }
+    let amount = data["amount"]
+    if (amount % 1 != 0 || amount < 1) {
+        let message = "Неправильно введены данные!"
+        let bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlDeposit;
+        rs.httpPost("deposit", JSON.stringify(data), "application/json")
+    }
+}
+
+function htmlDeposit(text) {
+    let data = JSON.parse(text); console.log(data);
+    let message = null, bcgcolor = null;
+    
+    if (data["status"] == 200) {
+        message = "Деньги внесены успешно!"
+        bcgcolor = "#3bff86"
+        output(message, bcgcolor)
+    }
+    else if (data["status"] == 400) {
+        message = "Неправильно введены данные!"
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 401) {
+        window.location.reload();
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
+
+function getAllLogs(text) { //(endpoint - ministry_economic_logs)
+    let logsDiv = document.getElementById("log-table");
+    try {logsDiv.remove()} catch {};
+    let functionName = "getClearLogs";
+    functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+
+
+
+    logsDiv = document.createElement("div");
+    logsDiv.classList.add("log-table");
+    logsDiv.setAttribute("id", "log-table");
+    document.body.append(logsDiv);
+    logsDiv.insertAdjacentHTML("afterbegin", ` 
+    <h2>Здесь будут выводиться все логи платёжной системы</h2>
+    <button onclick="${functionName}" id="clear-logs" class="btn-purple">Очистить системные логи</button><br>
+    <hr>`);
+    logsDiv.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
+    
+    rs.callback = htmlAllLogsCallback;
+    rs.httpGet(`ministry_economic_logs?length=${text}`);
+}
+
+function htmlAllLogsCallback (text) {
+    let logsDiv = document.getElementById("log-table");
+    let data = JSON.parse(text); console.log(data);
+
+    if (data["status"] == 200) {
+        let logCount = 0;
+
+        for (let i = 0; data["logs"][i] != undefined; i++) {
+            let text = data["logs"][i];
+            logsDiv.innerHTML += `<h2>${i+1}: ${text}</h2>`
+            ++logCount;
+
+            if (data["logs"][i+1] != undefined) {
+                logsDiv.innerHTML += `<hr>`;
+            }
+            else {
+                document.getElementById("clear-logs").insertAdjacentHTML("afterend", `<h2>Всего строк выведено: ${logCount}</h2>`);
+            }
+        }
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
+
+function getClearLogs() {
+    rs.callback = htmlclearLogsCallback;
+    rs.httpGet("clear_logs");
+}
+
+function htmlclearLogsCallback(text) {
+    let data = JSON.parse(text);
+    let message = null, bcgcolor = null;
+
+    if (data["status"] == 200) {
+        message = "Логи успешно очищены!";
+        bcgcolor = "#3bff86";
+        output(message, bcgcolor);
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
 
 function talicWordEnding (talic) {
     if (talic%10 == 1) {
@@ -756,3 +1135,22 @@ function talicWordEnding (talic) {
         return "талиц";
     }
 }
+
+
+
+setInterval(() => { // Обновление страницы каждый период
+    let date = new Date();
+    console.log(date.getHours(), date.getMinutes(), date.getSeconds());
+    if (
+        (date.getHours() == 9 && date.getMinutes() == 0) ||
+        (date.getHours() == 10 && date.getMinutes() == 0) ||
+        (date.getHours() == 11 && date.getMinutes() == 0) ||
+        (date.getHours() == 12 && date.getMinutes() == 0) ||
+        (date.getHours() == 13 && date.getMinutes() == 0) ||
+        (date.getHours() == 14 && date.getMinutes() == 0) ||
+        (date.getHours() == 15 && date.getMinutes() == 0))
+    {
+        location.reload();
+    }
+
+}, 55000);

@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="getCompany(localStorage.getItem('Firm'))">
-    <div class="start-btns">
-        <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
-    </div>
+    <div class="start-btns"></div>
     <div class="main">
         <div id="info">
             <h1 id="greeting">Добро пожаловать, фирма </h1>
@@ -17,7 +15,7 @@
             <hr id="main-hr">
             <h1>Ваши возможности:</h1>
         </div>
-        <div>
+        <div id="btns">
             <button onclick="postCompanySalary()" class="btn-purple">Уплата налогов и выдача зарплаты сотрудникам</button><br>
             <button onclick="editEmployees()" class="btn-purple">Нанять/уволить сотрудника</button><br>
             <button id="firm-back" onclick="document.location = './player.html'" class="btn-orange">Вернуться</button><br>

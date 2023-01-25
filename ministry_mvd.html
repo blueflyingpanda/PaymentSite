@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MVD</title>
 </head>
-<body onload="getFinePlayers()">
+<body onload="getMinistryPage()">
     <div class="start-btns">
         <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
         <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
@@ -18,6 +18,10 @@
             <h1>Добро пожаловать, сотрудник МВД!</h1>
             <h2>У вас есть доступ к таблице штрафников по всей системе</h2>
         </div>
+        <div id="btns">
+            <button onclick="memoMVD()" class="btn-purple">Памятка</button>
+        </div>
+        <hr id="main-hr">
     </div>
 
     <script src="main.js"></script>

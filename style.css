@@ -21,6 +21,19 @@ button {
 body {    
     font-size: 1.5rem;
     font-family: 'Oswald', sans-serif;
+    animation-name: body-show;
+    animation-timing-function: cubic-bezier(.88,.35,.22,1.65);
+    animation-duration: 1.2s;
+}
+@keyframes body-show {
+    from {
+        opacity: 0;
+        transform: translateY(-15vh);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
 }
 li {
     font-size: 2rem;
@@ -170,11 +183,26 @@ input { /*Поля*/
 .modal-window { /*Содержание модального окна*/
     border: 10px solid #fe9654;
     width: 80vw;
+    max-height: 55vh;
+    overflow: auto;
+    overflow-x: hidden;
     border-radius: 10px;
     background: #fff;
     margin: 10vh auto;
     text-align: center;
+    animation-name: modal-window-show;
+    animation-timing-function: cubic-bezier(.88,.35,.21,1);
+    animation-duration: 1s;
 }
+@keyframes modal-window-show {
+    from {
+        transform: translateY(-80vh);
+    }
+    to {
+        transform: translateY(0px);
+    }
+}
+
 .modal-header {
     padding: 5px 10px;
 }
@@ -218,6 +246,7 @@ input { /*Поля*/
     border: 10px solid #fe9654;
     margin: 1vh auto 5vh auto;
     overflow: auto;
+    overflow-x: hidden;
     text-align: center;
 }
 .log-table button {

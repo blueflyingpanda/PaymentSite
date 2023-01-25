@@ -10,21 +10,21 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
   let toggleBtn = document.getElementById("lightDarkToggle");
 
   if (localStorage["Toggle"] == "true") {
-    toggleBtn.textContent = "🌚";
+    try { toggleBtn.textContent = "🌚" } catch {};
     try { hr.style.backgroundColor = "#000"; hr.style.borderColor = "#000";} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#000"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#000"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#000"}} catch {};
-    document.body.style.backgroundColor = "#fff"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1200});
+    document.body.style.backgroundColor = "#fff"; 
     if (toggle) {localStorage["Toggle"] = "false"; location.reload();}
   }
   else {
-    toggleBtn.textContent = "☀";
+    try { toggleBtn.textContent = "☀"; } catch {};
     try { hr.style.backgroundColor = "#fff"; hr.style.borderColor = "#fff";} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#fff"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#fff"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#fff"}} catch {};
-    document.body.style.backgroundColor = "#000"; document.body.animate([{opacity: 0}, {opacity: 1}], { duration: 1200});
+    document.body.style.backgroundColor = "#000"; 
     if (toggle) {localStorage["Toggle"] = "true"; location.reload();}
   }
 }
@@ -97,8 +97,8 @@ function pinCode(functionName, data) { //Модальное окно с ввод
         <input id="pin-input" type="password" autocomplete="off" maxlength="6" placeholder="Введите ваш пин-код: " name="pin-code" required>
       </div>
       <div class="modal-footer">
-        <button id="modal_cancel_id" type="button" onclick="pinCodeVerify(${functionName}, [${dataNew}])" class="btn-orange">Подтвердить</button>
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button type="button" onclick="pinCodeVerify(${functionName}, [${dataNew}])" class="btn-orange">Подтвердить</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>
     </div>
   </div>`);
@@ -124,7 +124,7 @@ function confirm() { //Изменение пин-кода с подтвержд�
     functionName = `checkFieldsDataSave('${functionName}', true)`;
   }
   else {
-    functionName = `checkFieldsDataSave(${functionName}, false)`
+    functionName = `checkFieldsDataSave(${functionName}, false)`;
   }
 
   let modal = document.createElement("div");
@@ -143,6 +143,7 @@ function confirm() { //Изменение пин-кода с подтвержд�
         </div>
         <div class="modal-footer">
           <button onclick="${functionName}" type="button" class="btn-orange">Подтвердить</button>
+          <button onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
     </div>
@@ -154,7 +155,7 @@ function confirmPass() {
     localStorage["Confirmation"] = sha256(input.value);
   }
   else {
-    localStorage["Confirmation"] = false;
+    localStorage["Confirmation"] = "false";
   }
   modalCancel(true);
   location.reload();
@@ -182,8 +183,8 @@ function transferModal() { //Модалка переводов (игрок/уч�
           <input id="input_2" autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
-          <button id="modal_cancel_id" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
-          <button id="modal_cancel_id" onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
+          <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
+          <button onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
     </div>
@@ -210,8 +211,8 @@ function firmModal() { //Оплата услуг компании (игрок/у
         <input autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button id="modal_cancel_id" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
     </div>
   </div>`);
@@ -219,11 +220,12 @@ function firmModal() { //Оплата услуг компании (игрок/у
 
 
 
-function withdraw() { //Модалка переводов из электронных в наличные (министерство экономики)
+function moneyTransit() { //Модалка переводов из электронных в наличные (министерство экономики)
   let modal = document.createElement("div");
-  let functionName = "postWithdraw";
-  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
-
+  let functionNameWithdraw = "postWithdraw";
+  let functionNameDeposit = "postDeposit";
+  functionNameWithdraw = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameWithdraw}', true)` : `checkFieldsDataSave(${functionNameWithdraw}, false)`;
+  functionNameDeposit = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameDeposit}', true)` : `checkFieldsDataSave(${functionNameDeposit}, false)`;
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -231,15 +233,16 @@ function withdraw() { //Модалка переводов из электрон�
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
-        <span class="modal-title">Перевод электронных денег в наличные</span>
+        <span class="modal-title">Перевод денег</span>
       </div>
       <div id="modal-body" class="modal-body">
         <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
         <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
-        <button id="withdraw" onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button onclick="modalCancel(true), ${functionNameWithdraw}" type="button" class="btn-orange">Снять</button>
+        <button onclick="modalCancel(true), ${functionNameDeposit}" type="button" class="btn-orange">Внести</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
   </div>`);
@@ -269,7 +272,7 @@ function editEmployees() {
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionAddEmployee}" type="button" class="btn-orange">Нанять сотрудника</button>
         <button onclick="modalCancel(true), ${functionRemoveEmployee}" type="button" class="btn-orange">Уволить сотрудника</button>
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
   </div>`);
@@ -280,8 +283,6 @@ function finePlayer() { //Штрафник и отработка его долг
   let modal = document.createElement("div");
   let functionNameTax = "postFinePlayerPay";
   functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
-
-  
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -297,8 +298,62 @@ function finePlayer() { //Штрафник и отработка его долг
       <div class="modal-footer">
         <button id="find-player" onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
         <button id="drop-charges" onclick="${functionNameTax}" type="button" class="btn-orange" disabled>Отработать налоги и штрафы</button>
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  
+    </div>
+  </div>`);
+}
+
+
+
+function allLogs() { //Штрафник и отработка его долгов (юстиции и экономика)
+  let modal = document.createElement("div");
+  let functionName = "getAllLogs";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Системные логи</span>
+        <input id="input_1" autocomplete="off" type="number" maxlength="32" placeholder="Количество выводимых строк: " required>
+      </div>
+      <div id="modal-body" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Найти</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+      </div>  
+    </div>
+  </div>`);
+}
+
+
+
+function memoMVD() {
+  let modalInfo = document.createElement("div");
+
+  modalInfo.classList.add("modal-info");
+  document.body.append(modalInfo);
+  modalInfo.insertAdjacentHTML("afterbegin", `    
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Памятка</span>
+      </div>
+      <div id="modal-body" class="modal-body">
+        <span>Для того, чтобы опознавать уклонистов среди игроков, обращайте внимание на цвет экрана игрока. Это важно!</span><br>
+        <span>Не уплатил налог:</span><br><span class="modal-frame" style="background-color: #8A2BE2; color: #fff"">цвет экрана</span><br>
+        <span>Имеется штраф:</span><br><span class="modal-frame" style="background-color: #FF69B4; color: #fff"">цвет экрана</span><br>
+        <span>Не уплатил налог и имеется штраф:</span><br><span class="modal-frame" style="background-color: #DC143C; color: #fff"">цвет экрана</span><br>
+        <span>Также просите их обновить страницу и проверяйте её ссылку, так как они могут вас обмануть!</span><br>
+        <span>Костяк ссылки:</span><br><span class="modal-frame" style="background-color: #8A2BE2; color: #fff">"blueflyingpanda.github.io"</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+      </div>
     </div>
   </div>`);
 }
@@ -312,15 +367,15 @@ function output(message=null, bcgcolor="#fe9654") { //Оповещения
   document.body.append(modalInfo);
   modalInfo.insertAdjacentHTML("afterbegin", `    
   <div id="modal-overlay" class="modal-overlay">
-    <div id="modal-window" class="modal-window">
+    <div id="modal-window" class="modal-window" style="border-color: ${bcgcolor}">
       <div class="modal-header">
         <span class="modal-title">Оповещение</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <span class="modal-frame" style="background-color: ${bcgcolor}">${message}<span>
+        <span class="modal-frame" style="background-color: ${bcgcolor}; color: #fff;">${message}<span>
       </div>
       <div class="modal-footer">
-        <button id="modal_cancel_id" type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange" style="background-color: ${bcgcolor}">Выйти</button>
       </div>
     </div>
   </div>`);
@@ -330,42 +385,77 @@ function output(message=null, bcgcolor="#fe9654") { //Оповещения
 
 function modalCancel(modalClose) { //Кнопка "Выйти" в модалках
   if (modalClose) {
-    let modalBtn = document.querySelectorAll("#modal_cancel_id");
-    for (let i = 0; i < modalBtn.length; i++) {modalBtn[i].setAttribute("disabled", "disabled");}
+    let modalBtn = document.querySelectorAll("button");
+    for (let i = 0; i < modalBtn.length; i++) {
+      modalBtn[i].setAttribute("disabled", "disabled");
+      setTimeout(() => {
+        modalBtn[i].removeAttribute("disabled");
+      }, 1000);
+    }
   }
-  let modal = Array.from(document.querySelectorAll(".modal"));
-  let pinModal = Array.from(document.querySelectorAll(".pin-modal"));
-  let modalInfo = Array.from(document.querySelectorAll(".modal-info"));
+  let modals = Array.from(document.querySelectorAll(".modal"));
+  let modalWindows = Array.from(document.querySelectorAll(".modal-window"));
+  let pinModals = Array.from(document.querySelectorAll(".pin-modal"));
+  let modalsInfo = Array.from(document.querySelectorAll(".modal-info"));
   let modalAnimate = [
-    {opacity: "1"},
-    {opacity: "0"}
+    {opacity: 1},
+    {opacity: 0}
   ]
+  let modalWindowAnimate = [
+    {transform: "translateY(0px)"},
+    {transform: "translateY(100vh)"}
+  ]
+  let modalAnimateOptions = {
+    duration: 1000,
+    easing: "cubic-bezier(1,0,.4,1)",
+  }
 
-  if (modal != 0) {
-    modal.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
-    modal.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
+  if (modals != 0) {
+    modals.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000 })});
+    modalWindows.forEach((modal) => {modal.animate(modalWindowAnimate, modalAnimateOptions)});
+    modals.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});
   }
-  if (pinModal != 0) {
-    pinModal.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
-    pinModal.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
+  if (pinModals != 0) {
+    pinModals.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000})});
+    modalWindows.forEach((modal) => {modal.animate(modalWindowAnimate, modalAnimateOptions)});
+    pinModals.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});
   }
-  if (modalInfo != 0) {
-    modalInfo.forEach((modal) => { modal.animate(modalAnimate, {duration: 1000}) });
-    modalInfo.forEach((modal) => {setTimeout(() => { modal.remove(); }, 970)});
+  if (modalsInfo != 0) {
+    modalsInfo.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000})});
+    modalWindows.forEach((modal) => { modal.animate(modalWindowAnimate, modalAnimateOptions)});
+    modalsInfo.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});
   }
 }
 
 
 
+
+window.addEventListener("keydown", keydownCheck, false);
 let timer;
-window.onkeydown = (e) => {
-  if (e.keyCode == 9) {
-      e.preventDefault();
-      document.activeElement.blur();
+function blockKeydown(e) {
+  if (e.keyCode) {
+    e.preventDefault();
   }
-  if (!timer && e.keyCode == 27) {
+}
+function keydownCheck(e) { //e.keyCode == 126
+  if (e.keyCode == 9 ||
+      e.keyCode == 13 ||
+      e.keyCode == 18) {
+    e.preventDefault();
+    document.activeElement.blur();
+  }
+  else if (!timer && e.keyCode == 27) {
     document.activeElement.blur();
     modalCancel(true);
     timer = setTimeout(() => timer = clearTimeout(timer), 1000);
   }
 }
+
+document.body.addEventListener("animationstart", (e) => {
+  window.removeEventListener("keydown", keydownCheck, false);
+  window.addEventListener("keydown", blockKeydown, false);
+})
+document.body.addEventListener("animationend", (e) => {
+  window.addEventListener("keydown", keydownCheck, false);
+  window.removeEventListener("keydown", blockKeydown, false);
+})
