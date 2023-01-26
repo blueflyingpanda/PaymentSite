@@ -192,6 +192,7 @@ function htmlPlayerCallback(text) {
         document.getElementById("grade").innerHTML += `${gradeInfo}`
         document.getElementById("inn").innerHTML += `${inn}`;
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
+        document.title = `${firstName} ${lastName}`;
 
         if (firm != null) { //Есть в фирме или нет
             let employee = founder == 1 ? "владелец" : "наёмный сотрудник";
@@ -216,7 +217,7 @@ function htmlPlayerCallback(text) {
         else if (tax != 1) {
             localStorage["Toggle"] = false; 
             lightDarkToggle();
-            document.body.style.backgroundColor = "#8A2BE2"; //Фиолетовый
+            document.body.style.backgroundColor = "#4B0082"; //Фиолетовый #8A2BE2
             document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">У вас неуплачены налоги!</h2>`)
         }
         else if (fine > 0) {
@@ -273,6 +274,7 @@ function htmlTeacherCallback(text) {
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
         document.getElementById("company-balance").innerHTML += `${companyBalance} ${talicCompany}`;
         document.getElementById("inn").innerHTML += `${inn}`;
+        document.title = `${firstName} ${middleName} (учитель)`;
     }
     else {
         let message = `STATUS: ${data["status"]}, MESSAGE: ${data["message"]}`,
@@ -306,6 +308,7 @@ function htmlCompanyCallback(text) {
 
         document.getElementById("greeting").innerHTML += `${firmName}!`;
         document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
+        document.title = `Фирма ${firmName.toUpperCase()}`;
 
         for (let i = 0; data["members"][i] != undefined; i++) {
             document.getElementById("company-list").insertAdjacentHTML("beforeend", `<li>${data["members"][i]}</li>`);
@@ -322,7 +325,7 @@ function htmlCompanyCallback(text) {
             document.querySelector("#btns").querySelectorAll("button").forEach((button) => {
                 button.setAttribute("disabled", "disabled");
             })
-            document.getElementById("firm-back").removeAttribute("disabled");
+            firmExit.removeAttribute("disabled");
         }
         if (fine > 0 && tax != 1) {
             localStorage["Toggle"] = false; 
@@ -333,7 +336,7 @@ function htmlCompanyCallback(text) {
         else if (tax != 1) {
             localStorage["Toggle"] = false; 
             lightDarkToggle();
-            document.body.style.backgroundColor = "#8A2BE2"; //Фиолетовый
+            document.body.style.backgroundColor = "#4B0082"; //Фиолетовый
             document.getElementById("info").insertAdjacentHTML("afterbegin", `<h2 style="color: #fff">У вас неуплачены налоги!</h2>`)
         }
         else if (fine > 0) {
@@ -482,6 +485,7 @@ function htmlTaxesCallback(text) {
     if (data["status"] == 200) {
         modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены!</span><br>`
         modalBody.innerHTML += `<span>Сумма штрафа: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
+        setTimeout(() => { window.location.reload()}, 3000);
     }
     else if (data["status"] == 400) {
         if (data["message"] == "taxes have already been paid") {
@@ -556,7 +560,6 @@ function htmlTransferCallback(text) {
 }
 
 
-
 function postPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
     bool = localStorage.getItem("isTeacher") == "true" ? true : false;
     data = {
@@ -608,7 +611,6 @@ function htmlPayFirmCallback(text) {
         }, 3000);
     }
 }
-
 
 
 function postTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
@@ -848,7 +850,7 @@ function htmlFinePlayers(text) {
 
 
 function getFinePlayerFind() { //Проверка штрафов у игрока (endpoint - check-players)
-    let input = document.getElementById("input_1");
+    let input = document.getElementById("fine-input");
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
 
@@ -868,7 +870,7 @@ function htmlFinePlayerFind(text) {
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        let input = document.getElementById("input_1").value;
+        let input = document.getElementById("fine-input").value;
         let fine = data["fine"];
         let taxes = data["tax_paid"] == "1" ? "уплачены" : "не уплачены";
         let talic = talicWordEnding(fine);
@@ -909,7 +911,7 @@ function htmlFinePlayerFind(text) {
 
 
 function postFinePlayerPay() { // (endpoint - /drop-charges)
-    input = document.getElementById("input_1");
+    let input = document.getElementById("fine-input");
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     document.getElementById("find-player").setAttribute("disabled", "disabled")
 

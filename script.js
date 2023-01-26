@@ -143,7 +143,6 @@ function confirm() { //Изменение пин-кода с подтвержд�
         </div>
         <div class="modal-footer">
           <button onclick="${functionName}" type="button" class="btn-orange">Подтвердить</button>
-          <button onclick="modalCancel(true)" type="button" class="btn-orange">Выйти</button>
         </div>
       </form>
     </div>
@@ -179,8 +178,8 @@ function transferModal() { //Модалка переводов (игрок/уч�
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-          <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока: " required>
-          <input id="input_2" autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
+          <input id="transfer-input" autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока: " required>
+          <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
           <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -291,7 +290,7 @@ function finePlayer() { //Штрафник и отработка его долг
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
         <span class="modal-title">Неуплата штрафа</span>
-        <input id="input_1" autocomplete="off" type="number" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
+        <input id="fine-input" autocomplete="off" type="number" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
       </div>
       <div id="modal-body" class="modal-body">
       </div>
@@ -318,7 +317,7 @@ function allLogs() { //Штрафник и отработка его долго�
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
         <span class="modal-title">Системные логи</span>
-        <input id="input_1" autocomplete="off" type="number" maxlength="32" placeholder="Количество выводимых строк: " required>
+        <input id="logs-input" autocomplete="off" type="number" maxlength="32" placeholder="Количество выводимых строк: " required>
       </div>
       <div id="modal-body" class="modal-body">
       </div>
@@ -344,12 +343,18 @@ function memoMVD() {
         <span class="modal-title">Памятка</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <span>Для того, чтобы опознавать уклонистов среди игроков, обращайте внимание на цвет экрана игрока. Это важно!</span><br>
-        <span>Не уплатил налог:</span><br><span class="modal-frame" style="background-color: #8A2BE2; color: #fff"">цвет экрана</span><br>
+        <span>Для того, чтобы опознавать уклонистов среди игроков, обращайте внимание на цвет экрана игрока. Это важно!<br>
+              Экран игроков, уплативших налоги и неимеющих штрафы, имеет белый или чёрный цвет.</span><br>
+        <span>Не уплатил налог:</span><br><span class="modal-frame" style="background-color: #4B0082; color: #fff"">цвет экрана</span><br>
         <span>Имеется штраф:</span><br><span class="modal-frame" style="background-color: #FF69B4; color: #fff"">цвет экрана</span><br>
         <span>Не уплатил налог и имеется штраф:</span><br><span class="modal-frame" style="background-color: #DC143C; color: #fff"">цвет экрана</span><br>
-        <span>Также просите их обновить страницу и проверяйте её ссылку, так как они могут вас обмануть!</span><br>
-        <span>Костяк ссылки:</span><br><span class="modal-frame" style="background-color: #8A2BE2; color: #fff">"blueflyingpanda.github.io"</span>
+        <span>Советы по поимке уклонистов:<br>
+              1. Просите игроков обновлять страницу. Особенно просите тех, у кого стандартная тема сайта (белая/чёрная)<br>
+              2. Начало ссылки сайта должно соответсвовать костяку, указаному ниже:</span><br>
+                  Костяк ссылки:<br>
+                <span class="modal-frame" style="background-color: #8A2BE2; color: #fff">"blueflyingpanda.github.io"</span><br>
+              3. Ищите уклонистов в заполненных людьми местах.<br>
+              4. Бить всех и вся ;3
       </div>
       <div class="modal-footer">
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
