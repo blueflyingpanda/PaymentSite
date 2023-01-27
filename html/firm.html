@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Фирма</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/img/icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <script src="/js/sha256.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body onload="getCompany(localStorage.getItem('Firm'))">
+    <div class="start-btns"></div>
+    <div class="main">
+        <div id="info">
+            <h1 id="greeting">Добро пожаловать, фирма </h1>
+            <h2 id="balance">Баланс фирмы: </h2>
+            <h2 id="company-list">Участники фирмы: </h2>
+            <hr id="main-hr">
+            <h1>Ваши возможности:</h1>
+        </div>
+        <div id="btns">
+            <button onclick="postCompanySalary()" class="btn-purple">Уплата налогов и выдача зарплаты сотрудникам</button><br>
+            <button onclick="editEmployees()" class="btn-purple">Нанять/уволить сотрудника</button><br>
+            <button id="firm-back" onclick="document.location = './player.html'" class="btn-orange">Вернуться</button><br>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/script.js"></script>
+    <script>lightDarkToggle()</script>
+</body>
+</html>
