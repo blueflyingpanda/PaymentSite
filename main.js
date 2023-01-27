@@ -42,6 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
+
 const frontProduction = true;
 const frontAndroidProduction = true;
 const backProduction = true;
