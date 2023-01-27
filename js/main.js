@@ -47,11 +47,11 @@ const frontAndroidProduction = true;
 const backProduction = true;
 const commonPasswordLength = 5;
 
-let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500/html" : "http://127.0.0.1:5500/html"
+let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500" : "http://127.0.0.1:5500"
 let apiURL = "http://127.0.0.1:5000";
 
 if (frontProduction) {
-    baseURL = "https://blueflyingpanda.github.io/PaymentSite/html"
+    baseURL = "https://blueflyingpanda.github.io/PaymentSite"
 }
 if (backProduction) {
     apiURL = "https://lhelper.pythonanywhere.com";
