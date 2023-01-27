@@ -564,7 +564,7 @@ function postPayFirm(text) { //Оплата услуг компании (endpoin
     bool = localStorage.getItem("isTeacher") == "true" ? true : false;
     data = {
         "amount": Number(text[1]),
-        "company": text[0],
+        "company": text[0].toLowerCase(),
         "isTeacher": bool
     }
 
@@ -616,21 +616,18 @@ function htmlPayFirmCallback(text) {
 function postTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
     let data = {
         "amount": Number(text[1]),
-        "receiver": Number(text[0])
+        "receiver": Number(text[0]),
     }
-    let salary = data["amount"]
-    if (salary > 30 || salary < 10) {
+    let salary = data["amount"];
+
+    if (salary >= 10 && salary <= 30) {
+        rs.callback = htmlTeacherSalaryCallback;
+        rs.httpPost("teacher-salary", JSON.stringify(data), "application/json");
+    }
+    else {
         message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
-    }
-    else {
-        message = "Произошла непревиденная ошибка!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
     }
 }
 
@@ -817,13 +814,18 @@ function htmlFinePlayers(text) {
 
     if (data["status"] == 200) {
         for (let i = 0; data["debtors"][i] != undefined; i++) {
-            data["debtors"][i][1] = data["debtors"][i][1] == "1" ? "уплачены" : "неуплачены";
-            talic = talicWordEnding(data["debtors"][i][2]);
+            let player = `${data["debtors"][i][1]} ${data["debtors"][i][0]} (ID: ${data["debtors"][i][2]})`,
+            tax = data["debtors"][i][3] == "1" ? "уплачены" : "неуплачены",
+            colorTax = tax == "уплачены" ? "#3BFF86" : "#DC143C";
+            fine = data["debtors"][i][4],
+            talic = talicWordEnding(fine);
+
+
 
             transferDiv.innerHTML += `
-            <h2>ID игрока: ${data["debtors"][i][0]}</h2>
-            <h2>Налоги ${data["debtors"][i][1]}</h2>
-            <h2>Штраф - ${data["debtors"][i][2]} ${talic}</h2>
+            <h2>Игрок: ${player}</h2>
+            <h2 style="color: ${colorTax}">Налоги ${tax}</h2>
+            <h2>Штраф - <span style="color: #DC143C">${fine}</span> ${talic}</h2>
             `
 
             if (data["debtors"][i+1] != undefined) {

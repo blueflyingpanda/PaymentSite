@@ -138,7 +138,7 @@ function confirm() { //Изменение пин-кода с подтвержд�
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-        <span>Придумайте пароль, с помощью которого вы будете выполнять важные действия в своём аккаунте (поставьте пробел, если он не нужен)</span>
+        <span>Придумайте пин-код, с помощью которого вы будете выполнять важные действия в своём аккаунте (поставьте пробел, если он не нужен)</span>
         <input id="pin-code" autocomplete="off" maxlength="10" placeholder="Введите пароль (или пробел): ">
         </div>
         <div class="modal-footer">
@@ -178,7 +178,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-          <input id="transfer-input" autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока: " required>
+          <input id="transfer-input" autocomplete="off" type="number" maxlength="15" placeholder="Введите ИНН игрока: " required>
           <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
