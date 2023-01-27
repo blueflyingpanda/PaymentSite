@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Министерство внутренних дел</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/img/icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body onload="getMinistryPage()">
+    <div class="start-btns">
+        <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
+        <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
+    </div>
+    <div class="main">
+        <div id="info">
+            <h1>Добро пожаловать, сотрудник МВД!</h1>
+            <h2>У вас есть доступ к таблице штрафников по всей системе</h2>
+        </div>
+        <div id="btns">
+            <button onclick="memoMVD()" class="btn-purple">Памятка</button>
+        </div>
+        <hr id="main-hr">
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/script.js"></script>
+    <script>lightDarkToggle()</script>
+</body>
+</html>
