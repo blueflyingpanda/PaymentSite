@@ -718,7 +718,7 @@ function htmlAddEmployeeCallback(text) {
     }
     else if (data["status"] == 400) {
         if (data["message"] == "wrong minister signature") {
-            message = "Непраильная подпись министра!";
+            message = "Неправильная подпись министра!";
             bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
