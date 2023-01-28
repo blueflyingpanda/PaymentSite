@@ -3,15 +3,15 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
     localStorage["Toggle"] = "true";
   }
 
-  let h1 = document.querySelector("#info").querySelectorAll("h1");
-  let h2 = document.querySelector("#info").querySelectorAll("h2");
+  let h1 = document.querySelector(".main").querySelectorAll("h1");
+  let h2 = document.querySelector(".main").querySelectorAll("h2");
   let li = document.querySelectorAll("li");
-  let hr = document.getElementById("main-hr");
+  let hr = document.querySelectorAll("#main-hr");
   let toggleBtn = document.getElementById("lightDarkToggle");
 
   if (localStorage["Toggle"] == "true") {
     try { toggleBtn.textContent = "🌚" } catch {};
-    try { hr.style.backgroundColor = "#000"; hr.style.borderColor = "#000";} catch {};
+    try { hr.forEach((hr) => { hr.style.backgroundColor = "#000"; hr.style.borderColor = "#000";})} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#000"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#000"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#000"}} catch {};
@@ -20,7 +20,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
   }
   else {
     try { toggleBtn.textContent = "☀"; } catch {};
-    try { hr.style.backgroundColor = "#fff"; hr.style.borderColor = "#fff";} catch {};
+    try { hr.forEach((hr) => { hr.style.backgroundColor = "#fff"; hr.style.borderColor = "#fff";})} catch {};
     try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#fff"}} catch {}; 
     try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#fff"}} catch {};
     try { for (i = 0; i < li.length; i++) { li[i].style.color = "#fff"}} catch {};
@@ -147,6 +147,12 @@ function confirm() { //Изменение пин-кода с подтвержд�
       </form>
     </div>
   </div>`);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.keyCode == 27) {
+      localStorage["Confirmation"] = "false";
+    }
+  }, {once: true})
 }
 function confirmPass() {
   input = document.getElementById("pin-code");
@@ -163,8 +169,8 @@ function confirmPass() {
 
 
 function transferModal() { //Модалка переводов (игрок/учитель)
-  let header = localStorage["isTeacher"] == "true" ? "Выдача зарплаты" : "Перевод денег другому игроку";
-  let functionName = localStorage["isTeacher"] == "true" ? "postTeacherSalary" : "postTransfer";
+  let header = localStorage["Role"] == "teacher" ? "Выдача зарплаты" : "Перевод денег другому игроку";
+  let functionName = localStorage["Role"] == "teacher" ? "postTeacherSalary" : "postTransfer";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
 

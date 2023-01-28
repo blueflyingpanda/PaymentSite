@@ -42,9 +42,9 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = true;
-const backProduction = true;
+const backProduction = false;
 const commonPasswordLength = 5;
 
 let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500" : "http://127.0.0.1:5500"
@@ -65,9 +65,8 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
 function logout() { //Выход из аккаунта
     localStorage.removeItem("Authorization");
-    localStorage.removeItem("isTeacher");
+    localStorage.removeItem("Role");
     localStorage.removeItem("Firm");
-    localStorage.removeItem("FieldActivity");
     window.location.replace(`${baseURL}/index.html`);
 }
 
@@ -75,23 +74,21 @@ function logout() { //Выход из аккаунта
 
 function main() { // (endpoint - /auth)
     if (localStorage.getItem("Authorization")) {
-        if (localStorage.getItem("isTeacher") == "true") {
+        if (localStorage.getItem("Role") == "teacher") {
             window.location.replace(`${baseURL}/teacher.html`);
         }
-        else if (localStorage.getItem("isTeacher") == "false") {
+        else if (localStorage.getItem("Role") == "player") {
             window.location.replace(`${baseURL}/player.html`);
         }
-        else if (localStorage.getItem("isTeacher") == "null") {
-            if (localStorage["FieldActivity"] == "economic") {
-                window.location.replace(`${baseURL}/ministry_economic.html`);
-            }
-            else if (localStorage["FieldActivity"] == "mvd") {
-                window.location.replace(`${baseURL}/ministry_mvd.html`);
-            }
-            else if (localStorage["FieldActivity"] == "judgement") {
-                window.location.replace(`${baseURL}/ministry_justice.html`)
-            }
+        else if (localStorage.getItem("Role") == "economic") {
+            window.location.replace(`${baseURL}/ministry_economic.html`);
         }
+        else if (localStorage.getItem("Role") == "mvd") {
+                window.location.replace(`${baseURL}/ministry_mvd.html`);
+        }
+        else if (localStorage.getItem("Role") == "judgement") {
+            window.location.replace(`${baseURL}/ministry_justice.html`)
+        }    
     }
     addEventListener("submit", (e) => {
     e.preventDefault();
@@ -128,25 +125,21 @@ function htmlAuthCallback(text) {
     console.log(data);
     if (data["status"] == 200) {
         localStorage.setItem("Authorization", data[tokenHeader])
-        localStorage.setItem("isTeacher", data["teacher"])
-        if (data["teacher"] == true) {
+        localStorage.setItem("Role", data["role"])
+        if (data["role"] == "teacher") {
             window.location.replace(`${baseURL}/teacher.html`);
         }
-        else if (data["teacher"] == false) {
+        else if (data["role"] == "player") {
             window.location.replace(`${baseURL}/player.html`);
         }
-        else if (data["teacher"] == null) {
-            let field_activity = data["message"][6]; 
-            localStorage["FieldActivity"] = field_activity;
-            if (field_activity == "economic") {
-                window.location.replace(`${baseURL}/ministry_economic.html`);
-            }
-            else if (field_activity == "mvd") {
-                window.location.replace(`${baseURL}/ministry_mvd.html`);
-            }
-            else if (field_activity == "judgement") {
-                window.location.replace(`${baseURL}/ministry_justice.html`);
-            }
+        else if (data["role"] == "economic") {
+            window.location.replace(`${baseURL}/ministry_economic.html`);
+        }
+        else if (data["role"] == "mvd") {
+            window.location.replace(`${baseURL}/ministry_mvd.html`);
+        }
+        else if (data["role"] == "judgement") {
+            window.location.replace(`${baseURL}/ministry_justice.html`);
         }
     }
     else if (data["status"] == 401) {
@@ -262,17 +255,14 @@ function htmlTeacherCallback(text) {
     if (data["status"] == 200) {
         let firstName = data["teacher"][0],
         middleName = data["teacher"][1],
-        balance = data["teacher"][3],
+        balance = data["teacher"][2],
         talic = talicWordEnding(balance),
-        inn = data["teacher"][4];
-        subject = data["teacher"][5];
-        companyBalance = data["teacher"][6];
-        talicCompany = talicWordEnding(companyBalance);
+        inn = data["teacher"][3];
+        subject = data["teacher"][4];
         
         document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
         document.getElementById("subject").innerHTML += `${subject}`;
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
-        document.getElementById("company-balance").innerHTML += `${companyBalance} ${talicCompany}`;
         document.getElementById("inn").innerHTML += `${inn}`;
         document.title = `${firstName} ${middleName} (учитель)`;
     }
@@ -366,6 +356,10 @@ function htmlCompanyCallback(text) {
 
 
 function getMinistryPage() {
+    if (localStorage["Confirmation"] == undefined) {
+        confirm();
+    }
+
     rs.callback = htmlMinistryCallback;
     rs.httpGet("minister");
 }
@@ -392,7 +386,6 @@ function htmlMinistryCallback(text) {
                 let pressedKey = keys[e.keyCode];
                 if (pressedKey == konamiCode[keyCount]) {
                     ++keyCount;
-                    console.log(pressedKey);
                 }
                 else {
                     keyCount = 0;
@@ -428,11 +421,19 @@ function htmlMinistryCallback(text) {
             window.addEventListener("keydown", checkCodeKonami, false);
         }
 
+        if (localStorage["Role"] == "mvd") {
+            let firstname = data["minister"][0],
+            lastname = data["minister"][2],
+            grade = data["minister"][3],
+            balance = data["minister"][4],
+            talicBalance = talicWordEnding(balance);
+            inn = data["minister"][5];
 
-        if (localStorage["Confirmation"] == undefined && data["minister"][6] != "mvd") {
-            confirm();
-        }
-        if (data["minister"][6] == "mvd") {
+            document.getElementById("greeting").innerHTML += `${firstname} ${lastname}`;
+            document.getElementById("grade").innerHTML += `${grade}`;
+            document.getElementById("balance").innerHTML += `${balance} ${talicBalance}`;
+            document.getElementById("inn").innerHTML += `${inn}`;
+
             getFinePlayers();
         }
     }
@@ -512,12 +513,13 @@ function htmlTaxesCallback(text) {
 function postTransfer(text) { //Переводы между игроками (endpoint - /transfer)
     let data = {
         "amount": Number(text[1]),
-        "receiver": Number(text[0])
+        "receiver": Number(text[0]),
+        "role": localStorage["Role"],
     }
     let receiver = data["receiver"]
     let amount = data["amount"]
 
-    if (receiver % 1 != 0 || amount % 1 != 0 || receiver < 0 || amount < 0) {
+    if (receiver % 1 != 0 || amount % 1 != 0 || receiver <= 0 || amount <= 0) {
         let message = "Неправильно введены данные!"
         let bcgcolor = "#FE9654";
         output(message, bcgcolor);
@@ -561,16 +563,15 @@ function htmlTransferCallback(text) {
 
 
 function postPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
-    bool = localStorage.getItem("isTeacher") == "true" ? true : false;
     data = {
         "amount": Number(text[1]),
         "company": text[0].toLowerCase(),
-        "isTeacher": bool
+        "role": localStorage["Role"],
     }
 
     let amount = data["amount"]
 
-    if (amount % 1 != 0 || amount < 0) {
+    if (amount % 1 != 0 || amount <= 0) {
         let message = "Неправильно введены данные!"
         let bcgcolor = "#FE9654";
         output(message, bcgcolor);
@@ -619,15 +620,21 @@ function postTeacherSalary(text) { //Выдача зарплаты игроку 
         "receiver": Number(text[0]),
     }
     let salary = data["amount"];
+    let receiver = data["receiver"]
 
-    if (salary >= 10 && salary <= 30) {
-        rs.callback = htmlTeacherSalaryCallback;
-        rs.httpPost("teacher-salary", JSON.stringify(data), "application/json");
-    }
-    else {
-        message = "Минимальная зарплата должна быть выше 10 и максимальная ниже 30 талиц!";
+    if (receiver <= 0 || receiver%1 != 0) {
+        message = "Неправильно введён ИНН игрока!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
+    }
+    else if (salary < 10 || salary > 30 || salary%1 != 0 ){
+        message = "Зарплата должна быть целочисленной, а также не должна быть равна числу ниже 10 и выше 30 талиц!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlTeacherSalaryCallback;
+        rs.httpPost("teacher-salary", JSON.stringify(data), "application/json");
     }
 }
 

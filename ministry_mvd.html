@@ -7,22 +7,31 @@
     <link rel="icon" href="img/school.png">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="getMinistryPage()">
     <div class="start-btns">
         <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
+        <button id="action-pass" class="btn-green" onclick="confirm()">Изменить пин-код действий</button>
         <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
     </div>
     <div class="main">
         <div id="info">
-            <h1>Добро пожаловать, сотрудник МВД!</h1>
-            <h2>У вас есть доступ к таблице штрафников по всей системе</h2>
+            <h1 id="greeting">Добро пожаловать, </h1>
+            <h2 id="grade">Класс - </h2>
+            <h2 id="balance">Баланс: </h2>
+            <h2 id="inn">Ваш ИНН (ID): </h2>
+            <hr id="main-hr">
+            <h1>Ваши возможности:</h1>
         </div>
         <div id="btns">
-            <button onclick="memoMVD()" class="btn-purple">Памятка</button>
+            <button onclick="memoMVD()" class="btn-purple">Памятка</button><br>
+            <button onclick="transferModal()" class="btn-purple">Перевод денег другому игроку</button><br>
+            <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
         </div>
         <hr id="main-hr">
+        <h1>У вас есть доступ к таблице штрафников по всей системе</h1>
     </div>
 
     <script src="js/main.js"></script>
