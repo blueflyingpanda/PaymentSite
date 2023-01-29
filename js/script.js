@@ -148,11 +148,13 @@ function confirm() { //Изменение пин-кода с подтвержд�
     </div>
   </div>`);
 
-  window.addEventListener("keydown", (e) => {
-    if (e.keyCode == 27) {
-      localStorage["Confirmation"] = "false";
-    }
-  }, {once: true})
+  if (localStorage["Confirmation"] == "undefined" || localStorage["Confirmation"] == "false") {
+    window.addEventListener("keydown", (e) => {
+      if (e.keyCode == 27) {
+        localStorage["Confirmation"] = "false";
+      }
+    }, {once: true})
+  }
 }
 function confirmPass() {
   input = document.getElementById("pin-code");
@@ -212,8 +214,8 @@ function firmModal() { //Оплата услуг компании (игрок/у
         <span class="modal-title">Оплата услуг фирмы</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input autocomplete="off" maxlength="20" placeholder="Выберите фирму: " required>
-        <input autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
+        <input id="firm-input" autocomplete="off" maxlength="20" placeholder="Выберите фирму: " required>
+        <input id="services-input" autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>

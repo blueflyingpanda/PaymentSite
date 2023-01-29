@@ -71,25 +71,102 @@ function logout() { //Выход из аккаунта
 }
 
 
+if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefined) {
+    let role = localStorage["Role"];
+    let place = window.location.href;
+
+    if (place == `${baseURL}/index.html`) {
+        if (role == "player") {
+            place = `${baseURL}/player.html`
+        }
+        else if (role == "teacher") {
+            place = `${baseURL}/teacher.html`
+        }
+        else if (role == "mvd") {
+            place = `${baseURL}/ministry_mvd.html`
+        }
+        else if (role == "economic") {
+            place = `${baseURL}/ministry_economic.html`
+        }
+        else if (role == "judgement") {
+            place = `${baseURL}/ministry_justice.html`
+        }
+
+        authForm = document.getElementById("authForm");
+        authForm.insertAdjacentHTML("afterend", `
+        <button onclick="window.location = '${place}'" class="btn-green">Вернуться</button>`)
+
+    }
+    else {
+        startBtns = document.querySelector(".start-btns");
+        startBtns.insertAdjacentHTML("afterbegin", `
+        <button onclick="window.location = '${baseURL}/index.html'" class="btn-green">Вернуться</button>`)
+    }
+}
+
+function firmDiagrams() {
+    rs.callback = htmlDiagramCallback;
+    rs.httpGet("firm-diagram");
+
+    function htmlDiagramCallback(text) {
+        let data = JSON.parse(text); console.log(data);
+        let diagDiv = document.createElement("div");
+        diagDiv.classList.add("diagram");
+        diagDiv.insertAdjacentHTML("afterbegin", `
+        <canvas id="myChart"></canvas>
+        <h6>*СТАТИСТИКА ЭЛЕКТРОННЫХ ПЕРЕВОДОВ*</h6>`)
+        document.querySelector(".main").append(diagDiv);
+    
+        let dataChart = [];
+        data["companies"].forEach((company) => {
+            dataChart.push({company: company[0], profit: company[1]})
+        })
+        
+        let ctx = document.getElementById("myChart"); 
+        ctx.height = diagDiv.style.maxHeight;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: dataChart.map(row => row.company),
+              datasets: [{
+                label: 'Доход фирм',
+                data: dataChart.map(row => row.profit),
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+        });
+    }
+}
+
 
 function main() { // (endpoint - /auth)
-    if (localStorage.getItem("Authorization")) {
-        if (localStorage.getItem("Role") == "teacher") {
-            window.location.replace(`${baseURL}/teacher.html`);
-        }
-        else if (localStorage.getItem("Role") == "player") {
-            window.location.replace(`${baseURL}/player.html`);
-        }
-        else if (localStorage.getItem("Role") == "economic") {
-            window.location.replace(`${baseURL}/ministry_economic.html`);
-        }
-        else if (localStorage.getItem("Role") == "mvd") {
-                window.location.replace(`${baseURL}/ministry_mvd.html`);
-        }
-        else if (localStorage.getItem("Role") == "judgement") {
-            window.location.replace(`${baseURL}/ministry_justice.html`)
-        }    
-    }
+    // if (localStorage.getItem("Authorization")) {
+    //     if (localStorage.getItem("Role") == "teacher") {
+    //         window.location.replace(`${baseURL}/teacher.html`);
+    //     }
+    //     else if (localStorage.getItem("Role") == "player") {
+    //         window.location.replace(`${baseURL}/player.html`);
+    //     }
+    //     else if (localStorage.getItem("Role") == "economic") {
+    //         window.location.replace(`${baseURL}/ministry_economic.html`);
+    //     }
+    //     else if (localStorage.getItem("Role") == "mvd") {
+    //             window.location.replace(`${baseURL}/ministry_mvd.html`);
+    //     }
+    //     else if (localStorage.getItem("Role") == "judgement") {
+    //         window.location.replace(`${baseURL}/ministry_justice.html`)
+    //     }    
+    // }
+    firmDiagrams();
+
     addEventListener("submit", (e) => {
     e.preventDefault();
         rs.callback = htmlAuthCallback;
@@ -562,6 +639,7 @@ function htmlTransferCallback(text) {
 }
 
 
+
 function postPayFirm(text) { //Оплата услуг компании (endpoint - /pay)
     data = {
         "amount": Number(text[1]),
@@ -612,6 +690,7 @@ function htmlPayFirmCallback(text) {
         }, 3000);
     }
 }
+
 
 
 function postTeacherSalary(text) { //Выдача зарплаты игроку (endpoint - /teacher-salary)
@@ -961,6 +1040,7 @@ function htmlFinePlayerPay(text) {
         }, 3000);
     }
 }
+
 
 
 function postWithdraw(text) { // (endpoint - /withdraw)

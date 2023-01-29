@@ -67,6 +67,9 @@ input { /*Поля*/
     height: 0.75vh;
     width: 90vw;
 }
+.main span {
+    margin: 10vw;
+}
 
 .start-btns { /*div с верхними кнопками на страничке*/
     text-align: center;
@@ -235,13 +238,9 @@ input { /*Поля*/
 
 /*---------Логи---------*/
 
-.main span {
-    margin: 10vw;
-}
-
 .log-table {
-    width: 80vw;
-    height: 70vh;
+    max-width: 80vw;
+    max-height: 70vh;
     border-radius: 10px;
     border: 10px solid #fe9654;
     margin: 1vh auto 5vh auto;
@@ -266,4 +265,14 @@ input { /*Поля*/
     color: #fe9654;
     font-size: 1.5rem;
     margin: 1vh auto;
+}
+
+/*---------Диаграмма---------*/
+
+.diagram {
+    border: 10px solid #fe9654;
+    border-radius: 15px;
+    max-width: 80vw;
+    max-height: 55vh;
+    margin: 2vh auto 2vh auto;
 }
