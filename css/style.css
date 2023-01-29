@@ -68,7 +68,7 @@ input { /*Поля*/
     width: 90vw;
 }
 .main span {
-    margin: 10vw;
+    margin: 10vh 10vw 10vh 10vw;
 }
 
 .start-btns { /*div с верхними кнопками на страничке*/
@@ -269,10 +269,12 @@ input { /*Поля*/
 
 /*---------Диаграмма---------*/
 
-.diagram {
+.chart-container {
     border: 10px solid #fe9654;
     border-radius: 15px;
-    max-width: 80vw;
-    max-height: 55vh;
-    margin: 2vh auto 2vh auto;
+    width: 80vw;
+    height: 80vh;
+    margin: 2vh auto 10vh auto;
+    padding-left: 1vw;
+    padding-right: 3vw;
 }

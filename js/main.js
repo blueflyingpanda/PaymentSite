@@ -42,7 +42,7 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = true;
 const backProduction = true;
 const commonPasswordLength = 5;
@@ -63,15 +63,7 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
 
 
-function logout() { //Выход из аккаунта
-    localStorage.removeItem("Authorization");
-    localStorage.removeItem("Role");
-    localStorage.removeItem("Firm");
-    window.location.replace(`${baseURL}/index.html`);
-}
-
-
-if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefined) {
+if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefined) { //Кнопка "Вернуться"
     let role = localStorage["Role"];
     let place = window.location.href;
 
@@ -104,44 +96,58 @@ if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefi
     }
 }
 
-function firmDiagrams() {
+function logout() { //Выход из аккаунта
+    localStorage.removeItem("Authorization");
+    localStorage.removeItem("Role");
+    localStorage.removeItem("Firm");
+    window.location.replace(`${baseURL}/index.html`);
+}
+
+
+function firmDiagrams() { //Диаграмма фирм
     rs.callback = htmlDiagramCallback;
     rs.httpGet("firm-diagram");
 
     function htmlDiagramCallback(text) {
         let data = JSON.parse(text); console.log(data);
-        let diagDiv = document.createElement("div");
-        diagDiv.classList.add("diagram");
-        diagDiv.insertAdjacentHTML("afterbegin", `
+
+        let diagramDiv = document.createElement("div");
+        let main = document.querySelector(".main");
+
+        diagramDiv.classList.add("chart-container");
+        diagramDiv.insertAdjacentHTML("afterbegin", `
         <canvas id="myChart"></canvas>
-        <h6>*СТАТИСТИКА ЭЛЕКТРОННЫХ ПЕРЕВОДОВ*</h6>`)
-        document.querySelector(".main").append(diagDiv);
+        <h4>*СТАТИСТИКА ЭЛЕКТРОННЫХ ПЕРЕВОДОВ*</h4>`);
+        main.append(diagramDiv);
+        main.insertAdjacentHTML("beforeend", `<hr style="background-color: #000; border-color: #000;">`);
+        
     
-        let dataChart = [];
+        let companies = [];
         data["companies"].forEach((company) => {
-            dataChart.push({company: company[0], profit: company[1]})
+            companies.push({company: company[0], profit: company[1]})
         })
         
-        let ctx = document.getElementById("myChart"); 
-        ctx.height = diagDiv.style.maxHeight;
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: dataChart.map(row => row.company),
-              datasets: [{
+        let ctx = document.getElementById("myChart");
+        let chartData = {
+            labels: companies.map(row => row.company),
+            datasets: [{
                 label: 'Доход фирм',
-                data: dataChart.map(row => row.profit),
+                data: companies.map(row => row.profit),
                 borderWidth: 1
-              }]
-            },
-            options: {
-              scales: {
+            }]
+        }
+        let chartOptions = {
+            maintainAspectRatio: false,
+            scales: {
                 y: {
-                  beginAtZero: true
+                    beginAtZero: true
                 }
-              }
             }
+        }
+        let chartCompany = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: chartOptions,
         });
     }
 }
@@ -274,7 +280,7 @@ function htmlPlayerCallback(text) {
             let firmEnter = document.getElementById("firm-entrance");
             firmEnter.onclick = () => {
                 document.location = `${baseURL}/firm.html`;
-                Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+                Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
             };
         }
 
@@ -372,26 +378,24 @@ function htmlCompanyCallback(text) {
         fine = data["playerinfo"][1];
         founder = data["playerinfo"][2];
 
-
         document.getElementById("greeting").innerHTML += `${firmName}!`;
         document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
         document.title = `Фирма ${firmName.toUpperCase()}`;
 
-        for (let i = 0; data["members"][i] != undefined; i++) {
-            document.getElementById("company-list").insertAdjacentHTML("beforeend", `<li>${data["members"][i]}</li>`);
-        }
+        data["members"].forEach((member) => {
+            document.getElementById("company-list").insertAdjacentHTML("beforeend", `<li>${member}</li>`);
+        });
 
         let firmExit = document.getElementById("firm-back");
         firmExit.onclick = () => {
             document.location = `${baseURL}/player.html`;
-            Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+            Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
         };
 
-        
         if (founder != 1) {
             document.querySelector("#btns").querySelectorAll("button").forEach((button) => {
                 button.setAttribute("disabled", "disabled");
-            })
+            });
             firmExit.removeAttribute("disabled");
         }
         if (fine > 0 && tax != 1) {
@@ -531,12 +535,11 @@ function htmlMinistryCallback(text) {
 function postTaxes() { //Уплата налогов (endpoint - /paytax)
     rs.callback = htmlTaxesCallback;
     rs.httpPost('paytax', null);
-    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+    Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
     
 }
 
 function htmlTaxesCallback(text) {
-    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.removeAttribute("disabled")});
     let data = JSON.parse(text); console.log(data);
 
     if (data["status"] == 200 || data["status"] == 400) {
@@ -748,7 +751,7 @@ function htmlTeacherSalaryCallback(text) {
 function postCompanySalary() {  //Уплата налогов и выдача зарплаты у компании (endpoint - /company-salary)
     rs.callback = htmlCompanySalaryCallback;
     rs.httpPost("company-salary", null);
-    Array.from(document.querySelectorAll("button")).forEach((elem) => { elem.setAttribute("disabled", "disabled")});
+    Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
 }
 
 function htmlCompanySalaryCallback(text) {
@@ -759,7 +762,6 @@ function htmlCompanySalaryCallback(text) {
         message = "Зарплаты были выплачены!";
         bcgcolor = "#3BFF86";
         output(message, bcgcolor);
-
     }
     else if (data["status"] == 400) {
         message = "Недостаточно денег на счёте для выплаты зарплат!";
@@ -905,8 +907,6 @@ function htmlFinePlayers(text) {
             colorTax = tax == "уплачены" ? "#3BFF86" : "#DC143C";
             fine = data["debtors"][i][4],
             talic = talicWordEnding(fine);
-
-
 
             transferDiv.innerHTML += `
             <h2>Игрок: ${player}</h2>
