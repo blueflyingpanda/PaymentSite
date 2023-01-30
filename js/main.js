@@ -42,9 +42,9 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = true;
-const backProduction = true;
+const backProduction = false;
 const commonPasswordLength = 5;
 
 let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500" : "http://127.0.0.1:5500"
@@ -67,7 +67,7 @@ if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefi
     let role = localStorage["Role"];
     let place = window.location.href;
 
-    if (place == `${baseURL}/index.html`) {
+    if (place == `${baseURL}/index.html` || place == `${baseURL}/`) {
         if (role == "player") {
             place = `${baseURL}/player.html`
         }
@@ -110,16 +110,13 @@ function firmDiagrams() { //Диаграмма фирм
 
     function htmlDiagramCallback(text) {
         let data = JSON.parse(text); console.log(data);
-
-        let diagramDiv = document.createElement("div");
         let main = document.querySelector(".main");
 
-        diagramDiv.classList.add("chart-container");
-        diagramDiv.insertAdjacentHTML("afterbegin", `
-        <canvas id="myChart"></canvas>
-        <h4>*СТАТИСТИКА ЭЛЕКТРОННЫХ ПЕРЕВОДОВ*</h4>`);
-        main.append(diagramDiv);
-        main.insertAdjacentHTML("beforeend", `<hr style="background-color: #000; border-color: #000;">`);
+        main.insertAdjacentHTML("beforeend", `
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+        <hr style="background-color: #000; border-color: #000;">`);
         
     
         let companies = [];
@@ -128,19 +125,33 @@ function firmDiagrams() { //Диаграмма фирм
         })
         
         let ctx = document.getElementById("myChart");
+        let colors = [
+            "#cc7485",
+            "#fcea3c",
+            "#ac1048",
+            "#b6cbf7",
+            "#99eae9",
+            "#348173",
+            "#43d039",
+            "#eac092",
+            "#dfee80",
+            "#ddea70",
+        ]
         let chartData = {
             labels: companies.map(row => row.company),
             datasets: [{
-                label: 'Доход фирм',
+                label: 'Доход фирм (безналичка)',
                 data: companies.map(row => row.profit),
-                borderWidth: 1
+                backgroundColor: colors,
+                borderWidth: 5,
             }]
         }
         let chartOptions = {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    min: 0,
                 }
             }
         }
@@ -372,13 +383,15 @@ function htmlCompanyCallback(text) {
 
     if (data["status"] == 200) {
         let firmName = data["company"][1],
-        firmBalance = data["company"][5],
+        firmTax = data["company"][3] == 1 ? "уплачены" : "неуплачены",
+        firmBalance = data["company"][6],
         talic = talicWordEnding(firmBalance),
         tax = data["playerinfo"][0],
         fine = data["playerinfo"][1];
         founder = data["playerinfo"][2];
 
-        document.getElementById("greeting").innerHTML += `${firmName}!`;
+        document.getElementById("greeting").innerHTML += `"${firmName}"!`;
+        document.getElementById("tax").innerHTML += `${firmTax}`
         document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
         document.title = `Фирма ${firmName.toUpperCase()}`;
 
@@ -798,6 +811,9 @@ function htmlAddEmployeeCallback(text) {
         message = "Игрок успешно нанят!";
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
@@ -845,6 +861,9 @@ function htmlRemoveEmployeeCallback(text) {
         message = "Игрок успешно уволен!";
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
@@ -870,7 +889,7 @@ function htmlRemoveEmployeeCallback(text) {
         setTimeout(() => {
             window.location.reload();
         }, 3000);
-    } 
+    }
 }
 
 
@@ -958,11 +977,11 @@ function htmlFinePlayerFind(text) {
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        let input = document.getElementById("fine-input").value;
-        let fine = data["fine"];
-        let taxes = data["tax_paid"] == "1" ? "уплачены" : "не уплачены";
-        let talic = talicWordEnding(fine);
-        let body = document.getElementById("modal-body");
+        let input = document.getElementById("fine-input").value,
+        fine = data["fine"],
+        taxes = data["tax_paid"] == "1" ? "уплачены" : "не уплачены",
+        talic = talicWordEnding(fine),
+        body = document.getElementById("modal-body");
 
 
         body.insertAdjacentHTML("beforeend", `
@@ -992,7 +1011,7 @@ function htmlFinePlayerFind(text) {
     }
 
     setTimeout(() => {
-        document.getElementById("find-player").removeAttribute("disabled");
+        try {document.getElementById("find-player").removeAttribute("disabled")} catch {};
     }, 1000);
 }
 
