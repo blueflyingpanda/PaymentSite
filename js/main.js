@@ -42,9 +42,9 @@ function alertCallback(text) {
     alert(text)
 }
 
-const frontProduction = true;
+const frontProduction = false;
 const frontAndroidProduction = true;
-const backProduction = true;
+const backProduction = false;
 const commonPasswordLength = 5;
 
 let baseURL = frontAndroidProduction == true ?  "http://192.168.1.187:5500" : "http://127.0.0.1:5500"
@@ -110,58 +110,96 @@ function firmDiagrams() { //Диаграмма фирм
 
     function htmlDiagramCallback(text) {
         let data = JSON.parse(text); console.log(data);
-        let main = document.querySelector(".main");
+        let sum = data["sum"];
 
-        main.insertAdjacentHTML("beforeend", `
+        if (data["status"] == 200) {
+            let info = document.getElementById("info");
+        info.insertAdjacentHTML("beforeend", `
+        <h2>Доля в процентах каждой фирмы на рынке. УКАЗАНЫ ЛИШЬ ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
         <div class="chart-container">
             <canvas id="myChart"></canvas>
         </div>
         <hr style="background-color: #000; border-color: #000;">`);
         
-    
         let companies = [];
         data["companies"].forEach((company) => {
             companies.push({company: company[0], profit: company[1]})
         })
         
-        let ctx = document.getElementById("myChart");
-        let colors = [
-            "#cc7485",
-            "#fcea3c",
-            "#ac1048",
-            "#b6cbf7",
-            "#99eae9",
-            "#348173",
-            "#43d039",
-            "#eac092",
-            "#dfee80",
-            "#ddea70",
-        ]
-        let chartData = {
-            labels: companies.map(row => row.company),
-            datasets: [{
-                label: 'Доход фирм (безналичка)',
-                data: companies.map(row => row.profit),
-                backgroundColor: colors,
-                borderWidth: 5,
-            }]
-        }
-        let chartOptions = {
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                }
-            }
-        }
-        let chartCompany = new Chart(ctx, {
+        let config = {
             type: 'bar',
-            data: chartData,
-            options: chartOptions,
-        });
+            data: {
+                labels: companies.map((row) => row.company),
+                datasets: [{
+                    label: 'Доход фирм % (безналичка)',
+                    data: companies.map((row) => ((row.profit/sum)*100).toFixed()),
+                    backgroundColor: [
+                        "#cc7485",
+                        "#fcea3c",
+                        "#ac1048",
+                        "#b6cbf7",
+                        "#99eae9",
+                        "#348173",
+                        "#43d039",
+                        "#eac092",
+                        "#dfee80",
+                        "#ddea70",
+                    ],
+                    borderWidth: 5,
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100
+                        },
+                    }],
+                },
+            },
+        };
+
+        let ctx = document.getElementById("myChart");
+        let chartCompany = new Chart(ctx, config);
+        }
+        else {
+            let message = "К сожалению, диаграмма не была загружена!";
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        getPhoto();
     }
 }
+
+function getPhoto() {
+    rs.callback = htmlPhotoCallback;
+    rs.httpGet("get-telegram-photos")
+
+    function htmlPhotoCallback(text) {
+        let data = JSON.parse(text);
+        
+        if (data["status"] == 200) {
+            let info = document.getElementById("info");
+            info.insertAdjacentHTML("beforeend", `
+            <div id="photos"></div>`)
+            let photo = document.getElementById("photos");
+    
+            data["images"].forEach((img) => {
+                photo.insertAdjacentHTML("beforeend", `
+                <img src="data: image/jpg;base64, ${img}"><br>`)
+            })
+        }
+        else {
+            let message = "К сожалению, фотографии не были загружены!";
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+    }
+}
+
 
 
 function main() { // (endpoint - /auth)

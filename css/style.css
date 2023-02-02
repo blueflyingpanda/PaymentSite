@@ -18,12 +18,14 @@ input::-webkit-inner-spin-button {
 button {
     -webkit-tap-highlight-color: transparent;
 }
+
 body {    
     font-size: 1.5rem;
     font-family: 'Oswald', sans-serif;
     animation-name: body-show;
     animation-timing-function: cubic-bezier(.88,.35,.22,1.65);
     animation-duration: 1.2s;
+    text-align: center;
 }
 @keyframes body-show {
     from {
@@ -35,10 +37,18 @@ body {
         transform: translateY(0px);
     }
 }
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 li {
     font-size: 2rem;
 }
-input { /*Поля*/
+
+input {
     margin-left: auto;
     margin-right: auto;
     display: block;
@@ -56,23 +66,19 @@ input { /*Поля*/
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-
-
-.main {
-    text-align: center;
-}
-.main hr {
-    margin-top: 4vh;
-    margin-bottom: 3vh;
+hr {
+    margin-top: 1vh;
+    margin-bottom: 2vh;
     height: 0.75vh;
+}
+
+
+
+.main hr {
     width: 90vw;
 }
 .main span {
     margin: 10vh 10vw 10vh 10vw;
-}
-
-.start-btns { /*div с верхними кнопками на страничке*/
-    text-align: center;
 }
 
 .btn-green {
@@ -277,4 +283,20 @@ input { /*Поля*/
     margin: 2vh auto 10vh auto;
     padding-left: 1vw;
     padding-right: 3vw;
+}
+
+/*---------Фотографии---------*/
+
+#photos {
+    text-align: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+}
+
+#photos img {
+    margin: 5px 10px 5px 10px;
+    border-radius: 15px; 
+    max-width: 100%; 
 }
