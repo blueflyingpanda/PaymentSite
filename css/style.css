@@ -287,7 +287,7 @@ hr {
 
 /*---------Фотографии---------*/
 
-#photos {
+.photos {
     text-align: auto;
     display: flex;
     justify-content: center;
@@ -295,8 +295,13 @@ hr {
     overflow-x: hidden;
 }
 
-#photos img {
+.photos img {
     margin: 5px 10px 5px 10px;
     border-radius: 15px; 
-    max-width: 100%; 
+    max-width: 100%;
+    max-height: 50vh;
+    transition: 0.5s; 
+}
+.photos img:hover {
+    opacity: 0.8;
 }

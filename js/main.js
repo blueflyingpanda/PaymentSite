@@ -184,8 +184,8 @@ function getPhoto() {
         if (data["status"] == 200) {
             let info = document.getElementById("info");
             info.insertAdjacentHTML("beforeend", `
-            <div id="photos"></div>`)
-            let photo = document.getElementById("photos");
+            <div class="photos"></div>`)
+            let photo = document.querySelector(".photos");
     
             data["images"].forEach((img) => {
                 photo.insertAdjacentHTML("beforeend", `
