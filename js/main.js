@@ -66,6 +66,7 @@ let rs = new RequestsSender(apiURL, htmlAuthCallback);
 if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefined) { //Кнопка "Вернуться"
     let role = localStorage["Role"];
     let place = window.location.href;
+    console.log(place == `${baseURL}/firm.html`)
 
     if (place == `${baseURL}/index.html` || place == `${baseURL}/`) {
         if (role == "player") {
@@ -83,6 +84,9 @@ if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefi
         else if (role == "judgement") {
             place = `${baseURL}/ministry_justice.html`
         }
+        else if (role == "socdev") {
+            place = `${baseURL}/ministry_socdev.html`
+        }
 
         authForm = document.getElementById("authForm");
         authForm.insertAdjacentHTML("afterend", `
@@ -90,9 +94,11 @@ if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefi
 
     }
     else {
-        startBtns = document.querySelector(".start-btns");
-        startBtns.insertAdjacentHTML("afterbegin", `
-        <button onclick="window.location = '${baseURL}/index.html'" class="btn-green">Вернуться</button>`)
+        if (place != `${baseURL}/firm.html`) {
+            startBtns = document.querySelector(".start-btns");
+            startBtns.insertAdjacentHTML("afterbegin", `
+            <button onclick="window.location = '${baseURL}/index.html'" class="btn-green">Вернуться</button>`)
+        }
     }
 }
 
@@ -114,56 +120,56 @@ function firmDiagrams() { //Диаграмма фирм
 
         if (data["status"] == 200) {
             let info = document.getElementById("info");
-        info.insertAdjacentHTML("beforeend", `
-        <h2>Доля в процентах каждой фирмы на рынке. УКАЗАНЫ ЛИШЬ ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
-        <div class="chart-container">
-            <canvas id="myChart"></canvas>
-        </div>
-        <hr style="background-color: #000; border-color: #000;">`);
-        
-        let companies = [];
-        data["companies"].forEach((company) => {
-            companies.push({company: company[0], profit: company[1]})
-        })
-        
-        let config = {
-            type: 'bar',
-            data: {
-                labels: companies.map((row) => row.company),
-                datasets: [{
-                    label: 'Доход фирм % (безналичка)',
-                    data: companies.map((row) => ((row.profit/sum)*100).toFixed()),
-                    backgroundColor: [
-                        "#cc7485",
-                        "#fcea3c",
-                        "#ac1048",
-                        "#b6cbf7",
-                        "#99eae9",
-                        "#348173",
-                        "#43d039",
-                        "#eac092",
-                        "#dfee80",
-                        "#ddea70",
-                    ],
-                    borderWidth: 5,
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        ticks: {
-                            beginAtZero: true,
-                            max: 100
-                        },
-                    }],
+            info.insertAdjacentHTML("beforeend", `
+            <h2>Доля в процентах каждой фирмы на рынке. УКАЗАНЫ ТОЛЬКО ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+            <hr style="background-color: #000; border-color: #000;">`);
+            
+            let companies = [];
+            data["companies"].forEach((company) => {
+                companies.push({company: company[0], profit: company[1]})
+            })
+            
+            let config = {
+                type: 'bar',
+                data: {
+                    labels: companies.map((row) => row.company),
+                    datasets: [{
+                        label: 'Доход фирм % (безналичка)',
+                        data: companies.map((row) => ((row.profit/sum)*100).toFixed()),
+                        backgroundColor: [
+                            "#cc7485",
+                            "#fcea3c",
+                            "#ac1048",
+                            "#b6cbf7",
+                            "#99eae9",
+                            "#348173",
+                            "#43d039",
+                            "#eac092",
+                            "#dfee80",
+                            "#ddea70",
+                        ],
+                        borderWidth: 5,
+                    }]
                 },
-            },
-        };
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                beginAtZero: true,
+                                max: 100
+                            },
+                        }],
+                    },
+                },
+            };
 
-        let ctx = document.getElementById("myChart");
-        let chartCompany = new Chart(ctx, config);
+            let ctx = document.getElementById("myChart");
+            let chartCompany = new Chart(ctx, config);
         }
         else {
             let message = "К сожалению, диаграмма не была загружена!";
@@ -203,23 +209,6 @@ function getPhoto() {
 
 
 function main() { // (endpoint - /auth)
-    // if (localStorage.getItem("Authorization")) {
-    //     if (localStorage.getItem("Role") == "teacher") {
-    //         window.location.replace(`${baseURL}/teacher.html`);
-    //     }
-    //     else if (localStorage.getItem("Role") == "player") {
-    //         window.location.replace(`${baseURL}/player.html`);
-    //     }
-    //     else if (localStorage.getItem("Role") == "economic") {
-    //         window.location.replace(`${baseURL}/ministry_economic.html`);
-    //     }
-    //     else if (localStorage.getItem("Role") == "mvd") {
-    //             window.location.replace(`${baseURL}/ministry_mvd.html`);
-    //     }
-    //     else if (localStorage.getItem("Role") == "judgement") {
-    //         window.location.replace(`${baseURL}/ministry_justice.html`)
-    //     }    
-    // }
     firmDiagrams();
 
     addEventListener("submit", (e) => {
@@ -273,6 +262,9 @@ function htmlAuthCallback(text) {
         else if (data["role"] == "judgement") {
             window.location.replace(`${baseURL}/ministry_justice.html`);
         }
+        else if (data["role"] == "socdev") {
+            window.location.replace(`${baseURL}/ministry_socdev.html`);
+        }
     }
     else if (data["status"] == 401) {
         let message = "Неправильный пароль, попробуйте ещё раз!";
@@ -303,15 +295,15 @@ function htmlPlayerCallback(text) {
     }
     if (data["status"] == 200) {
         let firstName = data["player"][0],
-        lastName = data["player"][2],
-        gradeInfo = data["player"][3],
-        balance = data["player"][4],
+        lastName = data["player"][1],
+        gradeInfo = data["player"][2],
+        balance = data["player"][3],
         talic = talicWordEnding(balance),
-        firm = data["player"][5],
-        inn = data["player"][6],
-        fine = data["player"][7],
-        tax = data["player"][8],
-        founder = data["player"][9];
+        firm = data["player"][4],
+        inn = data["player"][5],
+        fine = data["player"][6],
+        tax = data["player"][7],
+        founder = data["player"][8];
 
         document.getElementById("greeting").innerHTML += `${firstName} ${lastName}!`;
         document.getElementById("grade").innerHTML += `${gradeInfo}`
@@ -382,7 +374,7 @@ function htmlTeacherCallback(text) {
         confirm();
     }
 
-    let data = JSON.parse(text); console.log(data);
+    let data = JSON.parse(text);
 
     if (data["status"] == 200) {
         let firstName = data["teacher"][0],
@@ -393,7 +385,7 @@ function htmlTeacherCallback(text) {
         subject = data["teacher"][4];
         
         document.getElementById("greeting").innerHTML += `${firstName} ${middleName}!`;
-        document.getElementById("subject").innerHTML += `${subject}`;
+        document.getElementById("subject").innerHTML += `"${subject.toUpperCase()}"`;
         document.getElementById("balance").innerHTML += `${balance} ${talic}`;
         document.getElementById("inn").innerHTML += `${inn}`;
         document.title = `${firstName} ${middleName} (учитель)`;
@@ -428,7 +420,7 @@ function htmlCompanyCallback(text) {
         fine = data["playerinfo"][1];
         founder = data["playerinfo"][2];
 
-        document.getElementById("greeting").innerHTML += `"${firmName}"!`;
+        document.getElementById("greeting").innerHTML += `"${firmName.toUpperCase()}"!`;
         document.getElementById("tax").innerHTML += `${firmTax}`
         document.getElementById("balance").innerHTML += `${firmBalance} ${talic}`;
         document.title = `Фирма ${firmName.toUpperCase()}`;
@@ -500,6 +492,19 @@ function htmlMinistryCallback(text) {
     let data = JSON.parse(text); console.log(data);
 
     if (data["status"] == 200) {
+        let firstname = data["minister"][0],
+        lastname = data["minister"][1],
+        grade = data["minister"][2],
+        balance = data["minister"][3],
+        talicBalance = talicWordEnding(balance),
+        inn = data["minister"][5],
+        role = data["minister"][6];
+
+        document.getElementById("greeting").innerHTML += `${firstname} ${lastname} (${role})`;
+        document.getElementById("grade").innerHTML += `${grade}`;
+        document.getElementById("balance").innerHTML += `${balance} ${talicBalance}`;
+        document.getElementById("inn").innerHTML += `${inn}`;
+
         if (data["minister"][6] == "economic") {
             let keys = {
                 37: "left",
@@ -508,11 +513,9 @@ function htmlMinistryCallback(text) {
                 40: "down",
                 65: "a",
                 66: "b",
-                16: "shift",
-                17: "ctrl",
                 32: "space",
             }
-            let konamiCode = ["up", "up", "down", "down", "left", "right", "left", "right", "b", "a", "ctrl", "shift", "ctrl", "shift", "space"];
+            let konamiCode = ["up", "up", "down", "down", "left", "right", "left", "right", "b", "a", "space"];
             let keyCount = 0;
             function checkCodeKonami(e) {
                 let pressedKey = keys[e.keyCode];
@@ -522,19 +525,19 @@ function htmlMinistryCallback(text) {
                 else {
                     keyCount = 0;
                 }
-                if (keyCount == 15) {
+                if (keyCount == 11) {
                     keyCount = 0;
                     modalCancel(true);
                     rs.callback = htmlMinisterCashCallback;
                     rs.httpGet("minister-cash");
 
                     function htmlMinisterCashCallback(text) {
-                        let data = JSON.parse(text);
+                        let data = JSON.parse(text); console.log(data);
                         if (data["status"] == 200) {
                             let message = `Имя: ${data["minister"][0]}<br>
-                                            Фамилия: ${data["minister"][2]}<br>
-                                            Отчество: ${data["minister"][1]}<br>
-                                            Наличка: ${data["minister"][4]} ${talicWordEnding(data["minister"][4])}`;
+                                            Фамилия: ${data["minister"][1]}<br>
+                                            MINISTER_ID: ${data["minister"][2]}<br>
+                                            Наличка: ${data["minister"][3]} ${talicWordEnding(data["minister"][3])}`;
                             let bcgcolor = "#FF4500";
 
                             output(message, bcgcolor);
@@ -554,18 +557,6 @@ function htmlMinistryCallback(text) {
         }
 
         if (localStorage["Role"] == "mvd") {
-            let firstname = data["minister"][0],
-            lastname = data["minister"][2],
-            grade = data["minister"][3],
-            balance = data["minister"][4],
-            talicBalance = talicWordEnding(balance);
-            inn = data["minister"][5];
-
-            document.getElementById("greeting").innerHTML += `${firstname} ${lastname}`;
-            document.getElementById("grade").innerHTML += `${grade}`;
-            document.getElementById("balance").innerHTML += `${balance} ${talicBalance}`;
-            document.getElementById("inn").innerHTML += `${inn}`;
-
             getFinePlayers();
         }
     }
@@ -583,56 +574,43 @@ function htmlMinistryCallback(text) {
 
 //Функции кнопок.
 
-function postTaxes() { //Уплата налогов (endpoint - /paytax)
-    rs.callback = htmlTaxesCallback;
-    rs.httpPost('paytax', null);
+function getPlayerTaxes() { //Уплата налогов (endpoint - /paytax)
+    rs.callback = htmlPlayerTaxesCallback;
+    rs.httpGet('paytax');
     Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
     
 }
 
-function htmlTaxesCallback(text) {
+function htmlPlayerTaxesCallback(text) {
     let data = JSON.parse(text); console.log(data);
+    let fine = data["fine"],
+    talic = talicWordEnding(fine);
 
-    if (data["status"] == 200 || data["status"] == 400) {
-        let modal = document.createElement("div");
-        modal.classList.add("modal");
-        document.body.append(modal);
-        modal.insertAdjacentHTML("afterbegin", `
-        <div id="modal-overlay" class="modal-overlay">
-            <div id="modal-window" class="modal-window">
-                <div id="modal-header" class="modal-header">
-                    <span class="modal-title">Уплата налогов</span>
-                </div>
-                <div id="modal-body" class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <button id="modal_cancel_id" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
-                </div>
-            </div>
-        </div>`);
-    }
-
-    let modalBody = document.getElementById("modal-body");
-
+    let label = "Уплата налогов";
     if (data["status"] == 200) {
-        modalBody.innerHTML += `<span class="modal-frame" style="background-color: #3bff86;">Налоги только что были уплачены!</span><br>`
-        modalBody.innerHTML += `<span>Сумма штрафа: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
-        setTimeout(() => { window.location.reload()}, 3000);
+        let message = `Налоги только что были уплачены!<br>
+                        Сумма штрафов: ${fine} ${talic}`;
+        let bcgcolor = "#3bff86";
+        output(message, bcgcolor, label);
     }
     else if (data["status"] == 400) {
         if (data["message"] == "taxes have already been paid") {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #FE9654;">Налоги уже были уплачены за этот период!</span><br>`;
-            modalBody.innerHTML += `<span>Сумма штрафа: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
+            let message = `Налоги уже были уплачены за этот период!<br>
+                            Сумма штрафов: ${fine} ${talic}`;
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor, label);
         }
         else {
-            modalBody.innerHTML += `<span class="modal-frame" style="background-color: #FE9654;">У вас недостаточно средств для уплаты налогов!</span><br>`;
-            modalBody.innerHTML += `<span>Количество штрафов: </span><span class="modal-frame" style="background-color: #FE9654">${data["fine"]}</span><br>`;
+            let message = `У вас недостаточно средств для уплаты налогов!<br>
+                            Сумма штрафов: ${fine} ${talic}`;
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor, label);
         }
     }
     else {
         message = "Произошла непревиденная ошибка!";
         bcgcolor = "#FE9654";
-        output(message, bcgcolor);
+        output(message, bcgcolor, label);
         setTimeout(() => {
             window.location.reload();
         }, 3000);
@@ -657,7 +635,7 @@ function postTransfer(text) { //Переводы между игроками (en
     }
     else {
         rs.callback = htmlTransferCallback;
-        rs.httpPost("transfer", JSON.stringify(data), "application/json");   
+        rs.httpPost("transfer", JSON.stringify(data), "application/json");
     }
 }
 
@@ -730,7 +708,7 @@ function htmlPayFirmCallback(text) {
             output(message, bcgcolor);
         }
         else if (data["message"] == "no such company") {
-            message = "Такой компании не существует!";
+            message = "Такой фирмы не существует!";
             bcgcolor = "#FE9654";
             output(message, bcgcolor);
         }
@@ -831,6 +809,100 @@ function htmlCompanySalaryCallback(text) {
 
 
 
+function getCompanyTaxes() { //Уплата налогов (endpoint - /paytax)
+    rs.callback = htmlCompanyTaxesCallback;
+    rs.httpGet('company-paytax');
+    Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
+    
+}
+
+function htmlCompanyTaxesCallback(text) {
+    let data = JSON.parse(text); console.log(data);
+    let tax_amount = data["tax_amount"],
+    talic = talicWordEnding(tax_amount);
+
+    let label = "Уплата налогов фирмы";
+    if (data["status"] == 200) {
+        let message = `Налоги фирмы только что были уплачены!`;
+        let bcgcolor = "#3bff86";
+        output(message, bcgcolor, label);
+    }
+    else if (data["status"] == 400) {
+        if (data["message"] == "taxes have already been paid") {
+            let message = `Налоги уже были уплачены за этот период!`;
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor, label);
+        }
+        else {
+            let message = `У вас недостаточно средств для уплаты налогов!<br>
+                            Сумма к уплате налогов: ${tax_amount} ${talic}`;
+            let bcgcolor = "#FE9654";
+            output(message, bcgcolor, label);
+        }
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor, label);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
+
+function postPayCompanySalary(text) {
+    let employees = text[0].trim().split(" ");
+    let salary = Number(text[1]);
+
+    if ((employees.filter((employee) => !!Number(employee) == true && employee.length < 4)).length == employees.length && salary%1 == 0 && salary >= 1) {
+        let data = {
+            employees: employees.map((employee) => Number(employee)),
+            salary: salary,
+        }
+        console.log(data);
+
+        rs.callback = htmlPayCompanySalary;
+        rs.httpPost("/company-salary", JSON.stringify(data), "application/json");
+    }
+    else {
+        let message = "Неправильно введены данные!";
+        let bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+}
+
+function htmlPayCompanySalary(text) {
+    let data = JSON.parse(text);
+    let message = null, bcgcolor = null;
+
+    if (data["status"] == 200) {
+        message = "Зарплаты успешно выплачены!";
+        bcgcolor = "#3bff86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 400) {
+        if (data["message"] == "tax aren't paid") {
+            message = "Для выплаты зарплаты нужно уплатить налоги!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else if (data["message"] == "not enough money") {
+            message = "Недостаточно денег для выплаты зарплаты!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else {
+            message = "Данных игроков нет в фирме!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+    }
+}
+
+
+
 function postAddEmployee(text) { //Нанять сотрудника (endpoint - /add-employee)
     data = {
         "signature": `${sha256(String(text[1]))}`,
@@ -849,9 +921,6 @@ function htmlAddEmployeeCallback(text) {
         message = "Игрок успешно нанят!";
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
@@ -899,9 +968,6 @@ function htmlRemoveEmployeeCallback(text) {
         message = "Игрок успешно уволен!";
         bcgcolor = "#3bff86";
         output(message, bcgcolor);
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
     }
     else if (data["status"] == 404) {
         message = "Вы не основатель фирмы!";
@@ -959,7 +1025,7 @@ function htmlFinePlayers(text) {
 
     if (data["status"] == 200) {
         for (let i = 0; data["debtors"][i] != undefined; i++) {
-            let player = `${data["debtors"][i][1]} ${data["debtors"][i][0]} (ID: ${data["debtors"][i][2]})`,
+            let player = `${data["debtors"][i][1]} ${data["debtors"][i][0]}, PLAYER_ID: ${data["debtors"][i][2]}`,
             tax = data["debtors"][i][3] == "1" ? "уплачены" : "неуплачены",
             colorTax = tax == "уплачены" ? "#3BFF86" : "#DC143C";
             fine = data["debtors"][i][4],
@@ -1011,20 +1077,22 @@ function getFinePlayerFind() { //Проверка штрафов у игрока
 }
 
 function htmlFinePlayerFind(text) {
-    let data = JSON.parse(text); 
+    let data = JSON.parse(text); console.log(data);
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        let input = document.getElementById("fine-input").value,
-        fine = data["fine"],
-        taxes = data["tax_paid"] == "1" ? "уплачены" : "не уплачены",
+        let firstname = data["player"][0],
+        lastname = data["player"][1],
+        player_id = data["player"][2]
+        fine = data["player"][3],
         talic = talicWordEnding(fine),
+        tax = data["player"][4] == "1" ? "уплачены" : "не уплачены",
         body = document.getElementById("modal-body");
 
 
         body.insertAdjacentHTML("beforeend", `
-        <h2 id="player_id">Игрок: ${input}</h2>
-        <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${taxes}</span><br>
+        <h2 id="player_id">Игрок: ${firstname} ${lastname}, PLAYER_ID: ${player_id}</h2>
+        <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${tax}</span><br>
         <span>Размер штрафа:</span><span id="fines" style="background-color: #FE9654; color: #000" class="modal-frame">${fine} ${talic}</span>
         `)
         document.getElementById("drop-charges").removeAttribute("disabled");
@@ -1204,7 +1272,8 @@ function getAllLogs(text) { //(endpoint - ministry_economic_logs)
     logsDiv.classList.add("log-table");
     logsDiv.setAttribute("id", "log-table");
     document.body.append(logsDiv);
-    logsDiv.insertAdjacentHTML("afterbegin", ` 
+    lightDarkToggle();
+    logsDiv.insertAdjacentHTML("afterbegin", `
     <h2>Здесь будут выводиться все логи платёжной системы</h2>
     <button onclick="${functionName}" id="clear-logs" class="btn-purple">Очистить системные логи</button><br>
     <hr>`);

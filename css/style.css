@@ -67,9 +67,10 @@ input {
 }
 
 hr {
-    margin-top: 1vh;
-    margin-bottom: 2vh;
+    margin-top: 2vh;
+    margin-bottom: 5vh;
     height: 0.75vh;
+    background-color: #000;
 }
 
 
@@ -288,11 +289,9 @@ hr {
 /*---------Фотографии---------*/
 
 .photos {
-    text-align: auto;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    overflow-x: hidden;
 }
 
 .photos img {

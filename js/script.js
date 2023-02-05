@@ -6,7 +6,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
   let h1 = document.querySelector(".main").querySelectorAll("h1");
   let h2 = document.querySelector(".main").querySelectorAll("h2");
   let li = document.querySelectorAll("li");
-  let hr = document.querySelectorAll("#main-hr");
+  let hr = document.querySelectorAll("hr");
   let toggleBtn = document.getElementById("lightDarkToggle");
 
   if (localStorage["Toggle"] == "true") {
@@ -186,8 +186,8 @@ function transferModal() { //Модалка переводов (игрок/уч�
       </div>
       <form id="transferForm" method="post">
         <div class="modal-body">
-          <input id="transfer-input" autocomplete="off" type="number" maxlength="15" placeholder="Введите ИНН игрока: " required>
-          <input autocomplete="off" type="number" placeholder="Кол-во талиц: " required>
+          <input id="transfer-input" autocomplete="off" type="number" maxlength="4" placeholder="Введите ИНН игрока: " required>
+          <input autocomplete="off" type="number" maxlength="10" placeholder="Кол-во талиц: " required>
         </div>
         <div class="modal-footer">
           <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -214,8 +214,8 @@ function firmModal() { //Оплата услуг компании (игрок/у
         <span class="modal-title">Оплата услуг фирмы</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input id="firm-input" autocomplete="off" maxlength="20" placeholder="Выберите фирму: " required>
-        <input id="services-input" autocomplete="off" maxlength="20" placeholder="Кол-во талиц: " required>
+        <input id="firm-input" autocomplete="off" maxlength="64" placeholder="Выберите фирму: " required>
+        <input id="services-input" autocomplete="off" type="number" maxlength="10" placeholder="Кол-во талиц: " required>
       </div>
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -257,6 +257,33 @@ function moneyTransit() { //Модалка переводов из электр�
 
 
 
+function payCompanySalary() {
+  let modal = document.createElement("div");
+  let FunctionName = "postPayCompanySalary";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${FunctionName}', true)` : `checkFieldsDataSave(${FunctionName}, false)`;
+
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Выплата зарплат</span>
+      </div>
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" maxlength="31" placeholder="Образец: 110 41 350 (PLAYER_ID) " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Размер заработной платы: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Выплатить</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+      </div> 
+    </div>
+  </div>`);
+}
+
+
+
 function editEmployees() {
   let modal = document.createElement("div");
   let functionAddEmployee = "postAddEmployee";
@@ -270,10 +297,10 @@ function editEmployees() {
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
-        <span class="modal-title">Работа с сотрудниками</span>
+        <span class="modal-title">Управление сотрудниками</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input autocomplete="off" maxlength="15" placeholder="Выберите игрока: " required>
+        <input autocomplete="off" maxlength="15" placeholder="Выберите игрока (PLAYER_ID): " required>
         <input autocomplete="off" type="password" maxlength="15" placeholder="Подпись министра экономики: " required>
       </div>
       <div class="modal-footer">
@@ -313,7 +340,7 @@ function finePlayer() { //Штрафник и отработка его долг
 
 
 
-function allLogs() { //Штрафник и отработка его долгов (юстиции и экономика)
+function allLogs() { //Вывод всех логов (министерство экономики)
   let modal = document.createElement("div");
   let functionName = "getAllLogs";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
@@ -339,7 +366,7 @@ function allLogs() { //Штрафник и отработка его долго�
 
 
 
-function memoMVD() {
+function memoMVD() { //Памятка для министерства МВД
   let modalInfo = document.createElement("div");
 
   modalInfo.classList.add("modal-info");
@@ -362,7 +389,6 @@ function memoMVD() {
                   Костяк ссылки:<br>
                 <span class="modal-frame" style="background-color: #8A2BE2; color: #fff">"blueflyingpanda.github.io"</span><br>
               3. Ищите уклонистов в заполненных людьми местах.<br>
-              4. Бить всех и вся ;3
       </div>
       <div class="modal-footer">
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
@@ -373,7 +399,7 @@ function memoMVD() {
 
 
 
-function output(message=null, bcgcolor="#fe9654") { //Оповещения
+function output(message=null, bcgcolor="#fe9654", label="Оповещение") { //Оповещения
   let modalInfo = document.createElement("div");
 
   modalInfo.classList.add("modal-info");
@@ -382,7 +408,7 @@ function output(message=null, bcgcolor="#fe9654") { //Оповещения
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window" style="border-color: ${bcgcolor}">
       <div class="modal-header">
-        <span class="modal-title">Оповещение</span>
+        <span class="modal-title">${label}</span>
       </div>
       <div id="modal-body" class="modal-body">
         <span class="modal-frame" style="background-color: ${bcgcolor}; color: #fff;">${message}<span>
@@ -423,17 +449,17 @@ function modalCancel(modalClose) { //Кнопка "Выйти" в модалка
     easing: "cubic-bezier(1,0,.4,1)",
   }
 
-  if (modals != 0) {
+  if (modals) {
     modals.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000 })});
     modalWindows.forEach((modal) => {modal.animate(modalWindowAnimate, modalAnimateOptions)});
     modals.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});
   }
-  if (pinModals != 0) {
+  if (pinModals) {
     pinModals.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000})});
     modalWindows.forEach((modal) => {modal.animate(modalWindowAnimate, modalAnimateOptions)});
     pinModals.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});
   }
-  if (modalsInfo != 0) {
+  if (modalsInfo) {
     modalsInfo.forEach((modal) => {modal.animate(modalAnimate, {duration: 1000})});
     modalWindows.forEach((modal) => { modal.animate(modalWindowAnimate, modalAnimateOptions)});
     modalsInfo.forEach((modal) => {setTimeout(() => {modal.remove();}, 970)});

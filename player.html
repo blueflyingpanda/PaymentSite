@@ -9,7 +9,6 @@
     <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body onload="getPlayerPage()">
     <div class="start-btns">    
         <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
@@ -21,12 +20,12 @@
             <h1 id="greeting">Добро пожаловать, </h1>
             <h2 id="grade">Класс - </h2>
             <h2 id="balance">Баланс: </h2>
-            <h2 id="inn">Ваш ИНН (ID): </h2>
+            <h2 id="inn">Ваш ИНН (PLAYER_ID): </h2>
             <hr id="main-hr">
             <h1>Ваши возможности:</h1>
         </div>
         <div id="btns">
-            <button onclick="postTaxes()" class="btn-purple">Уплатить налоги</button><br>
+            <button onclick="getPlayerTaxes()" class="btn-purple">Уплатить налоги</button><br>
             <button onclick="transferModal()" class="btn-purple">Перевод денег другому игроку</button><br>
             <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
         </div>

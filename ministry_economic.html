@@ -11,22 +11,31 @@
 </head>
 <body onload="getMinistryPage()">
     <div class="start-btns">
-        <button id="logout" onclick="logout()" class="btn-green">Выйти из аккаунта</button>
+        <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
         <button class="btn-green" onclick="confirm()">Изменить пин-код действий</button>
         <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
+        <hr>
     </div>
     <div class="main">
         <div id="info">
-            <h1>Добро пожаловать, сотрудник министерства экономики!</h1>
-            <hr id="main-hr">
-            <h1>Ваши возможности: </h1>
+            <h1 id="greeting">Добро пожаловать, </h1>
+            <h2 id="grade">Класс - </h2>
+            <h2 id="balance">Личный баланс: </h2>
+            <h2 id="inn">Ваш ИНН (MINISTER_ID): </h2>
+            <hr>
+            <h1>Ваши возможности в качестве сотрудника министерства экономики:</h1>
         </div>
-        <div>
-            <button onclick="moneyTransit()" id="cashcard-transfer" class="btn-purple">Перевод денег</button><br>
+        <div id="btns">
+            <button onclick="moneyTransit()" id="cashcard-transfer" class="btn-purple">Банковский перевод денег</button><br>
             <button onclick="finePlayer()" id="taxes-pay-economic" class="btn-purple">Уплата штрафов и налогов игрока</button><br>
             <button onclick="allLogs()" id="all-logs-economic" class="btn-purple">Системные логи</button><br>
+            <hr>
+            <h1>Ваши возможности в качестве игрока:</h1>
+            <button onclick="transferModal()" class="btn-purple">Перевод денег другому игроку</button><br>
+            <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
         </div>
     </div>
+    <hr>
 
     <script src="js/main.js"></script>
     <script src="js/script.js"></script>

@@ -17,11 +17,12 @@
             <h2 id="balance">Баланс фирмы: </h2>
             <h2 id="tax">Налоги: </h2>
             <h2 id="company-list">Участники фирмы: </h2>
-            <hr id="main-hr">
+            <hr>
             <h1>Ваши возможности:</h1>
         </div>
         <div id="btns">
-            <button onclick="postCompanySalary()" class="btn-purple">Уплата налогов и выдача зарплаты сотрудникам</button><br>
+            <button onclick="getCompanyTaxes()" class="btn-purple">Уплата налогов фирмы</button><br>
+            <button onclick="payCompanySalary()" class="btn-purple">Выплата зарплат</button><br>
             <button onclick="editEmployees()" class="btn-purple">Нанять/уволить сотрудника</button><br>
             <button id="firm-back" onclick="document.location = './player.html'" class="btn-orange">Вернуться</button><br>
         </div>

@@ -9,20 +9,20 @@
     <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body onload="getTeacherPage()">
     <div class="start-btns">
         <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
         <button class="btn-green" onclick="confirm()">Изменить пин-код действий</button>
         <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
+        <hr>
     </div>
         <div class="main">
         <div id="info">
             <h1 id="greeting">Добро пожаловать, </h1>
             <h2 id="subject">Ваше госпредприятие - </h2>
             <h2 id="balance">Ваш баланс: </h2>
-            <h2 id="inn">Ваш ИНН (ID): </h2>  
-            <hr id="main-hr">
+            <h2 id="inn">Ваш ИНН (TEACHER_ID): </h2>
+            <hr>
             <h1>Ваши возможности:</h1>
         </div>
         <div>
