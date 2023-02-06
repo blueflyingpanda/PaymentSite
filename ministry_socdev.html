@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Министерство социального развития</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="img/school.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <script src="js/sha256.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body onload="getMinistryPage()">
+    <div class="start-btns">    
+        <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
+        <button id="action-pass" class="btn-green" onclick="confirm()">Изменить пин-код действий</button>
+        <button id="lightDarkToggle" onclick="lightDarkToggle(true)" class="btn-green">&#9728;</button>
+        <hr>
+    </div>
+    <div class="main">
+        <div id="info">
+            <h1 id="greeting">Добро пожаловать, </h1>
+            <h2 id="grade">Класс - </h2>
+            <h2 id="balance">Баланс: </h2>
+            <h2 id="inn">Ваш ИНН (MINISTER_ID): </h2>
+            <hr>
+            <h1>Ваши возможности в качестве игрока:</h1>
+        </div>
+        <div id="btns">
+            <button onclick="transferModal()" class="btn-purple">Перевод денег другому игроку</button><br>
+            <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/script.js"></script>
+    <script>lightDarkToggle()</script>
+</body>
+</html>
