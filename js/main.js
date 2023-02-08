@@ -55,7 +55,7 @@ if (frontProduction) {
 }
 if (backProduction) {
     // apiURL = "https://lhelper.pythonanywhere.com";
-    apiURL = "http://62.217.183.164:5000"
+    apiURL = "https://62.217.183.164:5000"
 }
 
 const tokenHeader = "auth_token";
