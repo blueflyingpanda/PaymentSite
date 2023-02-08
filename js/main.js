@@ -54,7 +54,8 @@ if (frontProduction) {
     baseURL = "https://blueflyingpanda.github.io/PaymentSite"
 }
 if (backProduction) {
-    apiURL = "https://lhelper.pythonanywhere.com";
+    // apiURL = "https://lhelper.pythonanywhere.com";
+    apiURL = "http://62.217.183.164:5000"
 }
 
 const tokenHeader = "auth_token";
@@ -623,7 +624,6 @@ function postTransfer(text) { //Переводы между игроками (en
     let data = {
         "amount": Number(text[1]),
         "receiver": Number(text[0]),
-        "role": localStorage["Role"],
     }
     let receiver = data["receiver"]
     let amount = data["amount"]
@@ -676,7 +676,6 @@ function postPayFirm(text) { //Оплата услуг компании (endpoin
     data = {
         "amount": Number(text[1]),
         "company": text[0].toLowerCase(),
-        "role": localStorage["Role"],
     }
 
     let amount = data["amount"]
