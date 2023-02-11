@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Министерство внутренних дел</title>
+
+    <script>
+        let randVer = (new Date()).getTime();
+        document.write(`<script src="js/version.js?ver=${randVer}"\><\/script>`);
+    </script>
+
     <meta charset="UTF-8">
     <link rel="icon" href="img/school.png">
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
-    <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body onload="getMinistryPage()">
     <div class="start-btns">
         <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
@@ -34,8 +40,7 @@
         <h1>У вас есть доступ к таблице штрафников по всей системе</h1>
     </div>
 
-    <script src="js/main.js"></script>
-    <script src="js/script.js"></script>
     <script>lightDarkToggle()</script>
 </body>
+
 </html>

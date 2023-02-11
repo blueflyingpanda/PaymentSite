@@ -1,35 +1,44 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Фирма</title>
+
+    <script>
+        let randVer = (new Date()).getTime();
+        document.write(`<script src="js/version.js?ver=${randVer}"\><\/script>`);
+    </script>
+
     <meta charset="UTF-8">
     <link rel="icon" href="img/school.png">
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
-    <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body onload="getCompany(localStorage.getItem('Firm'))">
     <div class="start-btns"></div>
     <div class="main">
         <div id="info">
             <h1 id="greeting">Добро пожаловать, фирма </h1>
             <h2 id="balance">Баланс фирмы: </h2>
-            <h2 id="tax">Налоги: </h2>
+            <h2 id="inn">ИНН фирмы (COMPANY_ID): </h2>
+            <h3 id="tax_paid">Налоги: </h3>
+            <h3 id="fine">Сумма штрафа: </h3>
+            <h3 id="revenue">Предполагаемый доход: </h3>
+            <h3 id="tax">Процент налога: </h3>
+            <h3 id="profit">Реальный доход: </h3>
             <h2 id="company-list">Участники фирмы: </h2>
             <hr>
             <h1>Ваши возможности:</h1>
         </div>
         <div id="btns">
-            <button onclick="getCompanyTaxes()" class="btn-purple">Уплата налогов фирмы</button><br>
+            <button onclick="getCompanyDebts()" class="btn-purple">Уплата налогов и штрафов фирмы</button><br>
             <button onclick="payCompanySalary()" class="btn-purple">Выплата зарплат</button><br>
-            <button onclick="editEmployees()" class="btn-purple">Нанять/уволить сотрудника</button><br>
             <button id="firm-back" onclick="document.location = './player.html'" class="btn-orange">Вернуться</button><br>
         </div>
     </div>
 
-    <script src="js/main.js"></script>
-    <script src="js/script.js"></script>
     <script>lightDarkToggle()</script>
 </body>
+
 </html>

@@ -1,10 +1,11 @@
-function lightDarkToggle(toggle) { //Отрисовщик интерфейса страницы
+function lightDarkToggle(toggle) {
   if (typeof localStorage["Toggle"] != "string") {
     localStorage["Toggle"] = "true";
   }
 
   let h1 = document.querySelector(".main").querySelectorAll("h1");
   let h2 = document.querySelector(".main").querySelectorAll("h2");
+  let h3 = document.querySelector(".main").querySelectorAll("h3");
   let li = document.querySelectorAll("li");
   let hr = document.querySelectorAll("hr");
   let toggleBtn = document.getElementById("lightDarkToggle");
@@ -12,18 +13,18 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
   if (localStorage["Toggle"] == "true") {
     try { toggleBtn.textContent = "🌚" } catch {};
     try { hr.forEach((hr) => { hr.style.backgroundColor = "#000"; hr.style.borderColor = "#000";})} catch {};
-    try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#000"}} catch {}; 
-    try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#000"}} catch {};
-    try { for (i = 0; i < li.length; i++) { li[i].style.color = "#000"}} catch {};
+    try { h1.forEach((h1) => { h1.style.color = "#000"})} catch {};
+    try { h2.forEach((h2) => { h2.style.color = "#000"})} catch {};
+    try { h3.forEach((h3) => { h3.style.color = "#000"})} catch {};
     document.body.style.backgroundColor = "#fff"; 
     if (toggle) {localStorage["Toggle"] = "false"; location.reload();}
   }
   else {
     try { toggleBtn.textContent = "☀"; } catch {};
     try { hr.forEach((hr) => { hr.style.backgroundColor = "#fff"; hr.style.borderColor = "#fff";})} catch {};
-    try { for (i = 0; i < h1.length; i++) { h1[i].style.color = "#fff"}} catch {}; 
-    try { for (i = 0; i < h2.length; i++) { h2[i].style.color = "#fff"}} catch {};
-    try { for (i = 0; i < li.length; i++) { li[i].style.color = "#fff"}} catch {};
+    try { h1.forEach((h1) => { h1.style.color = "#fff"})} catch {};
+    try { h2.forEach((h2) => { h2.style.color = "#fff"})} catch {};
+    try { h3.forEach((h3) => { h3.style.color = "#fff"})} catch {};
     document.body.style.backgroundColor = "#000"; 
     if (toggle) {localStorage["Toggle"] = "true"; location.reload();}
   }
@@ -31,7 +32,7 @@ function lightDarkToggle(toggle) { //Отрисовщик интерфейса �
 
 
 
-function checkFieldsDataSave(functionName, pinValue) { //Проверка полей на соответствие и сохранение введённых в них данных.
+function checkFieldsDataSave(functionName, pinValue) {
   inputs = Array.from(document.querySelectorAll("input"));
   if (functionName.name != "confirmPass") {
     for (i = 0; i < inputs.length; i++) {
@@ -73,16 +74,16 @@ function checkFieldsDataSave(functionName, pinValue) { //Проверка пол
 }
 
 
-function pinCode(functionName, data) { //Модальное окно с вводом пин-кода (после checkFieldsDataSave).
-  let dataNew = ''; //Приводим массив в порядок (добавляем кавычки, а то PinCodeVerify их съедает)
-  for (i = 0; i < data.length; i++) {
+function pinCode(functionName, data) {
+  let dataNew = '';
+  data.forEach((data) => {
     if (dataNew == '') {
-      dataNew += `'${data[i]}'`;
+      dataNew += `'${data}'`;
     }
     else {
-      dataNew += `, '${data[i]}'`;
+      dataNew += `, '${data}'`;
     }
-  }
+  });
 
   let pinModal = document.createElement("div");
   pinModal.classList.add("pin-modal");
@@ -103,11 +104,11 @@ function pinCode(functionName, data) { //Модальное окно с ввод
     </div>
   </div>`);
 }
-function pinCodeVerify(functionName, data) { //Подтверждение пароля.
+function pinCodeVerify(functionName, data) {
   let pinInput = document.getElementById("pin-input");
   if (sha256(String(pinInput.value)) == localStorage["Confirmation"]) {
+    pinInput.style.border = "3px solid #3bff86";
     modalCancel(true);
-    pinInput.style.border = "3px solid #3bff86"
     functionName(data);
   }
   else {
@@ -118,7 +119,7 @@ function pinCodeVerify(functionName, data) { //Подтверждение пар
 
 
 let CONFIRM = localStorage["Confirmation"];
-function confirm() { //Изменение пин-кода с подтверждением.
+function confirm() {
   let functionName = "confirmPass";
   if (CONFIRM != undefined && CONFIRM != "false") {
     functionName = `checkFieldsDataSave('${functionName}', true)`;
@@ -148,7 +149,7 @@ function confirm() { //Изменение пин-кода с подтвержд�
     </div>
   </div>`);
 
-  if (localStorage["Confirmation"] == "undefined" || localStorage["Confirmation"] == "false") {
+  if (localStorage["Confirmation"] == undefined || localStorage["Confirmation"] == "false") {
     window.addEventListener("keydown", (e) => {
       if (e.keyCode == 27) {
         localStorage["Confirmation"] = "false";
@@ -170,7 +171,7 @@ function confirmPass() {
 
 
 
-function transferModal() { //Модалка переводов (игрок/учитель)
+function transferModal() {
   let header = localStorage["Role"] == "teacher" ? "Выдача зарплаты" : "Перевод денег другому игроку";
   let functionName = localStorage["Role"] == "teacher" ? "postTeacherSalary" : "postTransfer";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
@@ -200,7 +201,7 @@ function transferModal() { //Модалка переводов (игрок/уч�
 
 
 
-function firmModal() { //Оплата услуг компании (игрок/учитель)
+function firmModal() {
   let functionName = "postPayFirm";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
@@ -227,7 +228,7 @@ function firmModal() { //Оплата услуг компании (игрок/у
 
 
 
-function moneyTransit() { //Модалка переводов из электронных в наличные (министерство экономики)
+function moneyTransit() {
   let modal = document.createElement("div");
   let functionNameWithdraw = "postWithdraw";
   let functionNameDeposit = "postDeposit";
@@ -300,8 +301,9 @@ function editEmployees() {
         <span class="modal-title">Управление сотрудниками</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input autocomplete="off" maxlength="15" placeholder="Выберите игрока (PLAYER_ID): " required>
-        <input autocomplete="off" type="password" maxlength="15" placeholder="Подпись министра экономики: " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока (PLAYER_ID): " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите владельца (PLAYER_ID): " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="ИНН фирмы: " required>
       </div>
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionAddEmployee}" type="button" class="btn-orange">Нанять сотрудника</button>
@@ -313,7 +315,38 @@ function editEmployees() {
 }
 
 
-function finePlayer() { //Штрафник и отработка его долгов (юстиции и экономика)
+
+function addFine() {
+  let modal = document.createElement("div");
+  let functionAddPlayer = "postAddPlayerFine";
+  let functionAddFirm = "postAddFirmFine";
+  functionAddPlayer = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddPlayer}', true)` : `checkFieldsDataSave(${functionAddPlayer}, false)`;
+  functionAddFirm = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddFirm}', true)` : `checkFieldsDataSave(${functionAddFirm}, false)`;
+
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Выписать штраф</span>
+      </div>
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите ИНН (PLAYER_ID/COMPANY_ID): " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Сумма штрафа: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="modalCancel(true), ${functionAddPlayer}" type="button" class="btn-orange">Выписать игроку</button>
+        <button onclick="modalCancel(true), ${functionAddFirm}" type="button" class="btn-orange">Выписать фирме</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+      </div> 
+    </div>
+  </div>`);
+}
+
+
+
+function finePlayer() {
   let modal = document.createElement("div");
   let functionNameTax = "postFinePlayerPay";
   functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
@@ -340,7 +373,7 @@ function finePlayer() { //Штрафник и отработка его долг
 
 
 
-function allLogs() { //Вывод всех логов (министерство экономики)
+function allLogs() {
   let modal = document.createElement("div");
   let functionName = "getAllLogs";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
@@ -366,7 +399,7 @@ function allLogs() { //Вывод всех логов (министерство 
 
 
 
-function memoMVD() { //Памятка для министерства МВД
+function memoMVD() {
   let modalInfo = document.createElement("div");
 
   modalInfo.classList.add("modal-info");
@@ -384,11 +417,8 @@ function memoMVD() { //Памятка для министерства МВД
         <span>Имеется штраф:</span><br><span class="modal-frame" style="background-color: #FF69B4; color: #fff"">цвет экрана</span><br>
         <span>Не уплатил налог и имеется штраф:</span><br><span class="modal-frame" style="background-color: #DC143C; color: #fff"">цвет экрана</span><br>
         <span>Советы по поимке уклонистов:<br>
-              1. Просите игроков обновлять страницу. Особенно просите тех, у кого стандартная тема сайта (белая/чёрная)<br>
-              2. Начало ссылки сайта должно соответсвовать костяку, указаному ниже:</span><br>
-                  Костяк ссылки:<br>
-                <span class="modal-frame" style="background-color: #8A2BE2; color: #fff">"blueflyingpanda.github.io"</span><br>
-              3. Ищите уклонистов в заполненных людьми местах.<br>
+              1. Просите игрока обновить страницу, если заподозрите его в обмане.<br>
+              2. Ищите уклонистов в заполненных людьми местах.<br>
       </div>
       <div class="modal-footer">
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
@@ -399,7 +429,7 @@ function memoMVD() { //Памятка для министерства МВД
 
 
 
-function output(message=null, bcgcolor="#fe9654", label="Оповещение") { //Оповещения
+function output(message=null, bcgcolor="#fe9654", label="Оповещение") {
   let modalInfo = document.createElement("div");
 
   modalInfo.classList.add("modal-info");
@@ -422,7 +452,7 @@ function output(message=null, bcgcolor="#fe9654", label="Оповещение") 
 
 
 
-function modalCancel(modalClose) { //Кнопка "Выйти" в модалках
+function modalCancel(modalClose) {
   if (modalClose) {
     let modalBtn = document.querySelectorAll("button");
     for (let i = 0; i < modalBtn.length; i++) {
@@ -490,11 +520,14 @@ function keydownCheck(e) { //e.keyCode == 126
   }
 }
 
-document.body.addEventListener("animationstart", (e) => {
-  window.removeEventListener("keydown", keydownCheck, false);
-  window.addEventListener("keydown", blockKeydown, false);
-})
-document.body.addEventListener("animationend", (e) => {
-  window.addEventListener("keydown", keydownCheck, false);
-  window.removeEventListener("keydown", blockKeydown, false);
-})
+try {
+  document.body.addEventListener("animationstart", (e) => {
+    window.removeEventListener("keydown", keydownCheck, false);
+    window.addEventListener("keydown", blockKeydown, false);
+  })
+  document.body.addEventListener("animationend", (e) => {
+    window.addEventListener("keydown", keydownCheck, false);
+    window.removeEventListener("keydown", blockKeydown, false);
+  })
+}
+catch {}

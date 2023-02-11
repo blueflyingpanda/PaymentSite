@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Игрок</title>
+
+    <script>
+        let randVer = (new Date()).getTime();
+        document.write(`<script src="js/version.js?ver=${randVer}"\><\/script>`);
+    </script>
+
     <meta charset="UTF-8">
     <link rel="icon" href="img/school.png">
     <link rel="stylesheet" href="css/style.css">
@@ -9,6 +16,7 @@
     <script src="js/sha256.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body onload="getPlayerPage()">
     <div class="start-btns">    
         <button class="btn-green" onclick="logout()">Выйти из аккаунта</button>
@@ -30,8 +38,6 @@
             <button onclick="firmModal()" class="btn-purple">Услуги фирмы</button><br>
         </div>
     </div>
-
-    <script src="js/main.js"></script>
-    <script src="js/script.js"></script>
 </body>
+
 </html>
