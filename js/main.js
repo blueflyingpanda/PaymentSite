@@ -62,7 +62,7 @@ const tokenHeader = "auth_token";
 let rs = new RequestsSender(apiURL, htmlAuthCallback);
 
 
-window.addEventListener("DOMContentLoaded", (e) => {
+window.addEventListener("load", (e) => {
     if (localStorage["Authorization"] != undefined && localStorage["Role"] != undefined) {
         let role = localStorage["Role"];
         let place = window.location.href;
@@ -86,17 +86,22 @@ window.addEventListener("DOMContentLoaded", (e) => {
             else if (role == "socdev") {
                 place = `${baseURL}/ministry_socdev.html`
             }
-    
-            let authForm = document.getElementById("authForm");
-            authForm.insertAdjacentHTML("afterend", `
-            <button onclick="window.location = '${place}'" class="btn-green">Вернуться</button>`)
-    
+            
+            try {
+                let authForm = document.getElementById("authForm");
+                authForm.insertAdjacentHTML("afterend", `
+                <button onclick="window.location = '${place}'" class="btn-green">Вернуться</button>`)
+            }
+            catch {}
         }
         else {
             if (place != `${baseURL}/firm.html`) {
-                let startBtns = document.querySelector(".start-btns");
-                startBtns.insertAdjacentHTML("afterbegin", `
-                <button onclick="window.location = '${baseURL}/index.html'" class="btn-green">Вернуться</button>`)
+                try {
+                    let startBtns = document.querySelector(".start-btns");
+                    startBtns.insertAdjacentHTML("afterbegin", `
+                    <button onclick="window.location = '${baseURL}/index.html'" class="btn-green">Вернуться</button>`)
+                }
+                catch {}
             }
         }
     }
@@ -123,7 +128,7 @@ function firmDiagrams() {
         if (data["status"] == 200) {
             let info = document.getElementById("info");
             info.insertAdjacentHTML("beforeend", `
-            <h2>Доля в процентах каждой фирмы на рынке. УКАЗАНЫ ТОЛЬКО ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
+            <h2>Доли государственных фирмы на рынке в процентах. УКАЗАНЫ ТОЛЬКО ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
             <div class="chart-container">
                 <canvas id="myChart"></canvas>
             </div>
@@ -604,7 +609,7 @@ function htmlPlayerTaxesCallback(text) {
     if (data["status"] == 200) {
         let message = `Налоги только что были уплачены!<br>
                         Сумма штрафов: ${fine} ${talic}`;
-        let bcgcolor = "#3bff86";
+        let bcgcolor = "#3BFF86";
         output(message, bcgcolor, label);
     }
     else if (data["status"] == 400) {
@@ -658,7 +663,7 @@ function htmlTransferCallback(text) {
 
     if (data["status"] == 200) {
         message = "Операция прошла успешно!";
-        bcgcolor = "#3bff86"
+        bcgcolor = "#3BFF86"
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
@@ -710,7 +715,7 @@ function htmlPayFirmCallback(text) {
 
     if (data["status"] == 200) {
         message = "Операция прошла успешно!";
-        bcgcolor = "#3bff86"
+        bcgcolor = "#3BFF86"
         output(message, bcgcolor);
     }
     else if (data["status"] == 400){
@@ -768,7 +773,7 @@ function htmlTeacherSalaryCallback(text) {
     if (data["status"] == 200) {
         if (data["message"] == "salary paid") {
             message = "Зарплата выплачена!";
-            bcgcolor = "#3bff86";
+            bcgcolor = "#3BFF86";
             output(message, bcgcolor);
         }
         else if (data["message"] == "player does not exist") {
@@ -836,7 +841,7 @@ function htmlCompanyTaxesCallback(text) {
     let label = "Уплата налогов фирмы";
     if (data["status"] == 200) {
         let message = `Налоги фирмы и её штрафы только что были уплачены!`;
-        let bcgcolor = "#3bff86";
+        let bcgcolor = "#3BFF86";
         output(message, bcgcolor, label);
     }
     else if (data["status"] == 400) {
@@ -890,7 +895,7 @@ function htmlPayCompanySalary(text) {
 
     if (data["status"] == 200) {
         message = "Зарплаты успешно выплачены!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
@@ -941,25 +946,18 @@ function htmlAddEmployeeCallback(text) {
     
     if (data["status"] == 200) {
         message = "Игрок успешно нанят!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else if (data["status"] == 404) {
-        message = "Вы не основатель фирмы!";
+        message = "Такого владельца в фирме нет!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
-        if (data["message"] == "wrong minister signature") {
-            message = "Неправильная подпись министра!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
-        else {
-            message = "Либо игрока не существует, либо он уже работает в фирме!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
+        message = "Либо игрока не существует, либо он уже работает в фирме!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
     }
     else {
         message = "Произошла непревиденная ошибка!";
@@ -989,25 +987,18 @@ function htmlRemoveEmployeeCallback(text) {
 
     if (data["status"] == 200) {
         message = "Игрок успешно уволен!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else if (data["status"] == 404) {
-        message = "Вы не основатель фирмы!";
+        message = "Такого владельца в фирме нет!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else if (data["status"] == 400) {
-        if (data["message"] == "wrong minister signature") {
-            message = "Неправильная подпись министра!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
-        else {
-            message = "Либо игрока не существует, либо он уже работает в фирме!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
+        message = "Либо игрока не существует, либо он уже работает в фирме!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
     }
     else {
         message = "Произошла непревиденная ошибка!";
@@ -1047,7 +1038,12 @@ function htmlAddPlayerFine(text) {
 
     if (data["status"] == 200) {
         message = "Штраф выписан игроку успешно!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 404) {
+        message = "Такого игрока не существует!";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
@@ -1088,7 +1084,12 @@ function htmlAddFirmFine(text) {
 
     if (data["status"] == 200) {
         message = "Штраф выписан фирме успешно!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 404) {
+        message = "Такой фирмы не существует!";
+        bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
@@ -1173,7 +1174,7 @@ function getFinePlayerFind() {
         input.style.border = "3px solid #ff483b";
     }
     else {
-        input.style.border = "3px solid #3bff86"
+        input.style.border = "3px solid #3BFF86"
         document.getElementById("find-player").setAttribute("disabled", "disabled");
         rs.callback = htmlFinePlayerFind;
         rs.httpGet(`check-player?player_id=${input.value}`);
@@ -1246,7 +1247,7 @@ function htmlFinePlayerPay(text) {
 
     if (data["status"] == 200) {
         message = "Штраф аннулирован, налоги были уплачены!"
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else if (data["status"] == 404) {
@@ -1296,16 +1297,28 @@ function htmlWithdraw(text) {
     
     if (data["status"] == 200) {
         message = "Деньги сняты успешно!";
-        bcgcolor = "#3bff86"
+        bcgcolor = "#3BFF86"
         output(message, bcgcolor)
+    }
+    else if (data["status"] == 400) {
+        if (data["message"] == "not enough cash") {
+            message = "У вас кончились наличные деньги!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else if (data["message"] == "not enough money to withdraw") {
+            message = "У игрока недостаточно денег для вывода!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else {
+            message = "Неправильно введены данные!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
     }
     else if (data["status"] == 401) {
         window.location.reload();
-    }
-    else if (data["status"] == 400) {
-        message = "Неправильно введены данные!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
     }
     else {
         message = "Произошла непревиденная ошибка!";
@@ -1344,13 +1357,25 @@ function htmlDeposit(text) {
     
     if (data["status"] == 200) {
         message = "Деньги внесены успешно!";
-        bcgcolor = "#3bff86"
+        bcgcolor = "#3BFF86"
         output(message, bcgcolor)
     }
     else if (data["status"] == 400) {
-        message = "Неправильно введены данные!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
+        if (data["message"] == "not enough cash") {
+            message = "У вас кончились наличные деньги!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else if (data["message"] == "not enough money to withdraw") {
+            message = "У игрока недостаточно денег для вывода!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
+        else {
+            message = "Неправильно введены данные!";
+            bcgcolor = "#FE9654";
+            output(message, bcgcolor);
+        }
     }
     else if (data["status"] == 401) {
         window.location.reload();
@@ -1368,26 +1393,33 @@ function htmlDeposit(text) {
 
 
 function getAllLogs(text) {
-    let logsDiv = document.getElementById("log-table");
-    try {logsDiv.remove()} catch {};
-    let functionName = "getClearLogs";
-    functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
-
-
-
-    logsDiv = document.createElement("div");
-    logsDiv.classList.add("log-table");
-    logsDiv.setAttribute("id", "log-table");
-    document.body.append(logsDiv);
-    lightDarkToggle();
-    logsDiv.insertAdjacentHTML("afterbegin", `
-    <h2>Здесь будут выводиться все логи платёжной системы</h2>
-    <button onclick="${functionName}" id="clear-logs" class="btn-purple">Очистить системные логи</button><br>
-    <hr>`);
-    logsDiv.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
+    if (text%1 == 0 && text >= 0) {
+        let logsDiv = document.getElementById("log-table");
+        try {logsDiv.remove()} catch {};
+        let functionName = "getClearLogs";
+        functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
     
-    rs.callback = htmlAllLogsCallback;
-    rs.httpGet(`ministry_economic_logs?length=${text}`);
+    
+    
+        logsDiv = document.createElement("div");
+        logsDiv.classList.add("log-table");
+        logsDiv.setAttribute("id", "log-table");
+        document.body.append(logsDiv);
+        lightDarkToggle();
+        logsDiv.insertAdjacentHTML("afterbegin", `
+        <h2>Здесь будут выводиться все логи платёжной системы</h2>
+        <button onclick="${functionName}" id="clear-logs" class="btn-purple">Очистить системные логи</button><br>
+        <hr>`);
+        logsDiv.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
+        
+        rs.callback = htmlAllLogsCallback;
+        rs.httpGet(`ministry_economic_logs?length=${text}`);
+    }
+    else {
+        message = "Неправильно введены данные!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
 }
 
 function htmlAllLogsCallback (text) {
@@ -1438,7 +1470,7 @@ function htmlclearLogsCallback(text) {
 
     if (data["status"] == 200) {
         message = "Логи успешно очищены!";
-        bcgcolor = "#3bff86";
+        bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else {

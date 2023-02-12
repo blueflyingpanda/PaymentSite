@@ -272,7 +272,8 @@ function payCompanySalary() {
         <span class="modal-title">Выплата зарплат</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input autocomplete="off" maxlength="31" placeholder="Образец: 110 41 350 (PLAYER_ID) " required>
+      <span></span>
+        <input autocomplete="off" maxlength="31" placeholder="PLAYER_ID через пробел: " required>
         <input autocomplete="off" type="number" maxlength="15" placeholder="Размер заработной платы: " required>
       </div>
       <div class="modal-footer">
@@ -357,7 +358,7 @@ function finePlayer() {
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
-        <span class="modal-title">Неуплата штрафа</span>
+        <span class="modal-title">Уплата штрафов и налогов игрока</span>
         <input id="fine-input" autocomplete="off" type="number" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
       </div>
       <div id="modal-body" class="modal-body">
@@ -506,7 +507,7 @@ function blockKeydown(e) {
     e.preventDefault();
   }
 }
-function keydownCheck(e) { //e.keyCode == 126
+function keydownCheck(e) {
   if (e.keyCode == 9 ||
       e.keyCode == 13 ||
       e.keyCode == 18) {
