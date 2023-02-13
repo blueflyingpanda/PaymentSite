@@ -666,17 +666,15 @@ function htmlTransferCallback(text) {
         bcgcolor = "#3BFF86"
         output(message, bcgcolor);
     }
-    else if (data["status"] == 400) {
-        if (data["message"] == "receiver does not exist") {
-            message = "Такого игрока не существует!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
-        else if (data["message"] == "not enough money to transfer") {
-            message = "Недостаточно средств для перевода!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
+    else if (data["message"] == "receiver does not exist") {
+        message = "Такого игрока не существует!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else if (data["message"] == "not enough money to transfer") {
+        message = "Недостаточно средств для перевода!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
     }
     else {
         message = "Произошла непревиденная ошибка!";
@@ -690,45 +688,104 @@ function htmlTransferCallback(text) {
 
 
 
-function postPayFirm(text) {
-    data = {
-        "amount": Number(text[1]),
-        "company": text[0].toLowerCase(),
+function postFirmService(text) {
+    let data = {
+        "service": Number(text[1]),
+        "company": Number(text[0]),
+        "paystatus": false,
     }
 
-    let amount = data["amount"]
+    let amount = data["service"]
 
-    if (amount % 1 != 0 || amount <= 0) {
+    if (amount % 1 != 0 || amount < 1) {
         let message = "Неправильно введены данные!";
         let bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
     else {
-        rs.callback = htmlPayFirmCallback;
+        rs.callback = htmlFirmServiceCallback;
         rs.httpPost("pay", JSON.stringify(data), "application/json");
     }
 }
 
-function htmlPayFirmCallback(text) {
-    let data = JSON.parse(text);
+function htmlFirmServiceCallback(text) {
+    let data = JSON.parse(text); console.log(data);
     let message = null, bcgcolor = null;
+
+    if (data["status"] == 200) {
+        let serviceName = data["name"],
+        serviceCost = data["cost"],
+        serviceCostTalic = talicWordEnding(serviceCost),
+        serviceId = data["service"][0],
+        companyId = data["service"][1];
+
+        let modal = document.createElement("div");
+        let functionName = `postPayFirmTrue(${serviceId}, ${companyId})`;
+  
+        modal.classList.add("modal");
+        document.body.append(modal);
+        modal.insertAdjacentHTML("afterbegin", `
+        <div id="modal-overlay" class="modal-overlay">
+          <div id="modal-window" class="modal-window">
+            <div class="modal-header">
+              <span class="modal-title">Правильно ли указана услуга?</span>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <p style="background-color: #FE9654; color: #FFF" class="modal-frame">Имя услуги:</p>
+                <h3>"${serviceName}"</h3>
+                <h3 style="background-color: #FE9654; color: #FFF" class="modal-frame">Стоимость услуги: ${serviceCost} ${serviceCostTalic}</h3>
+            </div>
+            <div class="modal-footer">
+              <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Да</button>
+              <button type="button" onclick="modalCancel(true)" class="btn-orange">Нет</button>
+            </div>  
+          </div>
+        </div>`);
+    }
+    else if (data["status"] == 404) {
+        message = "Такая фирма или услуга не была найдена!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
+function postPayFirmTrue(serviceId, companyId) {
+    let data = {
+        "service": serviceId,
+        "company": companyId,
+        "paystatus": true,
+    }
+
+    rs.callback = htmlPayFirmTrueCallback;
+    rs.httpPost("pay", JSON.stringify(data), "application/json");
+}
+
+function htmlPayFirmTrueCallback(text) {
+    let data = JSON.parse(text); console.log(data);
 
     if (data["status"] == 200) {
         message = "Операция прошла успешно!";
         bcgcolor = "#3BFF86"
         output(message, bcgcolor);
     }
-    else if (data["status"] == 400){
-        if (data["message"] == "not enough money to pay") {
-            message = "Недостаточно средств для перевода!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
-        else if (data["message"] == "no such company") {
-            message = "Такой фирмы не существует!";
-            bcgcolor = "#FE9654";
-            output(message, bcgcolor);
-        }
+    else if (data["message"] == "not enough money to pay") {
+        message = "Недостаточно денег для перевода!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else if (data["message"] == "no such company") {
+        message = "Такой фирмы или услуги не существует!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
     }
     else {
         message = "Произошла непревиденная ошибка!";
@@ -1103,6 +1160,54 @@ function htmlAddFirmFine(text) {
 }
 
 
+
+function postChangeServiceCost(text) {
+    let data = {
+        "service": text[0].toUpperCase().trim(),
+        "cost": text[1],
+    }
+    let cost = data["cost"];
+
+    if (cost%1 != 0 || cost < 1) {
+        message = "Неправильно введены данные!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else {
+        rs.callback = htmlChangeServiceCostCallback;
+        rs.httpPost(`change-service-cost`, JSON.stringify(data), "application/json")
+    }
+}
+
+function htmlChangeServiceCostCallback(text) {
+    let data = JSON.parse(text);
+    if (data["status"] == 200) {
+        message = "Стоимость услуги успешно изменена!";
+        bcgcolor = "#3BFF86";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 406) {
+        message = "Неправильно набрано число!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else if (data["status"] == 404) {
+        message = "Такой услуги не существует!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+    }
+    else {
+        message = "Произошла непревиденная ошибка!";
+        bcgcolor = "#FE9654";
+        output(message, bcgcolor);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    }
+}
+
+
+
 function getDebtors() {
     let transferDiv = document.getElementById("log-table");
 
@@ -1120,11 +1225,11 @@ function getDebtors() {
     <hr>`);
     transferDiv.animate([ {opacity: 0}, {opacity: 1}], { duration: 1000});
 
-    rs.callback = htmlDebtors;
+    rs.callback = htmlDebtorsCallback;
     rs.httpGet("/debtors");
 }
 
-function htmlDebtors(text) {
+function htmlDebtorsCallback(text) {
     let transferDiv = document.getElementById("log-table");
     let data = JSON.parse(text);
 

@@ -201,8 +201,8 @@ function transferModal() {
 
 
 
-function firmModal() {
-  let functionName = "postPayFirm";
+function firmPayModal() {
+  let functionName = "postFirmService";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
   let modal = document.createElement("div");
   
@@ -215,8 +215,8 @@ function firmModal() {
         <span class="modal-title">Оплата услуг фирмы</span>
       </div>
       <div id="modal-body" class="modal-body">
-        <input id="firm-input" autocomplete="off" maxlength="64" placeholder="Выберите фирму: " required>
-        <input id="services-input" autocomplete="off" type="number" maxlength="10" placeholder="Кол-во талиц: " required>
+        <input id="firm-input" autocomplete="off" type="number" maxlength="10" placeholder="Выберите фирму: " required>
+        <input id="services-input" autocomplete="off" type="number" maxlength="10" placeholder="Выберите номер услуги: " required>
       </div>
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
@@ -228,7 +228,7 @@ function firmModal() {
 
 
 
-function moneyTransit() {
+function moneyTransitModal() {
   let modal = document.createElement("div");
   let functionNameWithdraw = "postWithdraw";
   let functionNameDeposit = "postDeposit";
@@ -286,7 +286,7 @@ function payCompanySalary() {
 
 
 
-function editEmployees() {
+function editEmployeesModal() {
   let modal = document.createElement("div");
   let functionAddEmployee = "postAddEmployee";
   let functionRemoveEmployee = "postRemoveEmployee";
@@ -317,7 +317,7 @@ function editEmployees() {
 
 
 
-function addFine() {
+function addFineModal() {
   let modal = document.createElement("div");
   let functionAddPlayer = "postAddPlayerFine";
   let functionAddFirm = "postAddFirmFine";
@@ -347,7 +347,34 @@ function addFine() {
 
 
 
-function finePlayer() {
+function changeServiceCostModal() {
+  let modal = document.createElement("div");
+  let functionName = "postChangeServiceCost";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
+
+  modal.classList.add("modal");
+  document.body.append(modal);
+  modal.insertAdjacentHTML("afterbegin", `
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-window" class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">Изменить стоимость услуги</span>
+      </div>
+      <div id="modal-body" class="modal-body">
+        <input autocomplete="off" placeholder="Напишите название услуги: " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="Новая цена: " required>
+      </div>
+      <div class="modal-footer">
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
+        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
+      </div> 
+    </div>
+  </div>`);
+}
+
+
+
+function playerFineModal() {
   let modal = document.createElement("div");
   let functionNameTax = "postFinePlayerPay";
   functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
@@ -374,7 +401,7 @@ function finePlayer() {
 
 
 
-function allLogs() {
+function allLogsModal() {
   let modal = document.createElement("div");
   let functionName = "getAllLogs";
   functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
@@ -400,7 +427,7 @@ function allLogs() {
 
 
 
-function memoMVD() {
+function memoMVDModal() {
   let modalInfo = document.createElement("div");
 
   modalInfo.classList.add("modal-info");
