@@ -54,7 +54,8 @@ if (frontProduction) {
     // baseURL = "https://game.school1598.ru";
 }
 if (backProduction) {
-    apiURL = "https://bgame.school1598.ru:5000"
+    // apiURL = "https://bgame.school1598.ru:5000";
+    apiURL = "https://lhelper.pythonanywhere.com";
 }
 
 const tokenHeader = "auth_token";
