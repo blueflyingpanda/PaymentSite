@@ -44,7 +44,7 @@ function alertCallback(text) {
 
 const frontProduction = true;
 const backProduction = true;
-const commonPasswordLength = 5;
+const commonPasswordLength = 10;
 
 let baseURL = "http://127.0.0.1:5500"
 let apiURL = "http://127.0.0.1:5000";
@@ -120,7 +120,7 @@ function logout() {
 
 function firmDiagrams() {
     rs.callback = htmlDiagramCallback;
-    rs.httpGet("company-diagram");
+    rs.httpGet("teacher-diagram");
 
     function htmlDiagramCallback(text) {
         let data = JSON.parse(text);
@@ -129,7 +129,7 @@ function firmDiagrams() {
         if (data["status"] == 200) {
             let info = document.getElementById("info");
             info.insertAdjacentHTML("beforeend", `
-            <h2>Доли государственных фирмы на рынке в процентах. УКАЗАНЫ ТОЛЬКО ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
+            <h2>Доли государственных фирм на рынке в процентах. УКАЗАНЫ ТОЛЬКО ЭЛЕКТРОННЫЕ ПЕРЕВОДЫ!</h2>
             <div class="chart-container">
                 <canvas id="myChart"></canvas>
             </div>
@@ -141,11 +141,11 @@ function firmDiagrams() {
             })
             
             let config = {
-                type: 'bar',
+                type: 'horizontalBar',
                 data: {
                     labels: companies.map((row) => row.company),
                     datasets: [{
-                        label: 'Доход фирм % (безналичка)',
+                        label: 'Спрос госфирм в % (безналичка)',
                         data: companies.map((row) => ((row.profit/sum)*100).toFixed()),
                         backgroundColor: [
                             "#cc7485",
@@ -446,7 +446,17 @@ function htmlCompanyCallback(text) {
         document.title = `Фирма ${firmName.toUpperCase()}`;
 
         data["members"].forEach((member) => {
-            document.getElementById("company-list").insertAdjacentHTML("beforeend", `<li>${member}</li>`);
+            let companyList = document.getElementById("company-list")
+
+            companyList.insertAdjacentHTML("beforeend", `<li>${member}</li>`);
+        });
+        data["services"].forEach((service) => {
+            let serviceName = service[2],
+            serviceCost = service[3],
+            talicServiceCost = talicWordEnding(service[3]),
+            serviceList = document.getElementById("service-list");
+
+            serviceList.insertAdjacentHTML("beforeend", `<li type="1">"${serviceName}", ЦЕНА: ${serviceCost} ${talicServiceCost}</li>`);
         });
 
         let firmExit = document.getElementById("firm-back");
@@ -597,8 +607,7 @@ function htmlMinistryCallback(text) {
 function getPlayerTaxes() {
     rs.callback = htmlPlayerTaxesCallback;
     rs.httpGet('paytax');
-    Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});
-    
+    Array.from(document.querySelectorAll("button")).forEach((elem) => {elem.setAttribute("disabled", "disabled")});   
 }
 
 function htmlPlayerTaxesCallback(text) {
@@ -1240,12 +1249,15 @@ function htmlDebtorsCallback(text) {
             tax = data["debtors"][i][3] == "1" ? "уплачены" : "неуплачены",
             colorTax = tax == "уплачены" ? "#3BFF86" : "#DC143C";
             fine = data["debtors"][i][4],
-            talic = talicWordEnding(fine);
+            fineTalic = talicWordEnding(fine),
+            money = data["debtors"][i][5],
+            moneyTalic = talicWordEnding(money);
 
             transferDiv.innerHTML += `
             <h2>Игрок: ${player}</h2>
+            <h2>Баланс игрока: ${money} ${moneyTalic}</h2>
             <h2 style="color: ${colorTax}">Налоги ${tax}</h2>
-            <h2>Штраф - <span style="color: #DC143C">${fine}</span> ${talic}</h2>
+            <h2>Штраф - <span style="color: #DC143C">${fine}</span> ${fineTalic}</h2>
             `
 
             if (data["debtors"][i+1] != undefined) {

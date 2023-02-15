@@ -304,7 +304,7 @@ function editEmployeesModal() {
       <div id="modal-body" class="modal-body">
         <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока (PLAYER_ID): " required>
         <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите владельца (PLAYER_ID): " required>
-        <input autocomplete="off" type="number" maxlength="15" placeholder="ИНН фирмы: " required>
+        <input autocomplete="off" type="number" maxlength="15" placeholder="ИНН фирмы (COMPANY_ID): " required>
       </div>
       <div class="modal-footer">
         <button onclick="modalCancel(true), ${functionAddEmployee}" type="button" class="btn-orange">Нанять сотрудника</button>
