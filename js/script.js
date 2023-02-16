@@ -34,26 +34,32 @@ function lightDarkToggle(toggle) {
 
 function checkFieldsDataSave(functionName, pinValue) {
   inputs = Array.from(document.querySelectorAll("input"));
+  select = Array.from(document.querySelectorAll("select"));
   if (functionName.name != "confirmPass") {
-    for (i = 0; i < inputs.length; i++) {
-      if (inputs[i].value.length > 20 || inputs[i].value.length < 1) {
-      inputs[i].style.border = "3px solid #ff483b";
+    inputs.forEach((input) => {
+      if (input.value.length < 1) {
+        input.style.border = "3px solid #ff483b";
       }
       else {
-        inputs[i].style.border = "3px solid #3bff86"
+        input.style.border = "3px solid #3bff86"
       }
-    }
+    })
   }
 
   let data = [];
-  for (i = 0; i < inputs.length; i++) {
-    if (typeof inputs[i].value == "string") {
-      data.push(`${inputs[i].value}`);
+  inputs.forEach((input) => {
+    if (typeof input.value == "string") {
+      data.push(`${input.value}`);
     }
     else {
-      data.push(inputs[i].value);
+      data.push(input.value);
     }
-  }
+  })
+  select.forEach((select) => {
+    if (select.value != null) {
+      data.push(select.value);
+    }
+  })
 
   if (inputs.filter(input => input.value.length < 1) != 0) {  
     if (functionName.name != "confirmPass") {
@@ -288,10 +294,8 @@ function payCompanySalary() {
 
 function editEmployeesModal() {
   let modal = document.createElement("div");
-  let functionAddEmployee = "postAddEmployee";
-  let functionRemoveEmployee = "postRemoveEmployee";
-  functionAddEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddEmployee}', true)` : `checkFieldsDataSave(${functionAddEmployee}, false)`;
-  functionRemoveEmployee = CONFIRM != "false" ? `checkFieldsDataSave('${functionRemoveEmployee}', true)` : `checkFieldsDataSave(${functionRemoveEmployee}, false)`;
+  let functionName = "postEditEmployees";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -305,10 +309,13 @@ function editEmployeesModal() {
         <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите игрока (PLAYER_ID): " required>
         <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите владельца (PLAYER_ID): " required>
         <input autocomplete="off" type="number" maxlength="15" placeholder="ИНН фирмы (COMPANY_ID): " required>
+        <select required>
+          <option value="add">Нанять сотрудника</option>
+          <option value="remove">Уволить сотрудника</option>
+        </select>
       </div>
       <div class="modal-footer">
-        <button onclick="modalCancel(true), ${functionAddEmployee}" type="button" class="btn-orange">Нанять сотрудника</button>
-        <button onclick="modalCancel(true), ${functionRemoveEmployee}" type="button" class="btn-orange">Уволить сотрудника</button>
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
@@ -319,10 +326,8 @@ function editEmployeesModal() {
 
 function addFineModal() {
   let modal = document.createElement("div");
-  let functionAddPlayer = "postAddPlayerFine";
-  let functionAddFirm = "postAddFirmFine";
-  functionAddPlayer = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddPlayer}', true)` : `checkFieldsDataSave(${functionAddPlayer}, false)`;
-  functionAddFirm = CONFIRM != "false" ? `checkFieldsDataSave('${functionAddFirm}', true)` : `checkFieldsDataSave(${functionAddFirm}, false)`;
+  let functionName = "postAddFine";
+  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
 
   modal.classList.add("modal");
   document.body.append(modal);
@@ -335,10 +340,13 @@ function addFineModal() {
       <div id="modal-body" class="modal-body">
         <input autocomplete="off" type="number" maxlength="15" placeholder="Выберите ИНН (PLAYER_ID/COMPANY_ID): " required>
         <input autocomplete="off" type="number" maxlength="15" placeholder="Сумма штрафа: " required>
+        <select required>
+          <option value="add-player">Выдать штраф игроку</option>
+          <option value="add-firm">Выдать штраф фирме</option>
+        </select>
       </div>
       <div class="modal-footer">
-        <button onclick="modalCancel(true), ${functionAddPlayer}" type="button" class="btn-orange">Выписать игроку</button>
-        <button onclick="modalCancel(true), ${functionAddFirm}" type="button" class="btn-orange">Выписать фирме</button>
+        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Выписать</button>
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div> 
     </div>
@@ -347,36 +355,11 @@ function addFineModal() {
 
 
 
-function changeServiceCostModal() {
+function FineModal() {
   let modal = document.createElement("div");
-  let functionName = "postChangeServiceCost";
-  functionName = CONFIRM != "false" ? `checkFieldsDataSave('${functionName}', true)` : `checkFieldsDataSave(${functionName}, false)`;
-
-  modal.classList.add("modal");
-  document.body.append(modal);
-  modal.insertAdjacentHTML("afterbegin", `
-  <div id="modal-overlay" class="modal-overlay">
-    <div id="modal-window" class="modal-window">
-      <div class="modal-header">
-        <span class="modal-title">Изменить стоимость услуги</span>
-      </div>
-      <div id="modal-body" class="modal-body">
-        <input autocomplete="off" placeholder="Напишите название услуги: " required>
-        <input autocomplete="off" type="number" maxlength="15" placeholder="Новая цена: " required>
-      </div>
-      <div class="modal-footer">
-        <button onclick="modalCancel(true), ${functionName}" type="button" class="btn-orange">Подтвердить</button>
-        <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
-      </div> 
-    </div>
-  </div>`);
-}
-
-
-
-function playerFineModal() {
-  let modal = document.createElement("div");
-  let functionNameTax = "postFinePlayerPay";
+  let functionFind = "getFineFind";
+  let functionNameTax = "postFinePay";
+  functionFind = CONFIRM != "false" ? `checkFieldsDataSave('${functionFind}', true)` : `checkFieldsDataSave(${functionFind}, false)`;
   functionNameTax = CONFIRM != "false" ? `checkFieldsDataSave('${functionNameTax}', true)` : `checkFieldsDataSave(${functionNameTax}, false)`;
 
   modal.classList.add("modal");
@@ -385,13 +368,17 @@ function playerFineModal() {
   <div id="modal-overlay" class="modal-overlay">
     <div id="modal-window" class="modal-window">
       <div class="modal-header">
-        <span class="modal-title">Уплата штрафов и налогов игрока</span>
+        <span class="modal-title">Уплата штрафов и налогов</span>
         <input id="fine-input" autocomplete="off" type="number" maxlength="32" placeholder="Выберите игрока: " name="player-name" required>
+        <select required>
+        <option value="player">Игрок</option>
+        <option value="firm">Фирма</option>
+      </select>
       </div>
       <div id="modal-body" class="modal-body">
       </div>
       <div class="modal-footer">
-        <button id="find-player" onclick="getFinePlayerFind()" type="button" class="btn-orange">Найти</button>
+        <button id="find-player" onclick="${functionFind}" type="button" class="btn-orange">Найти</button>
         <button id="drop-charges" onclick="${functionNameTax}" type="button" class="btn-orange" disabled>Отработать налоги и штрафы</button>
         <button type="button" onclick="modalCancel(true)" class="btn-orange">Выйти</button>
       </div>  

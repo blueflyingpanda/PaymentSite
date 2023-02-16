@@ -295,6 +295,7 @@ function getPlayerPage() {
 
 function htmlPlayerCallback(text) {
     let data = JSON.parse(text);
+    console.log(data);
 
     if (localStorage["Confirmation"] == undefined) {
         confirm();
@@ -420,16 +421,13 @@ function htmlCompanyCallback(text) {
     if (data["status"] == 200) {
         let inn = data["company"][0];
         let firmName = data["company"][1];
-        let revenue = data["company"][2];
-        let revenueTalic = talicWordEnding(revenue);
-        let tax = data["company"][3];
-        let firmTaxPaid = data["company"][4] == 1 ? "уплачены" : "неуплачены";
-        let firmFine = data["company"][5];
-        let fineTalic = talicWordEnding(firmFine)
-        let firmBalance = data["company"][7];
+        let tax = data["company"][2];
+        let taxTalic = talicWordEnding(tax);
+        let firmTaxPaid = data["company"][3] == 1 ? "уплачены" : "неуплачены";
+        let firmFine = data["company"][4];
+        let fineTalic = talicWordEnding(firmFine);
+        let firmBalance = data["company"][6];
         let balanceTalic = talicWordEnding(firmBalance);
-        let profit = data["company"][8];
-        let profitTalic = talicWordEnding(profit);
 
         let playerTaxPaid = data["playerinfo"][0];
         let playerFine = data["playerinfo"][1];
@@ -440,9 +438,7 @@ function htmlCompanyCallback(text) {
         document.getElementById("inn").innerHTML += `${inn}`;
         document.getElementById("tax_paid").innerHTML += `${firmTaxPaid}`;
         document.getElementById("fine").innerHTML += `${firmFine} ${fineTalic}`;
-        document.getElementById("revenue").innerHTML += `${revenue} ${revenueTalic}`;
-        document.getElementById("tax").innerHTML += `${tax}% от предполагаемого дохода`;
-        document.getElementById("profit").innerHTML += `${profit} ${profitTalic}`;
+        document.getElementById("tax").innerHTML += `${tax} ${taxTalic}`;
         document.title = `Фирма ${firmName.toUpperCase()}`;
 
         data["members"].forEach((member) => {
@@ -452,11 +448,12 @@ function htmlCompanyCallback(text) {
         });
         data["services"].forEach((service) => {
             let serviceName = service[2],
-            serviceCost = service[3],
-            talicServiceCost = talicWordEnding(service[3]),
+            serviceQuantity = service[3],
+            serviceCost = service[4],
+            talicServiceCost = talicWordEnding(serviceCost),
             serviceList = document.getElementById("service-list");
 
-            serviceList.insertAdjacentHTML("beforeend", `<li type="1">"${serviceName}", ЦЕНА: ${serviceCost} ${talicServiceCost}</li>`);
+            serviceList.insertAdjacentHTML("beforeend", `<li type="1">"${serviceName}", ЦЕНА: ${serviceCost} ${talicServiceCost}, КОЛ-ВО: ${serviceQuantity}</li>`);
         });
 
         let firmExit = document.getElementById("firm-back");
@@ -986,11 +983,13 @@ function htmlPayCompanySalary(text) {
 
 
 
-function postAddEmployee(text) {
+function postEditEmployees(text) {
+    console.log(text);
     data = {
         "company": `${text[2]}`,
         "founder": `${text[1]}`,
         "employee": `${text[0]}`,
+        "action": `${text[3]}`,
     }
     let company = data["company"];
     let founder = data["founder"];
@@ -1002,17 +1001,17 @@ function postAddEmployee(text) {
         output(message, bcgcolor);
     }
     else {
-        rs.callback = htmlAddEmployeeCallback;
-        rs.httpPost("add-employee", JSON.stringify(data), "application/json");
+        rs.callback = htmlEditEmployeesCallback;
+        rs.httpPost("edit-employee", JSON.stringify(data), "application/json");
     }
 }
 
-function htmlAddEmployeeCallback(text) {
+function htmlEditEmployeesCallback(text) {
     let data = JSON.parse(text);
     let message = null, bcgcolor = null;
     
     if (data["status"] == 200) {
-        message = "Игрок успешно нанят!";
+        message = "Успешно!";
         bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
@@ -1079,10 +1078,11 @@ function htmlRemoveEmployeeCallback(text) {
 
 
 
-function postAddPlayerFine(text) {
+function postAddFine(text) {
     let data = {
         "player": Number(text[0]),
         "fine": Number(text[1]),
+        "action": text[2],
     }
     let player = data["player"];
     let fine = data["fine"];
@@ -1095,7 +1095,7 @@ function postAddPlayerFine(text) {
     }
     else {
         rs.callback = htmlAddPlayerFine;
-        rs.httpPost(`add-player-fine`, JSON.stringify(data), "application/json")
+        rs.httpPost(`add-fine`, JSON.stringify(data), "application/json")
     }
 }
 
@@ -1104,105 +1104,12 @@ function htmlAddPlayerFine(text) {
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        message = "Штраф выписан игроку успешно!";
+        message = "Штраф выписан успешно!";
         bcgcolor = "#3BFF86";
         output(message, bcgcolor);
     }
     else if (data["status"] == 404) {
-        message = "Такого игрока не существует!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-    }
-    else {
-        message = "Произошла непревиденная ошибка!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
-    }
-}
-
-
-
-function postAddFirmFine(text) {
-    let data = {
-        "firm": Number(text[0]),
-        "fine": Number(text[1]),
-    }
-    let firm = data["firm"];
-    let fine = data["fine"];
-    let message = null, bcgcolor = null;
-
-    if (firm % 1 != 0 || fine % 1 != 0 || firm <= 0 || fine <= 0) {
-        message = "Неправильно введены данные!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-    }
-    else {
-        rs.callback = htmlAddFirmFine;
-        rs.httpPost(`add-firm-fine`, JSON.stringify(data), "application/json")
-    }
-}
-
-function htmlAddFirmFine(text) {
-    let data = JSON.parse(text);
-    let message = null, bcgcolor = null;
-
-    if (data["status"] == 200) {
-        message = "Штраф выписан фирме успешно!";
-        bcgcolor = "#3BFF86";
-        output(message, bcgcolor);
-    }
-    else if (data["status"] == 404) {
-        message = "Такой фирмы не существует!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-    }
-    else {
-        message = "Произошла непревиденная ошибка!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
-    }
-}
-
-
-
-function postChangeServiceCost(text) {
-    let data = {
-        "service": text[0].toUpperCase().trim(),
-        "cost": text[1],
-    }
-    let cost = data["cost"];
-
-    if (cost%1 != 0 || cost < 1) {
-        message = "Неправильно введены данные!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-    }
-    else {
-        rs.callback = htmlChangeServiceCostCallback;
-        rs.httpPost(`change-service-cost`, JSON.stringify(data), "application/json")
-    }
-}
-
-function htmlChangeServiceCostCallback(text) {
-    let data = JSON.parse(text);
-    if (data["status"] == 200) {
-        message = "Стоимость услуги успешно изменена!";
-        bcgcolor = "#3BFF86";
-        output(message, bcgcolor);
-    }
-    else if (data["status"] == 406) {
-        message = "Неправильно набрано число!";
-        bcgcolor = "#FE9654";
-        output(message, bcgcolor);
-    }
-    else if (data["status"] == 404) {
-        message = "Такой услуги не существует!";
+        message = "Такого игрока/фирмы не существует!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
     }
@@ -1283,42 +1190,53 @@ function htmlDebtorsCallback(text) {
 
 
 
-function getFinePlayerFind() {
-    let input = document.getElementById("fine-input");
+function getFineFind(text) {
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
+    document.getElementById("find-player").setAttribute("disabled", "disabled");
 
-    if (input.value == "") {
-        input.style.border = "3px solid #ff483b";
-    }
-    else {
-        input.style.border = "3px solid #3BFF86"
-        document.getElementById("find-player").setAttribute("disabled", "disabled");
-        rs.callback = htmlFinePlayerFind;
-        rs.httpGet(`check-player?player_id=${input.value}`);
-    }
+    rs.callback = htmlFineFind;
+    rs.httpGet(`check-player?fine_id=${text[0]}&action=${text[1]}`);
 }
 
-function htmlFinePlayerFind(text) {
+function htmlFineFind(text) {
     let data = JSON.parse(text);
     let message = null, bcgcolor = null;
 
     if (data["status"] == 200) {
-        let firstname = data["player"][0],
-        lastname = data["player"][1],
-        player_id = data["player"][2]
-        fine = data["player"][3],
-        talic = talicWordEnding(fine),
-        tax = data["player"][4] == "1" ? "уплачены" : "не уплачены",
-        body = document.getElementById("modal-body");
-
-
-        body.insertAdjacentHTML("beforeend", `
-        <h2 id="player_id">Игрок: ${firstname} ${lastname}, PLAYER_ID: ${player_id}</h2>
-        <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${tax}</span><br>
-        <span>Размер штрафа:</span><span id="fines" style="background-color: #FE9654; color: #000" class="modal-frame">${fine} ${talic}</span>
-        `)
-        document.getElementById("drop-charges").removeAttribute("disabled");
+        if (data["action"] == "player") {
+            let firstname = data["debtor"][0],
+            lastname = data["debtor"][1],
+            player_id = data["debtor"][2]
+            fine = data["debtor"][3],
+            talic = talicWordEnding(fine),
+            tax = data["debtor"][4] == "1" ? "уплачены" : "не уплачены",
+            body = document.getElementById("modal-body");
+    
+    
+            body.insertAdjacentHTML("beforeend", `
+            <h2 id="player_id">Игрок: ${firstname} ${lastname}, PLAYER_ID: ${player_id}</h2>
+            <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${tax}</span><br>
+            <span>Размер штрафа:</span><span id="fines" style="background-color: #FE9654; color: #000" class="modal-frame">${fine} ${talic}</span>
+            `)
+            document.getElementById("drop-charges").removeAttribute("disabled");
+        }
+        else if (data["action"] == "firm") {
+            let name = data["debtor"][0],
+            company_id = data["debtor"][1],
+            fine = data["debtor"][2],
+            talic = talicWordEnding(fine),
+            tax = data["debtor"][3] == "1" ? "уплачены" : "не уплачены",
+            body = document.getElementById("modal-body");
+    
+    
+            body.insertAdjacentHTML("beforeend", `
+            <h2 id="player_id">Фирма: "${name}", COMPANY_ID: ${company_id}</h2>
+            <span>Налоги:</span><span id="taxes" style="background-color: #FE9654; color: #000" class="modal-frame">${tax}</span><br>
+            <span>Размер штрафа:</span><span id="fines" style="background-color: #FE9654; color: #000" class="modal-frame">${fine} ${talic}</span>
+            `)
+            document.getElementById("drop-charges").removeAttribute("disabled");
+        }
     }
     else if (data["status"] == 404) {
         modalCancel(true);
@@ -1346,20 +1264,21 @@ function htmlFinePlayerFind(text) {
 
 
 
-function postFinePlayerPay() {
-    let input = document.getElementById("fine-input");
+function postFinePay(text) {
     document.getElementById("drop-charges").setAttribute("disabled", "disabled");
     document.getElementById("find-player").setAttribute("disabled", "disabled")
 
     let data = {
-        "player_id": Number(input.value)
+        "fine_id": Number(text[0]),
+        "action": text[1],
     }
 
-    rs.callback = htmlFinePlayerPay;
+    console.log(data);
+    rs.callback = htmlFinePay;
     rs.httpPost(`drop-charges`, JSON.stringify(data), "application/json")
 }
 
-function htmlFinePlayerPay(text) {
+function htmlFinePay(text) {
     let data = JSON.parse(text);
     let message = null, bcgcolor = null;
 
@@ -1370,7 +1289,7 @@ function htmlFinePlayerPay(text) {
     }
     else if (data["status"] == 404) {
         modalCancel(true);
-        message = "Такого игрока не существует!";
+        message = "Такого игрока/фирмы не существует!";
         bcgcolor = "#FE9654";
         output(message, bcgcolor);
         document.getElementById("drop-charges").setAttribute("disabled", "disabled");
@@ -1604,10 +1523,10 @@ function htmlclearLogsCallback(text) {
 
 
 function talicWordEnding (talic) {
-    if (talic%10 == 1) {
+    if (talic%10 == 1 && talic>20) {
         return "талица";
     }
-    else if (talic%10 == 2 || talic%10 == 3 || talic%10 == 4) {
+    else if ((talic%10 == 2 || talic%10 == 3 || talic%10 == 4) && talic>20) {
         return "талицы";
     }
     else {

@@ -48,9 +48,8 @@ li {
     font-size: 2rem;
 }
 
-input {
-    margin-left: auto;
-    margin-right: auto;
+input, select {
+    margin: 2vh auto 5vh auto;
     display: block;
     width: 50vw;
     height: 2.25rem;

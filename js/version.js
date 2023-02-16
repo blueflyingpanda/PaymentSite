@@ -1,4 +1,4 @@
-let version = 8;
+let version = 9;
 
 document.write(`<script src="js/main.js?ver=${version}"></script>`);
 document.write(`<script src="js/script.js?ver=${version}"></script>`);
